@@ -1,0 +1,27 @@
+import { CodeBlockCommand } from '@/components/code-block-command'
+
+## Installation
+
+1. Enable [MCP](https://modelcontextprotocol.io/docs/getting-started/intro) in your project environment. (Supports Claude Code, Cursor, etc.)
+
+<CodeBlockCommand mcp/>
+
+2. Add the registry to your project
+
+Add the following to your components.json file:
+
+```json
+{
+  "registries": {
+    "@spell": "https://spell.sh/r/{name}.json"
+  }
+}
+```
+
+### Usage
+
+You can now ask your IDE to use any Spell UI component. Here are some examples:
+
+- "Add a badge component"
+- "Add a blur reveal animation"
+- "Add a vertical marquee of logos"

@@ -1,0 +1,104 @@
+import { Demo } from './demo'
+import { Demo as DemoSpeed } from './demo-speed'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="blur-reveal">
+```tsx file=../../registry/spell-ui/blur-reveal.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Speed
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSpeed />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-speed.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { BlurReveal } from "@/components/blur-reveal";
+```
+```tsx
+<BlurReveal>Hello, World!</BlurReveal>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "string",
+      nameDetails: "Text content to animate"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes"
+    },
+    {
+      name: "delay",
+      type: "number",
+      default: "0",
+      nameDetails: "Delay before animation starts (in seconds)"
+    },
+    {
+      name: "speedReveal",
+      type: "number",
+      default: "1.5",
+      nameDetails: "Speed of the reveal animation"
+    },
+    {
+      name: "speedSegment",
+      type: "number",
+      default: "0.5",
+      nameDetails: "Speed of individual character animations"
+    },
+    {
+      name: "trigger",
+      type: "boolean",
+      default: "true",
+      nameDetails: "Controls whether animation is shown"
+    },
+    {
+      name: "onAnimationComplete",
+      type: "() => void",
+      nameDetails: "Callback when animation completes"
+    },
+    {
+      name: "onAnimationStart",
+      type: "() => void",
+      nameDetails: "Callback when animation starts"
+    },
+    {
+      name: "as",
+      type: "keyof JSX.IntrinsicElements",
+      default: "p",
+      nameDetails: "HTML element to render as"
+    },
+    {
+      name: "style",
+      type: "React.CSSProperties",
+      nameDetails: "Inline styles"
+    }
+  ]}
+/>

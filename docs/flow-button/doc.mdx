@@ -1,0 +1,84 @@
+import { Demo } from './demo'
+import { Demo as DemoSizes } from './demo-sizes'
+import { Demo as DemoColors } from './demo-colors'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="flow-button">
+```tsx file=../../registry/spell-ui/flow-button.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Size
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSizes />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-sizes.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Color
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoColors />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-colors.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { FlowButton } from "@/components/flow-button";
+```
+```tsx
+<FlowButton>Click me</FlowButton>
+```
+
+## Props
+
+<PropsTable
+    data={[
+      {
+        name: "children",
+        type: "React.ReactNode",
+        nameDetails: "The content of the button"
+      },
+      {
+        name: "size",
+        type: "SizeVariant",
+        default: "default",
+        typeDetails: "Button size. Options: sm, default, lg"
+      },
+      {
+        name: "borderColor",
+        type: "string",
+        default: "var(--rotating-border-color)",
+        nameDetails: "The color of the dashed border (CSS color value)"
+      },
+      {
+        name: "className",
+        type: "string",
+        nameDetails: "Additional CSS classes"
+      }
+    ]}
+  />

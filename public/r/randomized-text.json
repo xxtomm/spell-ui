@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "randomized-text",
+  "type": "registry:component",
+  "title": "Randomized Text",
+  "description": "Text component with randomized character reveal animation.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/randomized-text.tsx",
+      "content": "\"use client\";\n\nimport { motion } from \"motion/react\";\n\ntype Props = {\n  children: string;\n  className?: string;\n  duration?: number;\n  split?: 'words' | 'characters';\n};\n\nexport function RandomizedText({ children, className, duration = 0.75, split = 'characters' }: Props) {\n\n  let units: string[];\n\n  if (split === 'words') {\n    units = children.split(/\\s+/).filter(unit => unit.length > 0);\n  } else {\n    units = Array.from(children);\n  }\n\n  const total = units.length;\n  const effectiveTotal = Math.max(1, total);\n\n  const shuffle = <T,>(arr: T[]) => {\n    const a = [...arr];\n    for (let i = a.length - 1; i > 0; i--) {\n      const j = Math.floor(Math.random() * (i + 1));\n      [a[i], a[j]] = [a[j], a[i]];\n    }\n    return a;\n  };\n\n  const order = shuffle([...Array(total).keys()]);\n\n  const baseStagger = duration / (effectiveTotal * 1.2);\n\n  const staggerDelay = baseStagger * 0.9;\n  const neighborDelay = baseStagger * 2;\n\n  const charDuration = 0.15;\n\n  const delays = units.map((_, i) => {\n    const orderIndex = order.indexOf(i);\n    let delay = orderIndex * staggerDelay;\n\n    for (let offset = -2; offset <= 2; offset++) {\n      if (offset === 0) continue;\n\n      const neighborIndex = i + offset;\n      if (neighborIndex >= 0 && neighborIndex < total) {\n        const neighborOrderIndex = order.indexOf(neighborIndex);\n\n        if (neighborOrderIndex < orderIndex) {\n          const distance = Math.abs(offset);\n          const neighborBaseDelay = neighborOrderIndex * staggerDelay;\n          const additionalDelay = distance === 1 ? neighborDelay : neighborDelay * 0.5;\n\n          delay = Math.max(delay, neighborBaseDelay + additionalDelay);\n        }\n      }\n    }\n\n    return delay;\n  });\n\n  return (\n    <motion.span initial=\"hidden\" animate=\"visible\" className={className || \"inline-block\"}>\n      {units.map((unit, i) => (\n        <span key={i}>\n          <motion.span\n            className=\"inline-block\"\n            style={split === 'words' ? {} : { whiteSpace: \"pre\" }}\n            variants={{\n              hidden: { opacity: 0 },\n              visible: {\n                opacity: 1,\n                transition: {\n                  delay: delays[i],\n                  duration: charDuration,\n                  ease: \"easeOut\",\n                },\n              },\n            }}\n          >\n            {split === 'characters' && unit === \" \" ? \"\\u00A0\" : unit}\n          </motion.span>\n\n          {split === 'words' && i < total - 1 && ' '}\n        </span>\n      ))}\n    </motion.span>\n  );\n}",
+      "type": "registry:component"
+    }
+  ]
+}

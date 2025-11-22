@@ -1,0 +1,65 @@
+import { Demo } from './demo'
+import { Demo as DemoCustom } from './demo-custom'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="copy-button">
+```tsx file=../../registry/spell-ui/copy-button.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Size
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoCustom />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-custom.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { CopyButton } from "@/components/copy-button";
+```
+```tsx
+<CopyButton value="Text to copy" />
+```
+
+## Props
+
+<PropsTable
+    data={[
+      {
+        name: "value",
+        type: "string",
+        nameDetails: "The text content to copy to clipboard"
+      },
+      {
+        name: "size",
+        type: "SizeVariant",
+        default: "default",
+        typeDetails: "Button size. Options: sm, default, lg"
+      },
+      {
+        name: "className",
+        type: "string",
+        nameDetails: "Additional CSS classes"
+      }
+    ]}
+  />

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "copy-button",
+  "type": "registry:component",
+  "title": "Copy Button",
+  "description": "A copy-to-clipboard button with blur transition effect.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/copy-button.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { CheckIcon, CopyIcon } from \"lucide-react\";\nimport { cn } from \"@/lib/utils\";\n\ntype SizeVariant = \"sm\" | \"default\" | \"lg\";\n\ninterface CopyButtonProps\n  extends React.ButtonHTMLAttributes<HTMLButtonElement> {\n  value?: string;\n  size?: SizeVariant;\n}\n\nconst sizeMap: Record<SizeVariant, { button: string; icon: number }> = {\n  sm: { button: \"h-8 w-8\", icon: 14 },\n  default: { button: \"h-9 w-9\", icon: 16 },\n  lg: { button: \"h-12 w-12\", icon: 20 },\n};\n\nconst CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(\n  (\n    {\n      value,\n      size = \"default\",\n      className,\n      onClick,\n      ...props\n    },\n    ref,\n  ) => {\n    const [copied, setCopied] = React.useState<boolean>(false);\n\n    const handleCopy = async (event: React.MouseEvent<HTMLButtonElement>) => {\n      try {\n        if (value) {\n          await navigator.clipboard.writeText(value);\n        }\n        setCopied(true);\n        setTimeout(() => setCopied(false), 1500);\n      } catch (err) {\n        console.error(\"Failed to copy text: \", err);\n      }\n\n      onClick?.(event);\n    };\n\n    const { button: buttonSize, icon: iconSize } = sizeMap[size];\n\n    return (\n      <button\n        ref={ref}\n        type=\"button\"\n        onClick={handleCopy}\n        aria-label={copied ? \"Copied\" : \"Copy to clipboard\"}\n        disabled={copied}\n        className={cn(\n          \"relative cursor-pointer active:scale-[0.97] transition-all ease-out duration-200 inline-flex items-center justify-center rounded-md text-neutral-900 disabled:pointer-events-none disabled:opacity-100 dark:text-neutral-50\",\n          buttonSize,\n          className,\n        )}\n        {...props}\n      >\n        <div\n          className={cn(\n            \"transition-all duration-200\",\n            copied\n              ? \"scale-100 opacity-100 blur-none\"\n              : \"scale-70 opacity-0 blur-[2px]\",\n          )}\n        >\n          <CheckIcon\n            size={iconSize}\n            strokeWidth={2}\n            aria-hidden=\"true\"\n          />\n        </div>\n        <div\n          className={cn(\n            \"absolute transition-all duration-200\",\n            copied\n              ? \"scale-0 opacity-0 blur-[2px]\"\n              : \"scale-100 opacity-100 blur-none\",\n          )}\n        >\n          <CopyIcon size={iconSize} strokeWidth={2} aria-hidden=\"true\" />\n        </div>\n      </button>\n    );\n  },\n);\n\nCopyButton.displayName = \"CopyButton\";\n\nexport { CopyButton };\nexport type { CopyButtonProps };\n",
+      "type": "registry:component"
+    }
+  ]
+}

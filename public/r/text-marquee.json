@@ -1,0 +1,16 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-marquee",
+  "type": "registry:component",
+  "title": "Text Marquee",
+  "description": "Animated text marquee component with vertical scrolling.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/text-marquee.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\nimport { cn } from \"@/lib/utils\";\n\ninterface TextMarqueeProps {\n  children: React.ReactNode[];\n  speed?: number;\n  className?: string;\n  prefix?: React.ReactNode;\n  height?: number;\n}\n\nexport function TextMarquee({\n  children,\n  speed = 1,\n  className,\n  prefix,\n  height = 200,\n}: TextMarqueeProps) {\n  const count = React.Children.count(children);\n\n  return (\n    <>\n      <style>\n        {`\n          @keyframes slide-vertical {\n            to {\n              translate: 0 var(--destination);\n            }\n          }\n        `}\n      </style>\n      <div className={cn(\"flex relative\", className)}>\n        <div className=\"flex relative overflow-hidden flex-row gap-1 items-center w-min h-min\">\n          {prefix && (\n            <div className=\"whitespace-pre size-auto relative\">\n              {prefix}\n            </div>\n          )}\n          <div\n            className=\"opacity-100 mask-[linear-gradient(rgba(0,0,0,0)_0%,rgb(0,0,0)_43.6902%,rgba(0,0,0,0)_100%)] relative w-auto overflow-hidden\"\n            style={{ height: `${height}px` }}\n          >\n            <div\n              className=\"relative h-full\"\n              style={{\n                \"--count\": count,\n                \"--speed\": speed,\n              } as React.CSSProperties}\n            >\n              {React.Children.map(children, (child, index) => (\n                <div\n                  key={index}\n                  className=\"h-[40px] flex items-center\"\n                  style={{\n                    \"--index\": index,\n                    \"--origin\": `calc((var(--count) - var(--index)) * 100%)`,\n                    \"--destination\": `calc((var(--index) + 1) * -100%)`,\n                    \"--duration\": `calc(var(--speed) * ${count}s)`,\n                    \"--delay\":\n                      `calc((var(--duration) / var(--count)) * var(--index) - var(--duration))`,\n                    translate: `0 var(--origin)`,\n                    animation:\n                      `slide-vertical var(--duration) var(--delay) infinite linear`,\n                  } as React.CSSProperties}\n                >\n                  {child}\n                </div>\n              ))}\n            </div>\n          </div>\n        </div>\n      </div>\n    </>\n  );\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

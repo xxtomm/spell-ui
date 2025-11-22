@@ -1,0 +1,103 @@
+import { Demo } from './demo'
+import { Demo as DemoPassword } from './demo-password'
+import { Demo as DemoColors } from './demo-colors'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="label-input">
+```tsx file=../../registry/spell-ui/label-input.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Password Input
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoPassword />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-password.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Ring Color
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoColors />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-colors.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { LabelInput } from "@/components/label-input";
+```
+```tsx
+<LabelInput label="Email" type="email" />
+<LabelInput label="Password" type="password" />
+<LabelInput label="Name" ringColor="blue" />
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "label",
+      type: "string",
+      default: "Your Email",
+      nameDetails: "Floating label text"
+    },
+    {
+      name: "ringColor",
+      type: "RingColor",
+      default: "muted",
+      typeDetails: "Focus ring color. Options: muted, primary, secondary, destructive, red, blue, green, yellow, purple, pink, orange, cyan, indigo, violet, rose, amber, lime, emerald, sky, slate, fuchsia"
+    },
+    {
+      name: "containerClassName",
+      type: "string",
+      nameDetails: "CSS classes for the container div"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "CSS classes for the input element"
+    },
+    {
+      name: "type",
+      type: "string",
+      default: "email",
+      nameDetails: "Input type (email, password, text, etc.)"
+    },
+    {
+      name: "placeholder",
+      type: "string",
+      default: "\"\"",
+      nameDetails: "Input placeholder text"
+    },
+    {
+      name: "...props",
+      type: "InputHTMLAttributes",
+      nameDetails: "All standard HTML input attributes"
+    }
+  ]}
+/>

@@ -1,0 +1,92 @@
+import { Demo } from './demo'
+import { Demo as DemoColors } from './demo-colors'
+import { Demo as DemoSizes } from './demo-sizes'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="badge">
+```tsx file=../../registry/spell-ui/badge.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Color
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoColors />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-colors.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Size
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSizes />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-sizes.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { Badge } from "@/components/badge";
+```
+```tsx
+<Badge>Default</Badge>
+<Badge variant="blue">Blue</Badge>
+<Badge size="sm">Small</Badge>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      nameDetails: "The content of the badge"
+    },
+    {
+      name: "variant",
+      type: "string",
+      default: "default",
+      typeDetails: "Badge variant. Options: default, secondary, outline, destructive, red, blue, green, yellow, purple, pink, orange, cyan, indigo, violet, rose, amber, lime, emerald, sky, slate, fuchsia"
+    },
+    {
+      name: "size",
+      type: "string",
+      default: "default",
+      typeDetails: "Badge size. Options: sm, default"
+    },
+    {
+      name: "asChild",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Merge props with child element"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes"
+    }
+  ]}
+/>

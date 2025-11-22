@@ -1,0 +1,75 @@
+import { Demo } from './demo'
+import { Demo as DemoSymbols } from './demo-symbols'
+import { Demo as DemoCombinations } from './demo-combinations'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="kbd">
+```tsx file=../../registry/spell-ui/kbd.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Key Symbols
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSymbols />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-symbols.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Common Shortcuts
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoCombinations />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-combinations.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { Kbd } from "@/components/kbd";
+```
+```tsx
+<Kbd keys={["cmd", "K"]} />
+<Kbd keys={["ctrl", "shift", "P"]} />
+<Kbd keys={["alt", "tab"]} />
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "keys",
+      type: "string[]",
+      nameDetails: "Array of key names to display",
+      typeDetails: "Supported keys: command/cmd, control/ctrl, alt/option, shift, enter/return, escape/esc, tab, space, delete/backspace, arrowleft/left, arrowdown/down, arrowup/up, arrowright/right, or any letter/number"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes for the component"
+    }
+  ]}
+/>

@@ -1,0 +1,97 @@
+import { Demo } from './demo'
+import { Demo as DemoSizes } from './demo-sizes'
+import { Demo as DemoCallback } from './demo-callback'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="color-selector">
+```tsx file=../../registry/spell-ui/color-selector.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Size
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSizes />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-sizes.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Callback
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoCallback />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-callback.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { ColorSelector } from "@/components/color-selector";
+```
+```tsx
+<ColorSelector
+  colors={["red", "blue", "green"]}
+  defaultValue="blue"
+  onColorSelect={(color) => console.log(color)}
+/>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "colors",
+      type: "string[]",
+      nameDetails: "Array of color values to display"
+    },
+    {
+      name: "defaultValue",
+      type: "string",
+      nameDetails: "Initially selected color"
+    },
+    {
+      name: "size",
+      type: "string",
+      default: "default",
+      typeDetails: "Size of color circles. Options: sm, default, lg"
+    },
+    {
+      name: "name",
+      type: "string",
+      nameDetails: "Name attribute for hidden input (for form submission)"
+    },
+    {
+      name: "onColorSelect",
+      type: "(color: string) => void",
+      nameDetails: "Callback when a color is selected"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes for the component"
+    }
+  ]}
+/>

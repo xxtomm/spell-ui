@@ -1,0 +1,102 @@
+import { Demo } from './demo'
+import { Demo as DemoSpeed } from './demo-speed'
+import { Demo as DemoStagger } from './demo-stagger'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="words-stagger">
+```tsx file=../../registry/spell-ui/words-stagger.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Speed
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSpeed />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-speed.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Stagger
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoStagger />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-stagger.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { WordsStagger } from "@/components/words-stagger";
+```
+```tsx
+<WordsStagger className="text-3xl font-semibold tracking-tight">
+  Your complete platform for the Design.
+</WordsStagger>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      nameDetails: "The text content to animate"
+    },
+    {
+      name: "stagger",
+      type: "number",
+      default: "0.1",
+      nameDetails: "Delay between each word animation (in seconds)"
+    },
+    {
+      name: "speed",
+      type: "number",
+      default: "0.5",
+      nameDetails: "Duration of each word's animation (in seconds)"
+    },
+    {
+      name: "autoStart",
+      type: "boolean",
+      default: "true",
+      nameDetails: "Whether to start animation automatically on mount"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes for the container"
+    },
+    {
+      name: "onStart",
+      type: "() => void",
+      nameDetails: "Callback when animation starts"
+    },
+    {
+      name: "onComplete",
+      type: "() => void",
+      nameDetails: "Callback when animation completes"
+    }
+  ]}
+/>

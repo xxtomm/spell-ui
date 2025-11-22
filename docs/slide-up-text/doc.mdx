@@ -1,0 +1,122 @@
+import { Demo } from './demo'
+import { Demo as DemoSplit } from './demo-split'
+import { Demo as DemoStagger } from './demo-stagger'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="slide-up-text">
+```tsx file=../../registry/spell-ui/slide-up-text.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Split By
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSplit />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-split.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### From
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoStagger />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-stagger.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { SlideUpText } from "@/components/slide-up-text";
+```
+```tsx
+<SlideUpText>Your text here</SlideUpText>
+```
+
+## Props
+
+<PropsTable
+    data={[
+      {
+        name: "children",
+        type: "React.ReactNode",
+        nameDetails: "The text content to animate"
+      },
+      {
+        name: "split",
+        type: "'words' | 'characters' | 'lines'",
+        default: "words",
+        typeDetails: "How to split the text for animation"
+      },
+      {
+        name: "stagger",
+        type: "number",
+        default: "0.1",
+        nameDetails: "Delay between each element animation (in seconds)"
+      },
+      {
+        name: "from",
+        type: "'first' | 'last' | 'center'",
+        default: "first",
+        typeDetails: "Where to start the stagger animation from"
+      },
+      {
+        name: "transition",
+        type: "AnimationOptions",
+        default: "{ type: 'tween', ease: [0.625, 0.05, 0, 1], duration: 0.5 }",
+        nameDetails: "Motion transition configuration"
+      },
+      {
+        name: "autoStart",
+        type: "boolean",
+        default: "true",
+        nameDetails: "Whether to start animation automatically on mount"
+      },
+      {
+        name: "className",
+        type: "string",
+        nameDetails: "Additional CSS classes for the container"
+      },
+      {
+        name: "wordClass",
+        type: "string",
+        nameDetails: "Additional CSS classes for word wrapper"
+      },
+      {
+        name: "charClass",
+        type: "string",
+        nameDetails: "Additional CSS classes for character wrapper"
+      },
+      {
+        name: "onStart",
+        type: "() => void",
+        nameDetails: "Callback when animation starts"
+      },
+      {
+        name: "onComplete",
+        type: "() => void",
+        nameDetails: "Callback when animation completes"
+      }
+    ]}
+  />

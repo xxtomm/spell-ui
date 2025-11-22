@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "blur-reveal",
+  "type": "registry:component",
+  "title": "Blur Reveal",
+  "description": "Animated text reveal with blur effect.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/blur-reveal.tsx",
+      "content": "\"use client\";\nimport { AnimatePresence, motion } from \"motion/react\";\nimport React from \"react\";\n\nexport interface BlurRevealProps {\n  children: string;\n  className?: string;\n  delay?: number;\n  speedReveal?: number;\n  speedSegment?: number;\n  trigger?: boolean;\n  onAnimationComplete?: () => void;\n  onAnimationStart?: () => void;\n  as?: keyof React.JSX.IntrinsicElements;\n  style?: React.CSSProperties;\n}\n\nexport function BlurReveal({\n  children,\n  className,\n  delay = 0,\n  speedReveal = 1.5,\n  speedSegment = 0.5,\n  trigger = true,\n  onAnimationComplete,\n  onAnimationStart,\n  as = \"p\",\n  style,\n}: BlurRevealProps) {\n  const MotionTag = motion[as as keyof typeof motion] as typeof motion.div;\n\n  const stagger = 0.03 / speedReveal;\n  const baseDuration = 0.3 / speedSegment;\n\n  const containerVariants = {\n    hidden: { opacity: 0 },\n    visible: {\n      opacity: 1,\n      transition: {\n        staggerChildren: stagger,\n        delayChildren: delay,\n      },\n    },\n    exit: {\n      transition: {\n        staggerChildren: stagger,\n        staggerDirection: -1,\n      },\n    },\n  };\n\n  const itemVariants = {\n    hidden: { opacity: 0, filter: \"blur(12px)\", y: 10 },\n    visible: {\n      opacity: 1,\n      filter: \"blur(0px)\",\n      y: 0,\n      transition: {\n        duration: baseDuration,\n      },\n    },\n    exit: { opacity: 0, filter: \"blur(12px)\", y: 10 },\n  };\n\n  return (\n    <AnimatePresence mode=\"popLayout\">\n      {trigger && (\n        <MotionTag\n          initial=\"hidden\"\n          animate=\"visible\"\n          exit=\"exit\"\n          variants={containerVariants}\n          className={className}\n          onAnimationComplete={onAnimationComplete}\n          onAnimationStart={onAnimationStart}\n          style={style}\n        >\n          <span className=\"sr-only\">{children}</span>\n          {children.split(\"\").map((char, index) => (\n            <motion.span\n              key={`char-${index}`}\n              aria-hidden=\"true\"\n              variants={itemVariants}\n              className=\"inline-block whitespace-pre\"\n            >\n              {char}\n            </motion.span>\n          ))}\n        </MotionTag>\n      )}\n    </AnimatePresence>\n  );\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

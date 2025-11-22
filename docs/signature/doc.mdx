@@ -1,0 +1,81 @@
+import { Demo } from './demo'
+import { DemoContrast } from './demo-contrast'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="signature">
+```tsx file=../../registry/spell-ui/signature.tsx
+```
+</InstallationTabs>
+
+> Place the [LaStoriaBoldRegular.otf](https://spell.sh/LaStoriaBoldRegular.otf) font file inside your `public` directory or update the path in the component to load a different font.
+
+
+## Examples
+
+### Color
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoContrast />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-contrast.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { Signature } from "@/components/signature";
+```
+```tsx
+<Signature text="Spell Studio" fontSize={16} color="#000" />
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "text",
+      type: "string",
+      default: "\"Signature\"",
+      nameDetails: "The content to convert into a handwriting path"
+    },
+    {
+      name: "color",
+      type: "string",
+      default: "\"#000\"",
+      nameDetails: "Stroke and fill color for the signature"
+    },
+    {
+      name: "fontSize",
+      type: "number",
+      default: "14",
+      nameDetails: "Font size used while converting glyphs to paths"
+    },
+    {
+      name: "duration",
+      type: "number",
+      default: "1.5",
+      nameDetails: "Animation duration in seconds for each character"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply to the SVG element"
+    }
+  ]}
+/>

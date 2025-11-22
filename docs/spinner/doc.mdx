@@ -1,0 +1,94 @@
+import { PropsTable } from "@/components/props-table";
+import SpinnerDemo from "./demo";
+import SpinnerDemoSizes from "./demo-sizes";
+import SpinnerDemoColors from "./demo-colors";
+import SpinnerDemoSpeeds from "./demo-speeds";
+
+<DemoCanvas>
+  <DemoPreview>
+    <SpinnerDemo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="spinner">
+```tsx file=../../registry/spell-ui/spinner.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Size
+
+<DemoCanvas>
+  <DemoPreview>
+    <SpinnerDemoSizes />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-sizes.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Color
+
+<DemoCanvas>
+  <DemoPreview>
+    <SpinnerDemoColors />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-colors.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Speed
+
+<DemoCanvas>
+  <DemoPreview>
+    <SpinnerDemoSpeeds />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-speeds.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { Spinner } from "@/components/spinner";
+```
+
+```tsx
+<Spinner />
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "size",
+      type: '"sm" | "default" | "md" | "lg"',
+      default: '"md"',
+      nameDetails: "The size variant of the spinner",
+    },
+    {
+      name: "speed",
+      type: '"slow" | "normal" | "fast"',
+      default: '"normal"',
+      nameDetails: "The animation speed of the spinner",
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply to the spinner",
+    },
+  ]}
+/>

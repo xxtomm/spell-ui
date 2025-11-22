@@ -1,0 +1,73 @@
+import { Demo } from './demo'
+import { Demo as DemoSplit } from './demo-split'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="randomized-text">
+```tsx file=../../registry/spell-ui/randomized-text.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Split By
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSplit />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-split.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { RandomizedText } from "@/components/randomized-text";
+```
+
+```tsx
+<RandomizedText>You can just ship things.</RandomizedText>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "string",
+      required: true,
+      nameDetails: "The text to display with randomized animation"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes for the container"
+    },
+    {
+      name: "duration",
+      type: "number",
+      default: "0.75",
+      nameDetails: "Total animation duration in seconds"
+    },
+    {
+      name: "split",
+      type: "'words' | 'characters'",
+      default: "'characters'",
+      nameDetails: "How to split the text for animation - by words or characters"
+    }
+  ]}
+/>

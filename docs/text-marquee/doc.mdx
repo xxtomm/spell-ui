@@ -1,0 +1,84 @@
+import { Demo } from './demo'
+import { Demo as DemoSpeed } from './demo-speed'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="text-marquee">
+```tsx file=../../registry/spell-ui/text-marquee.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Speed
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSpeed />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-speed.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { TextMarquee } from "@/components/text-marquee";
+```
+
+```tsx
+<TextMarquee>
+  <p>Tomato</p>
+  <p>Apple</p>
+  <p>Carrot</p>
+  <p>Lettuce</p>
+  <p>Onion</p>
+</TextMarquee>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode[]",
+      required: true,
+      nameDetails: "Array of elements to display in the marquee"
+    },
+    {
+      name: "speed",
+      type: "number",
+      default: "1",
+      nameDetails: "Speed multiplier for the animation. Lower values are slower, higher values are faster"
+    },
+    {
+      name: "height",
+      type: "number",
+      default: "200",
+      nameDetails: "Height of the marquee container in pixels"
+    },
+    {
+      name: "prefix",
+      type: "React.ReactNode",
+      nameDetails: "Optional prefix element to display before the marquee"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes"
+    }
+  ]}
+/>

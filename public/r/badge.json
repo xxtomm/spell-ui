@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "badge",
+  "type": "registry:component",
+  "title": "Badge",
+  "description": "A badge component with multiple color variants and sizes.",
+  "dependencies": [
+    "@radix-ui/react-slot",
+    "class-variance-authority"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/badge.tsx",
+      "content": "import React from \"react\";\nimport { Slot } from \"@radix-ui/react-slot\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\nimport { cn } from \"@/lib/utils\";\n\nconst badgeVariants = cva(\n  \"rounded-sm font-medium text-xs leading-none inline-flex items-center justify-center\",\n  {\n    variants: {\n      variant: {\n        default:\n          \"bg-neutral-700 text-neutral-100 dark:bg-neutral-200 dark:text-neutral-800\",\n        secondary: \"bg-secondary text-secondary-foreground\",\n        outline: \"border border-input bg-background\",\n        destructive:\n          \"bg-destructive dark:text-destructive-foreground text-primary-foreground\",\n        red: \"bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400\",\n        blue:\n          \"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400\",\n        green:\n          \"bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400\",\n        yellow:\n          \"bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400\",\n        purple:\n          \"bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400\",\n        pink:\n          \"bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400\",\n        orange:\n          \"bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400\",\n        cyan:\n          \"bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400\",\n        indigo:\n          \"bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400\",\n        violet:\n          \"bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400\",\n        rose:\n          \"bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400\",\n        amber:\n          \"bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400\",\n        lime:\n          \"bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-400\",\n        emerald:\n          \"bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400\",\n        sky: \"bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400\",\n        slate:\n          \"bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400\",\n        fuchsia:\n          \"bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-400\",\n      },\n      size: {\n        default: \"px-1.5 py-1\",\n        sm: \"p-1\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n      size: \"default\",\n    },\n  },\n);\n\nexport interface BadgeProps\n  extends\n    React.HTMLAttributes<HTMLDivElement>,\n    VariantProps<typeof badgeVariants> {\n  asChild?: boolean;\n}\n\nconst Badge = React.forwardRef<\n  HTMLDivElement,\n  BadgeProps\n>(({ className, variant, size, asChild = false, ...props }, ref) => {\n  const Comp = asChild ? Slot : \"span\";\n  return (\n    <Comp\n      className={cn(badgeVariants({ variant, size }), className)}\n      ref={ref}\n      {...props}\n    />\n  );\n});\nBadge.displayName = \"Badge\";\n\nexport { Badge, badgeVariants };\n",
+      "type": "registry:component"
+    }
+  ]
+}

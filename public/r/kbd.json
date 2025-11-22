@@ -1,0 +1,16 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "kbd",
+  "type": "registry:component",
+  "title": "Keyboard Shortcuts",
+  "description": "Display keyboard shortcuts with proper key symbols.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/kbd.tsx",
+      "content": "import { cn } from \"@/lib/utils\";\n\ninterface KbdProps {\n  keys: string[];\n  className?: string;\n}\n\nconst keySymbolMap = {\n  command: \"⌘\",\n  cmd: \"⌘\",\n  control: \"⌃\",\n  ctrl: \"⌃\",\n  alt: \"⌥\",\n  option: \"⌥\",\n  enter: \"↵\",\n  return: \"↵\",\n  space: \"␣\",\n  arrowleft: \"←\",\n  left: \"←\",\n  arrowdown: \"↓\",\n  down: \"↓\",\n  arrowup: \"↑\",\n  up: \"↑\",\n  arrowright: \"→\",\n  right: \"→\",\n} as const;\n\nexport function Kbd({ keys, className }: KbdProps) {\n  const getKeyDisplay = (key: string): string => {\n    const lowerKey = key.toLowerCase();\n    return keySymbolMap[lowerKey as keyof typeof keySymbolMap] ||\n      key.toUpperCase();\n  };\n\n  return (\n    <div\n      className={cn(\n        \"shrink-0 flex items-center justify-center rounded shadow-sm\",\n        className,\n      )}\n    >\n      <div className=\"text-primary text-[10px] pointer-events-none h-4.5 select-none items-center rounded dark:shadow-[0_0_0_1px_rgba(255,255,255,0.145)] shadow-[0_0_0_1px_rgba(0,0,0,0.145)] justify-center font-medium opacity-100 flex px-1.5 gap-1\">\n        {keys.map((key, index) => (\n          <code key={index}>\n            {getKeyDisplay(key)}\n          </code>\n        ))}\n      </div>\n    </div>\n  );\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

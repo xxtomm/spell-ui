@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "words-stagger",
+  "type": "registry:component",
+  "title": "Words Stagger",
+  "description": "Word-by-word text animation with blur, transform, and opacity effects.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/words-stagger.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\nimport { motion, Transition } from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\ninterface WordsStaggerProps {\n  children: React.ReactNode;\n  className?: string;\n  stagger?: number;\n  speed?: number;\n  autoStart?: boolean;\n  onStart?: () => void;\n  onComplete?: () => void;\n}\n\nexport function WordsStagger({\n  children,\n  className,\n  stagger = 0.1,\n  speed = 0.5,\n  autoStart = true,\n  onStart,\n  onComplete,\n}: WordsStaggerProps) {\n  const text = React.Children.toArray(children)\n    .filter((child) => typeof child === \"string\")\n    .join(\"\");\n\n  const words = text.split(\" \").filter((word) => word.length > 0);\n\n  const transition: Transition = {\n    type: \"tween\",\n    ease: \"easeOut\",\n    duration: speed,\n  };\n\n  const containerVariants = {\n    hidden: {},\n    visible: {\n      transition: {\n        staggerChildren: stagger,\n      },\n    },\n  };\n\n  const wordVariants = {\n    hidden: {\n      opacity: 0,\n      y: 10,\n      filter: \"blur(10px)\",\n    },\n    visible: {\n      opacity: 1,\n      y: 0,\n      filter: \"blur(0px)\",\n      transition,\n    },\n  };\n\n  return (\n    <motion.div\n      className={cn(\"flex flex-wrap\", className)}\n      variants={containerVariants}\n      initial={autoStart ? \"hidden\" : false}\n      animate={autoStart ? \"visible\" : undefined}\n      onAnimationStart={onStart}\n      onAnimationComplete={onComplete}\n    >\n      {words.map((word, index) => (\n        <motion.span\n          key={`${word}-${index}`}\n          className=\"inline-block\"\n          variants={wordVariants}\n        >\n          {word}\n          {index < words.length - 1 && (\n            <span className=\"inline-block\">&nbsp;</span>\n          )}\n        </motion.span>\n      ))}\n    </motion.div>\n  );\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

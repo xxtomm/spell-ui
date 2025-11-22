@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "highlighted-text",
+  "type": "registry:component",
+  "title": "Highlighted Text",
+  "description": "Text with animated shimmer highlight effect.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/highlighted-text.tsx",
+      "content": "\"use client\";\n\nimport { motion } from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\ntype Variant =\n  | \"default\"\n  | \"secondary\"\n  | \"destructive\"\n  | \"red\"\n  | \"blue\"\n  | \"green\"\n  | \"yellow\"\n  | \"purple\"\n  | \"pink\"\n  | \"orange\"\n  | \"cyan\"\n  | \"indigo\"\n  | \"violet\"\n  | \"rose\"\n  | \"amber\"\n  | \"lime\"\n  | \"emerald\"\n  | \"sky\"\n  | \"slate\"\n  | \"fuchsia\";\n\ninterface HighlightedTextProps {\n  children: React.ReactNode;\n  className?: string;\n  variant?: Variant;\n  duration?: number;\n  delay?: number;\n  spread?: number;\n}\n\nconst variantMap: Record<Variant, string> = {\n  default: \"\",\n  secondary: \"text-secondary-foreground\",\n  destructive: \"text-destructive dark:text-destructive-foreground\",\n  red: \"text-red-600 dark:text-red-400\",\n  blue: \"text-blue-600 dark:text-blue-400\",\n  green: \"text-green-600 dark:text-green-400\",\n  yellow: \"text-yellow-600 dark:text-yellow-400\",\n  purple: \"text-purple-600 dark:text-purple-400\",\n  pink: \"text-pink-600 dark:text-pink-400\",\n  orange: \"text-orange-600 dark:text-orange-400\",\n  cyan: \"text-cyan-600 dark:text-cyan-400\",\n  indigo: \"text-indigo-600 dark:text-indigo-400\",\n  violet: \"text-violet-600 dark:text-violet-400\",\n  rose: \"text-rose-600 dark:text-rose-400\",\n  amber: \"text-amber-600 dark:text-amber-400\",\n  lime: \"text-lime-600 dark:text-lime-400\",\n  emerald: \"text-emerald-600 dark:text-emerald-400\",\n  sky: \"text-sky-600 dark:text-sky-400\",\n  slate: \"text-slate-600 dark:text-slate-400\",\n  fuchsia: \"text-fuchsia-600 dark:text-fuchsia-400\",\n};\n\nexport function HighlightedText({\n  children,\n  className,\n  variant = \"default\",\n  duration = 1.5,\n  delay = 1.5,\n}: HighlightedTextProps) {\n  return (\n    <div className=\"group overflow-hidden\">\n      <div>\n        <motion.div\n          className={cn(\n            \"inline-block [--shimmer-contrast:rgba(255,255,255,0.6)] dark:[--shimmer-contrast:rgba(0,0,0,0.5)]\",\n            variantMap[variant],\n            className,\n          )}\n          style={{\n            WebkitTextFillColor: \"transparent\",\n            background:\n              \"currentColor linear-gradient(to right, currentColor 0%, var(--shimmer-contrast) 40%, var(--shimmer-contrast) 60%, currentColor 100%)\",\n            WebkitBackgroundClip: \"text\",\n            backgroundClip: \"text\",\n            backgroundRepeat: \"no-repeat\",\n            backgroundSize: \"50% 200%\",\n          } as React.CSSProperties}\n          animate={{\n            backgroundPositionX: [\"-100%\", \"250%\"],\n          }}\n          transition={{\n            duration: duration,\n            delay: delay,\n            repeat: Infinity,\n            repeatDelay: 1.5,\n            ease: \"linear\",\n          }}\n        >\n          <span>{children}</span>\n        </motion.div>\n      </div>\n    </div>\n  );\n}\n\nexport default HighlightedText;\n",
+      "type": "registry:component"
+    }
+  ]
+}

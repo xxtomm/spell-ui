@@ -1,0 +1,278 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "spell-ui",
+  "homepage": "https://spell.sh",
+  "author": "tom (https://spell.sh)",
+  "items": [
+    {
+      "name": "blur-reveal",
+      "type": "registry:component",
+      "title": "Blur Reveal",
+      "description": "Animated text reveal with blur effect.",
+      "files": [
+        {
+          "path": "registry/spell-ui/blur-reveal.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["motion"],
+      "registryDependencies": [],
+      "category": "animation"
+    },
+    {
+      "name": "perspective-book",
+      "type": "registry:component",
+      "title": "Perspective Book",
+      "description": "A 3D book component with hover animation and customizable appearance.",
+      "files": [
+        {
+          "path": "registry/spell-ui/perspective-book.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "display"
+    },
+    {
+      "name": "badge",
+      "type": "registry:component",
+      "title": "Badge",
+      "description": "A badge component with multiple color variants and sizes.",
+      "files": [
+        {
+          "path": "registry/spell-ui/badge.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["@radix-ui/react-slot", "class-variance-authority"],
+      "registryDependencies": [],
+      "category": "display"
+    },
+    {
+      "name": "color-selector",
+      "type": "registry:component",
+      "title": "Color Selector",
+      "description": "Interactive color picker component.",
+      "files": [
+        {
+          "path": "registry/spell-ui/color-selector.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "input"
+    },
+    {
+      "name": "special-text",
+      "type": "registry:component",
+      "title": "Special Text",
+      "description": "Animated text with scramble effect.",
+      "files": [
+        {
+          "path": "registry/spell-ui/special-text.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "animation"
+    },
+    {
+      "name": "highlighted-text",
+      "type": "registry:component",
+      "title": "Highlighted Text",
+      "description": "Text with animated shimmer highlight effect.",
+      "files": [
+        {
+          "path": "registry/spell-ui/highlighted-text.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["motion"],
+      "registryDependencies": [],
+      "category": "animation"
+    },
+    {
+      "name": "rich-button",
+      "type": "registry:component",
+      "title": "Rich Button",
+      "description": "A button component with rich styling and color variants.",
+      "files": [
+        {
+          "path": "registry/spell-ui/rich-button.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["@radix-ui/react-slot"],
+      "registryDependencies": [],
+      "category": "button"
+    },
+    {
+      "name": "kbd",
+      "type": "registry:component",
+      "title": "Keyboard Shortcuts",
+      "description": "Display keyboard shortcuts with proper key symbols.",
+      "files": [
+        {
+          "path": "registry/spell-ui/kbd.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "display"
+    },
+    {
+      "name": "label-input",
+      "type": "registry:component",
+      "title": "Label Input",
+      "description": "Input field with floating label and password visibility toggle.",
+      "files": [
+        {
+          "path": "registry/spell-ui/label-input.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [],
+      "category": "input"
+    },
+    {
+      "name": "spinner",
+      "type": "registry:component",
+      "title": "Spinner",
+      "description": "A loading spinner component with customizable size and color.",
+      "files": [
+        {
+          "path": "registry/spell-ui/spinner.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "feedback"
+    },
+    {
+      "name": "flow-button",
+      "type": "registry:component",
+      "title": "Flow Button",
+      "description": "A button with animated flowing dashed border on hover.",
+      "files": [
+        {
+          "path": "registry/spell-ui/flow-button.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "button"
+    },
+    {
+      "name": "slide-up-text",
+      "type": "registry:component",
+      "title": "Slide Up Text",
+      "description": "Text animation that slides up from bottom with stagger effect.",
+      "files": [
+        {
+          "path": "registry/spell-ui/slide-up-text.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["motion"],
+      "registryDependencies": [],
+      "category": "animation"
+    },
+    {
+      "name": "copy-button",
+      "type": "registry:component",
+      "title": "Copy Button",
+      "description": "A copy-to-clipboard button with blur transition effect.",
+      "files": [
+        {
+          "path": "registry/spell-ui/copy-button.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [],
+      "category": "button"
+    },
+    {
+      "name": "text-marquee",
+      "type": "registry:component",
+      "title": "Text Marquee",
+      "description": "Animated text marquee component with vertical scrolling.",
+      "files": [
+        {
+          "path": "registry/spell-ui/text-marquee.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "animation"
+    },
+    {
+      "name": "words-stagger",
+      "type": "registry:component",
+      "title": "Words Stagger",
+      "description": "Word-by-word text animation with blur, transform, and opacity effects.",
+      "files": [
+        {
+          "path": "registry/spell-ui/words-stagger.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["motion"],
+      "registryDependencies": [],
+      "category": "animation"
+    },
+    {
+      "name": "marquee",
+      "type": "registry:component",
+      "title": "Marquee",
+      "description": "Infinite scrolling marquee component with customizable speed and direction.",
+      "files": [
+        {
+          "path": "registry/spell-ui/marquee.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "animation"
+    },
+    {
+      "name": "signature",
+      "type": "registry:component",
+      "title": "Signature",
+      "description": "Animated signature component with handwriting effect using custom fonts.",
+      "files": [
+        {
+          "path": "registry/spell-ui/signature.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["motion", "opentype.js"],
+      "registryDependencies": [],
+      "category": "animation"
+    },
+    {
+      "name": "randomized-text",
+      "type": "registry:component",
+      "title": "Randomized Text",
+      "description": "Text component with randomized character reveal animation.",
+      "files": [
+        {
+          "path": "registry/spell-ui/randomized-text.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["motion"],
+      "registryDependencies": [],
+      "category": "animation"
+    }
+  ]
+}

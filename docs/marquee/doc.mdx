@@ -1,0 +1,108 @@
+import { Demo } from './demo'
+import { Demo as DemoPause } from './demo-pause'
+import { Demo as DemoVertical } from './demo-vertical'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="marquee">
+```tsx file=../../registry/spell-ui/marquee.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Pause on Hover
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoPause />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-pause.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Vertical Scroll
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoVertical />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-vertical.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { Marquee } from "@/registry/spell-ui/marquee";
+```
+
+```tsx
+<Marquee>
+  <div className="mx-6">Content 1</div>
+  <div className="mx-6">Content 2</div>
+  <div className="mx-6">Content 3</div>
+</Marquee>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "duration",
+      type: "number",
+      default: "20",
+      nameDetails: "Animation duration in seconds"
+    },
+    {
+      name: "pauseOnHover",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Whether to pause animation on hover"
+    },
+    {
+      name: "direction",
+      type: '"left" | "right" | "up" | "down"',
+      default: '"left"',
+      nameDetails: "Direction of the marquee scroll (horizontal or vertical)"
+    },
+    {
+      name: "fade",
+      type: "boolean",
+      default: "true",
+      nameDetails: "Whether to apply fade gradient at edges"
+    },
+    {
+      name: "fadeAmount",
+      type: "number",
+      default: "10",
+      nameDetails: "Percentage of fade gradient (0-100)"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes"
+    },
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "Content to display in the marquee"
+    }
+  ]}
+/>

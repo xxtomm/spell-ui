@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "code-block",
+  "type": "registry:component",
+  "title": "Code Block",
+  "description": "A code block component with syntax highlighting using Shiki.",
+  "dependencies": [
+    "shiki",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/spell-ui/code-block.tsx",
+      "content": "\"use client\";\n\nimport { codeToHtml } from \"shiki\";\nimport { useEffect, useState } from \"react\";\nimport { Button } from \"@/components/ui/button\";\nimport { CheckIcon, Copy } from \"lucide-react\";\nimport type { BundledLanguage } from \"shiki\";\nimport { cn } from \"@/lib/utils\";\n\ninterface CodeBlockProps {\n  children: string;\n  language?: BundledLanguage;\n  filename?: string;\n  \"aria-label\"?: string;\n  copyable?: boolean;\n  className?: string;\n}\n\nexport function CodeBlock({\n  children,\n  language = \"tsx\",\n  filename,\n  \"aria-label\": ariaLabel,\n  copyable = false,\n  className,\n}: CodeBlockProps) {\n  const [html, setHtml] = useState<string>(\"\");\n  const [isCopied, setIsCopied] = useState(false);\n\n  useEffect(() => {\n    async function highlight() {\n      const result = await codeToHtml(children, {\n        lang: language,\n        themes: {\n          light: \"github-light\",\n          dark: \"github-dark\",\n        },\n        defaultColor: false,\n      });\n\n      const tempDiv = document.createElement(\"div\");\n      tempDiv.innerHTML = result;\n\n      const preElement = tempDiv.querySelector(\"pre\");\n      if (preElement) {\n        preElement.classList.add(\"overflow-x-auto\", \"p-4\", \"font-mono\");\n      }\n\n      setHtml(tempDiv.innerHTML);\n    }\n\n    highlight();\n  }, [children, language]);\n\n  const handleCopy = () => {\n    navigator.clipboard.writeText(children);\n    setIsCopied(true);\n    setTimeout(() => {\n      setIsCopied(false);\n    }, 1000);\n  };\n\n  return (\n    <div\n      className={cn(\n        \"overflow-hidden rounded-md border bg-background\",\n        className,\n      )}\n    >\n      {filename && (\n        <div className=\"flex items-center justify-between border-b pr-1.5 pl-4 h-10\">\n          <span className=\"text-sm text-muted-foreground\">{filename}</span>\n          {copyable && (\n            <Button\n              variant=\"ghost\"\n              size=\"icon\"\n              className=\"size-7 relative cursor-pointer active:scale-[0.97] transition-all ease-out duration-200 inline-flex items-center justify-center rounded-md text-neutral-900 disabled:pointer-events-none disabled:opacity-100 dark:text-neutral-50\"\n              onClick={handleCopy}\n            >\n              {isCopied\n                ? <CheckIcon className=\"size-3.5 text-emerald-500\" />\n                : <Copy className=\"size-3.5\" />}\n            </Button>\n          )}\n        </div>\n      )}\n      <div className=\"relative\" aria-label={ariaLabel}>\n        <div className=\"text-sm\" dangerouslySetInnerHTML={{ __html: html }} />\n        {copyable && !filename && (\n          <div className=\"absolute top-2.5 right-2.5\">\n            <Button\n              variant=\"outline\"\n              size=\"icon\"\n              className=\"size-7 border border-border dark:bg-[#191919] dark:hover:bg-[#212121]\"\n              onClick={handleCopy}\n            >\n              {isCopied\n                ? <CheckIcon className=\"size-3.5 text-emerald-500\" />\n                : <Copy className=\"size-3.5\" />}\n            </Button>\n          </div>\n        )}\n      </div>\n    </div>\n  );\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

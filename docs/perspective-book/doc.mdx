@@ -1,0 +1,80 @@
+import { Demo } from './demo'
+import { Demo as DemoTextured } from './demo-textured'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="perspective-book">
+
+```tsx file=../../registry/spell-ui/perspective-book.tsx
+```
+
+</InstallationTabs>
+
+## Usage
+
+```tsx
+import { PerspectiveBook } from "@/components/perspective-book";
+```
+```tsx
+<PerspectiveBook>
+  <div className="flex flex-col gap-4">
+    <h1 className="font-semibold leading-5">
+      Your complete platform for the Design.
+    </h1>
+    <BookOpen className="size-5" />
+  </div>
+</PerspectiveBook>
+```
+
+## Examples
+
+### Textured
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoTextured />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-textured.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      nameDetails: "The content to display inside the book"
+    },
+    {
+      name: "size",
+      type: "string",
+      default: "default",
+      typeDetails: "Size of the book. Options: sm, default, lg"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "CSS classes for styling the book cover. Use Tailwind classes like bg-amber-500, bg-red-600, etc."
+    },
+    {
+      name: "textured",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Adds a realistic book texture overlay to the cover"
+    }
+  ]}
+/>

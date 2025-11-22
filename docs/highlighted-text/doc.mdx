@@ -1,0 +1,77 @@
+import { Demo } from './demo'
+import { Demo as DemoColors } from './demo-colors'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="highlighted-text">
+```tsx file=../../registry/spell-ui/highlighted-text.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Color
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoColors />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-colors.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { HighlightedText } from "@/components/highlighted-text";
+```
+```tsx
+<HighlightedText>Shimmer Effect</HighlightedText>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      nameDetails: "Text content to display with shimmer effect"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes"
+    },
+    {
+      name: "variant",
+      type: "Variant",
+      default: "default",
+      typeDetails: "Text variant. Options: default, secondary, destructive, red, blue, green, yellow, purple, pink, orange, cyan, indigo, violet, rose, amber, lime, emerald, sky, slate, fuchsia"
+    },
+    {
+      name: "duration",
+      type: "number",
+      default: "1.5",
+      nameDetails: "Duration of the shimmer animation in seconds"
+    },
+    {
+      name: "delay",
+      type: "number",
+      default: "1.5",
+      nameDetails: "Delay before animation starts in seconds"
+    }
+  ]}
+/>

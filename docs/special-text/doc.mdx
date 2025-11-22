@@ -1,0 +1,68 @@
+import { Demo } from './demo'
+import { Demo as DemoSpeed } from './demo-speed'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="special-text">
+```tsx file=../../registry/spell-ui/special-text.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Speed
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSpeed />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-speed.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { SpecialText } from "@/components/special-text";
+```
+```tsx
+<SpecialText>HELLO WORLD</SpecialText>
+<SpecialText speed={10}>FAST</SpecialText>
+<SpecialText className="text-2xl text-blue-500">STYLED</SpecialText>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "string",
+      nameDetails: "The text content to animate"
+    },
+    {
+      name: "speed",
+      type: "number",
+      default: "20",
+      nameDetails: "Animation speed in milliseconds (lower is faster)"
+    },
+    {
+      name: "className",
+      type: "string",
+      default: "\"\"",
+      nameDetails: "Additional CSS classes for styling"
+    }
+  ]}
+/>

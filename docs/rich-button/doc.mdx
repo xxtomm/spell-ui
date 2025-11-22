@@ -1,0 +1,77 @@
+import { Demo } from './demo'
+import { Demo as DemoColored } from './demo-colored'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="rich-button">
+```tsx file=../../registry/spell-ui/rich-button.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Color
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoColored />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-colored.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import { RichButton } from "@/components/rich-button";
+```
+```tsx
+<RichButton>Default</RichButton>
+```
+
+## Props
+
+<PropsTable
+    data={[
+      {
+        name: "children",
+        type: "React.ReactNode",
+        nameDetails: "The content of the button"
+      },
+      {
+        name: "variant",
+        type: "Variant",
+        default: "default",
+        typeDetails: "Button variant. Options: default, blue, purple, pink, red, orange, yellow, green, teal, cyan, indigo, violet, rose, amber, lime, sky, slate, gray, zinc, neutral, stone, fuchsia, emerald"
+      },
+      {
+        name: "size",
+        type: "SizeVariant",
+        default: "default",
+        typeDetails: "Button size. Options: sm, default, lg"
+      },
+      {
+        name: "className",
+        type: "string",
+        nameDetails: "Additional CSS classes"
+      },
+      {
+        name: "asChild",
+        type: "boolean",
+        default: "false",
+        nameDetails: "Merge props with child element"
+      }
+    ]}
+  />
