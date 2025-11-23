@@ -1,0 +1,140 @@
+import { Demo } from './demo'
+import { Demo as DemoVariant } from './demo-variant'
+import { Demo as DemoSizes } from './demo-sizes'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="pop-button">
+```tsx file=../../registry/spell-ui/pop-button.tsx
+```
+</InstallationTabs>
+
+<details>
+<summary>Font Setup (Optional)</summary>
+
+To use the playful DynaPuff font with this component:
+
+1. Add the font to your `layout.tsx`:
+
+```tsx
+import { DynaPuff } from 'next/font/google'
+
+const dynaPuff = DynaPuff({
+  subsets: ['latin'],
+  variable: '--font-dyna-puff',
+})
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={dynaPuff.variable}>
+        {children}
+      </body>
+    </html>
+  )
+}
+```
+
+2. Add the CSS variable to your `globals.css`:
+
+```css
+:root {
+  --font-pop: var(--font-dyna-puff);
+}
+```
+
+</details>
+
+## Examples
+
+### Color
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoVariant />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-variant.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Sizes
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSizes />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-sizes.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+
+## Usage
+
+```tsx
+import { PopButton } from "@/components/pop-button";
+```
+
+```tsx
+<PopButton color="violet" size="default">
+  Button
+</PopButton>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "The content to display inside the button"
+    },
+    {
+      name: "color",
+      type: "'default' | 'blue' | 'purple' | 'pink' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'cyan' | 'indigo' | 'violet' | 'rose' | 'amber' | 'lime' | 'sky' | 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone' | 'fuchsia' | 'emerald'",
+      default: "'default'",
+      nameDetails: "The color of the button - supports all Tailwind colors"
+    },
+    {
+      name: "size",
+      type: "'sm' | 'default' | 'lg'",
+      default: "'default'",
+      nameDetails: "The size of the button"
+    },
+    {
+      name: "disabled",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Whether the button is disabled"
+    },
+    {
+      name: "onClick",
+      type: "() => void",
+      nameDetails: "Click event handler"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>

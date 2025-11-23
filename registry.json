@@ -273,6 +273,21 @@
       "dependencies": ["motion"],
       "registryDependencies": [],
       "category": "animation"
+    },
+    {
+      "name": "pop-button",
+      "type": "registry:component",
+      "title": "Pop Button",
+      "description": "A playful 3D-style button with push-down animation effect.",
+      "files": [
+        {
+          "path": "registry/spell-ui/pop-button.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "button"
     }
   ]
 }

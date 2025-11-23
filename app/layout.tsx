@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif, DynaPuff } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { JotaiProvider } from "@/components/providers";
@@ -13,10 +13,16 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
 const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
   subsets: ["latin"],
   weight: ["400"],
+});
+
+const dynaPuff = DynaPuff({
+  variable: "--font-dyna-puff",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +39,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} min-h-dvh bg-background text-foreground antialiased font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${dynaPuff.variable} min-h-dvh bg-background text-foreground antialiased font-sans`}
         suppressHydrationWarning
       >
         <JotaiProvider>

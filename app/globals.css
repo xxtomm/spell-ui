@@ -12,6 +12,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-pop: var(--font-dyna-puff);
   --font-serif: var(--font-instrument-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -140,6 +141,15 @@ html, body {
   scrollbar-width: none; /* firefox */
   -ms-overflow-style: none; /* IE 10+ */
 }
+
+details {
+  @apply mt-4;
+}
+
+summary {
+  @apply font-medium cursor-pointer;
+}
+
 
 ::-webkit-scrollbar {
   width: 0px;

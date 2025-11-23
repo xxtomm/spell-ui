@@ -2,7 +2,7 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
-type Variant =
+type Color =
   | "default"
   | "blue"
   | "purple"
@@ -32,13 +32,13 @@ type SizeVariant = "sm" | "default" | "lg";
 interface RichButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  variant?: Variant;
+  color?: Color;
   size?: SizeVariant;
   className?: string;
   asChild?: boolean;
 }
 
-const variantMap: Record<Variant, string> = {
+const colorMap: Record<Color, string> = {
   default:
     "from-zinc-900/85 to-zinc-900 dark:from-zinc-100/85 dark:to-zinc-100",
   emerald: "from-emerald-600/85 to-emerald-600 dark:from-emerald-600/75",
@@ -65,7 +65,7 @@ const variantMap: Record<Variant, string> = {
   fuchsia: "from-fuchsia-600/85 to-fuchsia-600 dark:from-fuchsia-600/75",
 };
 
-const textShadowMap: Record<Variant, string> = {
+const textShadowMap: Record<Color, string> = {
   default:
     "[text-shadow:0_1px_0_rgb(0,0,0)] dark:[text-shadow:0_1px_0_rgb(255,255,255)]",
   emerald: "[text-shadow:0_1px_0_var(--color-emerald-800)]",
@@ -102,7 +102,7 @@ const RichButton = React.forwardRef<HTMLButtonElement, RichButtonProps>(
   (
     {
       children,
-      variant = "default",
+      color = "default",
       size = "default",
       className,
       asChild = false,
@@ -111,10 +111,10 @@ const RichButton = React.forwardRef<HTMLButtonElement, RichButtonProps>(
     ref,
   ) => {
     const Comp = asChild ? Slot : "button";
-    const variantClasses = variantMap[variant];
-    const textShadowClasses = textShadowMap[variant];
+    const colorClasses = colorMap[color];
+    const textShadowClasses = textShadowMap[color];
     const sizeClasses = sizeMap[size];
-    const textColor = variant === "default"
+    const textColor = color === "default"
       ? "text-white dark:text-zinc-900"
       : "text-white";
 
@@ -123,7 +123,7 @@ const RichButton = React.forwardRef<HTMLButtonElement, RichButtonProps>(
         ref={ref}
         className={cn(
           "cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 inset-shadow-2xs inset-shadow-white/25 bg-linear-to-b dark:bg-linear-to-t border border-zinc-950/35 shadow-md shadow-zinc-950/20 ring-0 transition-[filter] duration-200 hover:brightness-110 active:brightness-95 dark:border-0 dark:border-zinc-950/50",
-          variantClasses,
+          colorClasses,
           sizeClasses,
           textColor,
           className,
