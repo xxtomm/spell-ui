@@ -19,7 +19,7 @@ const nextConfig = {
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [remarkGfm, codeImport],
+    remarkPlugins: [[codeImport, { cache: false }], remarkGfm],
     rehypePlugins: [
       rehypeSlug,
       [rehypeAutolinkHeadings, {
