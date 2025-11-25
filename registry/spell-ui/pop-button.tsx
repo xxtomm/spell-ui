@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
 type Color =
@@ -33,13 +34,16 @@ export interface PopButtonProps
   color?: Color;
   size?: SizeVariant;
   children: React.ReactNode;
+  asChild?: boolean;
 }
 
 const PopButton = React.forwardRef<HTMLButtonElement, PopButtonProps>(
   (
-    { className, color = "default", size = "default", children, ...props },
+    { className, color = "default", size = "default", children, asChild = false, ...props },
     ref,
   ) => {
+    const Comp = asChild ? Slot : "button";
+
     const baseClasses =
       "font-pop inline-flex select-none transition-all items-center justify-center whitespace-nowrap rounded-xl ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground active:border-b-2 active:scale-y-95 border-x-2 border-t-2 border-b-4 origin-bottom";
 
@@ -80,7 +84,7 @@ const PopButton = React.forwardRef<HTMLButtonElement, PopButtonProps>(
     };
 
     return (
-      <button
+      <Comp
         ref={ref}
         className={cn(
           baseClasses,
@@ -91,7 +95,7 @@ const PopButton = React.forwardRef<HTMLButtonElement, PopButtonProps>(
         {...props}
       >
         {children}
-      </button>
+      </Comp>
     );
   },
 );

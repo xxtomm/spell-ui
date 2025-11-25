@@ -16,7 +16,14 @@ export default async function DocPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const Doc = (await import(`@/docs/${id}/doc.mdx`)).default;
+
+  let Doc;
+  try {
+    Doc = (await import(`@/docs/${id}/doc.mdx`)).default;
+  } catch (error) {
+    notFound();
+  }
+
   const item = await getDoc(id);
 
   if (!item) {

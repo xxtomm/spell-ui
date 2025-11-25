@@ -4,11 +4,11 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="flex items-center justify-center h-svh">
-      <Link href={"/docs/introduction"}>
-        <RichButton asChild>
+      <RichButton className="rounded-full" asChild>
+        <Link href={"/docs/introduction"}>
           See Docs
-        </RichButton>
-      </Link>
+        </Link>
+      </RichButton>
     </div>
   );
 }
