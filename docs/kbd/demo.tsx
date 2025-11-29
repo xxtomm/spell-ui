@@ -7,7 +7,7 @@ export function Demo() {
       <Kbd keys={["enter"]} listenToKeyboard />
       <Kbd keys={["space"]} listenToKeyboard />
       <Kbd keys={["ctrl", "j"]} listenToKeyboard />
-      <Kbd keys={["hold"]} listenToKeyboard />
+      <Kbd keys={[{ display: "HOLD", key: "H" }]} listenToKeyboard />
       <Kbd keys={["up"]} listenToKeyboard />
     </div>
   );
