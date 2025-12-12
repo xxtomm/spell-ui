@@ -35,61 +35,73 @@ export function Hero() {
 
       {/* Bento Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-flow-dense gap-4 w-full max-w-[1400px]">
-        <div className="col-span-1 md:col-span-2 row-span-1 md:row-span-2 rounded-2xl border min-h-[300px] md:min-h-[400px] flex items-center justify-center relative">
-          <TextMarquee
-            height={250}
-            speed={1}
-            prefix={
-              <span className="text-2xl md:text-3xl text-muted-foreground/75 font-medium">
-                yourwebsite.com/
-              </span>
-            }
-          >
-            <p className="text-2xl md:text-3xl font-medium">emily</p>
-            <p className="text-2xl md:text-3xl font-medium">dennis</p>
-            <p className="text-2xl md:text-3xl font-medium">max</p>
-            <p className="text-2xl md:text-3xl font-medium">michele</p>
-            <p className="text-2xl md:text-3xl font-medium">adgv</p>
-            <p className="text-2xl md:text-3xl font-medium">tomm</p>
-            <p className="text-2xl md:text-3xl font-medium">hugh</p>
-            <p className="text-2xl md:text-3xl font-medium">alex</p>
-          </TextMarquee>
-          <Link href="/docs/text-marquee" className="absolute bottom-4 left-4 text-sm text-muted-foreground hover:text-foreground transition-colors">Text Marquee</Link>
+        <div className="col-span-1 md:col-span-2 row-span-1 md:row-span-2 rounded-2xl border min-h-[300px] md:min-h-[400px] flex flex-col p-4">
+          <div className="flex-1 flex items-center justify-center">
+            <TextMarquee
+              height={250}
+              speed={1}
+              prefix={
+                <span className="text-2xl md:text-3xl text-muted-foreground/75 font-medium">
+                  yourwebsite.com/
+                </span>
+              }
+            >
+              <p className="text-2xl md:text-3xl font-medium">emily</p>
+              <p className="text-2xl md:text-3xl font-medium">dennis</p>
+              <p className="text-2xl md:text-3xl font-medium">max</p>
+              <p className="text-2xl md:text-3xl font-medium">michele</p>
+              <p className="text-2xl md:text-3xl font-medium">adgv</p>
+              <p className="text-2xl md:text-3xl font-medium">tomm</p>
+              <p className="text-2xl md:text-3xl font-medium">hugh</p>
+              <p className="text-2xl md:text-3xl font-medium">alex</p>
+            </TextMarquee>
+          </div>
+          <Link href="/docs/text-marquee" className="text-sm leading-4 text-muted-foreground hover:text-foreground transition-colors">Text Marquee</Link>
         </div>
-        <div className="col-span-1 row-span-1 md:row-span-2 lg:col-start-4 lg:row-start-2 rounded-2xl border min-h-[300px] md:min-h-[400px] flex items-center justify-center relative">
-          <PerspectiveBook>
-            <div className="flex flex-col gap-4">
-              <h1 className="font-semibold leading-5">
-                Your complete platform for the Design.
-              </h1>
-              <BookOpen className="size-5" />
-            </div>
-          </PerspectiveBook>
-          <Link href="/docs/perspective-book" className="absolute bottom-4 left-4 text-sm text-muted-foreground hover:text-foreground transition-colors">Perspective Book</Link>
+        <div className="col-span-1 row-span-1 md:row-span-2 lg:col-start-4 lg:row-start-2 rounded-2xl border min-h-[300px] md:min-h-[400px] flex flex-col p-4">
+          <div className="flex-1 flex items-center justify-center">
+            <PerspectiveBook>
+              <div className="flex flex-col gap-4">
+                <h1 className="font-semibold leading-5">
+                  Your complete platform for the Design.
+                </h1>
+                <BookOpen className="size-5" />
+              </div>
+            </PerspectiveBook>
+          </div>
+          <Link href="/docs/perspective-book" className="text-sm leading-4 text-muted-foreground hover:text-foreground transition-colors">Perspective Book</Link>
         </div>
-        <div className="col-span-1 rounded-2xl border min-h-[200px] md:min-h-[240px] flex items-center justify-center relative">
-          <ShimmerText className="text-lg" duration={1}>
+        <div className="col-span-1 rounded-2xl border min-h-[200px] md:min-h-[240px] flex flex-col p-4">
+          <div className="flex-1 flex items-center justify-center">
+            <ShimmerText className="text-lg" duration={1}>
               Thinking longer...
-          </ShimmerText>
-          <Link href="/docs/shimmer-text" className="absolute bottom-4 left-4 text-sm text-muted-foreground hover:text-foreground transition-colors">Shimmer Text</Link>
+            </ShimmerText>
+          </div>
+          <Link href="/docs/shimmer-text" className="text-sm leading-4 text-muted-foreground hover:text-foreground transition-colors">Shimmer Text</Link>
         </div>
-        <div className="col-span-1 md:col-span-2 rounded-2xl border min-h-[200px] md:min-h-[240px] flex items-center justify-center gap-2 p-4 relative">
-          <SpotifyCardCarouselDemo />
-          <Link href="/docs/spotify-card" className="absolute bottom-4 left-4 text-sm text-muted-foreground hover:text-foreground transition-colors">Spotify Card</Link>
+        <div className="col-span-1 md:col-span-2 rounded-2xl border min-h-[200px] md:min-h-[240px] flex flex-col p-4">
+          <div className="flex-1 flex items-center justify-center">
+            <SpotifyCardCarouselDemo />
+          </div>
+          <Link href="/docs/spotify-card" className="text-sm leading-4 text-muted-foreground hover:text-foreground transition-colors">Spotify Card</Link>
         </div>
-        <div className="col-span-1 rounded-2xl border min-h-[200px] md:min-h-[240px] flex items-center justify-center overflow-hidden relative">
-          <MarqueeDemo />
-          <Link href="/docs/marquee" className="absolute bottom-4 left-4 text-sm text-muted-foreground hover:text-foreground transition-colors">Marquee</Link>
+        <div className="col-span-1 rounded-2xl border min-h-[200px] md:min-h-[240px] flex flex-col p-4 overflow-hidden">
+          <div className="flex-1 flex items-center justify-center">
+            <MarqueeDemo />
+          </div>
+          <Link href="/docs/marquee" className="text-sm leading-4 text-muted-foreground hover:text-foreground transition-colors">Marquee</Link>
         </div>
-        <div className="col-span-1 rounded-2xl border min-h-[200px] md:min-h-[240px] flex items-center justify-center relative">
-          <div className="flex flex-col gap-2">
+        <div className="col-span-1 rounded-2xl border min-h-[200px] md:min-h-[240px] flex flex-col p-4">
+          <div className="flex-1 flex items-center justify-center">
             <AnimatedCheckboxDemo />
           </div>
-          <Link href="/docs/animated-checkbox" className="absolute bottom-4 left-4 text-sm text-muted-foreground hover:text-foreground transition-colors">Animated Checkbox</Link>
+          <Link href="/docs/animated-checkbox" className="text-sm leading-4 text-muted-foreground hover:text-foreground transition-colors">Animated Checkbox</Link>
         </div>
-        <div className="col-span-1 rounded-2xl border min-h-[200px] md:min-h-[240px] flex items-center justify-center relative">
-          <ColorSelectorDemo />
-          <Link href="/docs/color-selector" className="absolute bottom-4 left-4 text-sm text-muted-foreground hover:text-foreground transition-colors">Color Selector</Link>
+        <div className="col-span-1 rounded-2xl border min-h-[200px] md:min-h-[240px] flex flex-col p-4">
+          <div className="flex-1 flex items-center justify-center">
+            <ColorSelectorDemo />
+          </div>
+          <Link href="/docs/color-selector" className="text-sm leading-4 text-muted-foreground hover:text-foreground transition-colors">Color Selector</Link>
         </div>
       </div>
     </div>
