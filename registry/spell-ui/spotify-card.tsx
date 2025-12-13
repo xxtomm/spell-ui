@@ -37,7 +37,7 @@ const SpotifyCardSkeleton = ({ className }: { className?: string }) => (
 const SpotifyCardError = ({ className }: { className?: string }) => (
   <div
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-2xl border border-border bg-muted/50 p-6 text-muted-foreground",
+      "flex h-[100px] w-full items-center justify-center rounded-2xl border border-border bg-muted/50 p-6 text-muted-foreground",
       className
     )}
   >
