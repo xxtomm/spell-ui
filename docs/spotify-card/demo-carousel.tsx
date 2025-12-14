@@ -10,7 +10,7 @@ import {
 
 const tracks = [
   "https://open.spotify.com/track/2OZVskV28xxJjjhQqKTLSg",
-  "https://open.spotify.com/track/76I3PmbGZazzNlEwlp1y85",
+  "https://open.spotify.com/track/7tTRFVlFzk6yTnoMcParmi",
   "https://open.spotify.com/track/2EiGLWYEH6x79f9ir0VEah",
 ];
 
