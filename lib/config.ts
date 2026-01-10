@@ -6,7 +6,7 @@ export const siteConfig = {
     "A refined collection of high-end UI components crafted for React and Tailwind CSS.",
   links: {
     tom: "https://x.com/tomm_ui",
-    x: "https://x.com/spellui",
+    x: "https://x.com/spell_ui",
     discord: "https://discord.gg/spellui",
     github: "https://github.com/xxtomm/spell-ui",
     // instagram: "https://instagram.com/spellui/",
