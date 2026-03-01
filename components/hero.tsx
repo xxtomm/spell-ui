@@ -18,7 +18,9 @@ export function Hero() {
           Refined UI components for Design Engineers
         </BlurReveal>
         <p className="text-base md:text-lg leading-6 text-muted-foreground">
-            Meticulously crafted, free and open-source components with animations built-in.<br /> Copy, paste, perfect.
+          A large collection of high-quality React components that
+          <br />
+          you can copy and paste into any project.
         </p>
         <div className="flex flex-row gap-3 mt-2 w-auto">
           <RichButton size="lg" className="transition-transform rounded-full trakcing-tight active:scale-[0.97] will-change-transform ease-out duration-150 px-4.5" asChild>
