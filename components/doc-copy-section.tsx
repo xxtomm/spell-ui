@@ -136,7 +136,7 @@ export function DocCopySection({ content, url }: DocCopySectionProps) {
 
   return (
     <Popover>
-      <div className="hidden md:inline-flex -space-x-px rounded-full shadow-xs rtl:space-x-reverse mr-2">
+      <div className="hidden md:inline-flex -space-x-px rounded-full shadow-none rtl:space-x-reverse mr-2">
         <Button
           className="rounded-none border-r-1 shadow-none first:rounded-s-md last:rounded-e-md focus-visible:z-10 relative cursor-pointer"
           variant="secondary"
@@ -174,7 +174,7 @@ export function DocCopySection({ content, url }: DocCopySectionProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild className="hidden sm:flex">
             <Button
-              className="cursor-pointer rounded-l-none size-8 shadow-none first:rounded-s-md last:rounded-e-md focus-visible:z-10"
+              className="cursor-pointer rounded-l-none size-8 shadow-none first:rounded-s-md last:rounded-e-md focus-visible:z-10 "
               variant="secondary"
               size="icon"
               aria-label="Open options"

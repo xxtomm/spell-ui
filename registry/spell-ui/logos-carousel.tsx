@@ -24,21 +24,17 @@ export function LogosCarousel({
 }: LogosCarouselProps) {
   const [index, setIndex] = React.useState(0);
   const [animate, setAnimate] = React.useState(false);
+  const [nextIndex, setNextIndex] = React.useState(1);
 
-  // Convert children to array and group them
   const childrenArray = React.Children.toArray(children);
   const logosPerGroup = count || childrenArray.length;
   const groups: React.ReactNode[][] = [];
-  
+
   for (let i = 0; i < childrenArray.length; i += logosPerGroup) {
     groups.push(childrenArray.slice(i, i + logosPerGroup));
   }
 
-  if (groups.length === 0) {
-    return null;
-  }
-
-  const [nextIndex, setNextIndex] = React.useState(1);
+  const groupsLength = groups.length;
 
   React.useEffect(() => {
     const id = setTimeout(() => {
@@ -51,14 +47,14 @@ export function LogosCarousel({
   }, [initialDelay]);
 
   React.useEffect(() => {
-    if (!animate || groups.length === 0) {
+    if (!animate || groupsLength === 0) {
       return;
     }
 
     function loop() {
       setIndex((prevIndex) => {
-        const newIndex = (prevIndex + 1) % groups.length;
-        setNextIndex((newIndex + 1) % groups.length);
+        const newIndex = (prevIndex + 1) % groupsLength;
+        setNextIndex((newIndex + 1) % groupsLength);
         return newIndex;
       });
     }
@@ -68,7 +64,11 @@ export function LogosCarousel({
     return () => {
       clearInterval(intervalId);
     };
-  }, [animate, interval, groups.length]);
+  }, [animate, interval, groupsLength]);
+
+  if (groupsLength === 0) {
+    return null;
+  }
 
   return (
     <>

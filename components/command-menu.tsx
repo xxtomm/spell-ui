@@ -23,7 +23,6 @@ import { useRouter } from "next/navigation";
 import { useIsMac } from "@/hooks/use-is-mac";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useConfig } from "@/hooks/use-config";
-import { Kbd } from "@/registry/spell-ui/kbd";
 
 interface PageItem {
   value: string;

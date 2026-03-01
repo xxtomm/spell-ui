@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { GithubStars } from "./github-stars";
 import { MobileNav } from "./mobile-nav";
+import { SpellLogo } from "./spell-logo";
 import Link from "next/link";
 export default function SiteHeader({ docSchema }: { docSchema?: DocSchema }) {
   const { theme, setTheme } = useTheme();
@@ -13,10 +14,11 @@ export default function SiteHeader({ docSchema }: { docSchema?: DocSchema }) {
     <header className="fixed bg-background top-0 left-0 right-0 z-50 w-full border-b border-border">
       <div className="flex justify-between w-full h-14 items-center gap-4 3xl:max-w-screen-2xl px-4 mx-auto">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {docSchema && <MobileNav docSchema={docSchema} className="md:hidden" />}
-            <Link href={"/"}>
-              <h1 className="font-medium" translate="no">Spell UI</h1>
+            <Link href={"/"} className="flex items-center gap-1.5">
+              <SpellLogo size={24} />
+              <h1 className="hidden md:inline font-medium" translate="no">Spell UI</h1>
             </Link>
           </div>
           <nav className="hidden md:flex items-center gap-4 md:gap-6 text-sm">

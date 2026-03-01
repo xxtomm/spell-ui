@@ -1,7 +1,16 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "fs/promises";
+import { join } from "path";
 import { siteConfig } from "@/lib/config";
 
 export const runtime = "nodejs";
+
+async function loadLogo(): Promise<string> {
+  const logoPath = join(process.cwd(), "public", "spell-ui", "logo.svg");
+  const logoSvg = await readFile(logoPath, "utf-8");
+  const logoSvgWhite = logoSvg.replace(/fill="black"/g, 'fill="white"');
+  return `data:image/svg+xml;base64,${Buffer.from(logoSvgWhite).toString("base64")}`;
+}
 
 async function loadAssets(): Promise<
   { name: string; data: Buffer; weight: 400 | 500 | 600; style: "normal" }[]
@@ -24,7 +33,7 @@ export async function GET(request: Request) {
   const title = searchParams.get("title");
   const description = searchParams.get("description");
 
-  const [fonts] = await Promise.all([loadAssets()]);
+  const [fonts, logoUrl] = await Promise.all([loadAssets(), loadLogo()]);
 
   return new ImageResponse(
     <div
@@ -38,6 +47,12 @@ export async function GET(request: Request) {
       <div tw="flex flex-col absolute justify-center items-center inset-0 p-30 w-full h-full">
         {title || description ? (
           <div tw="flex flex-col items-start justify-between text-start w-full h-full">
+            <img
+              src={logoUrl}
+              width={64}
+              height={68}
+              alt=""
+            />
             <div tw="flex flex-col">
               <div tw="text-zinc-50 flex text-7xl font-medium tracking-tight">
                 {title || siteConfig.name}
@@ -46,12 +61,15 @@ export async function GET(request: Request) {
                 {description || siteConfig.description}
               </div>
             </div>
-            <div tw="text-zinc-500 text-2xl flex mt-8">
-              spell.sh
-            </div>
           </div>
         ) : (
           <div tw="flex flex-col items-start justify-between text-start w-full h-full">
+            <img
+              src={logoUrl}
+              width={64}
+              height={68}
+              alt=""
+            />
             <div tw="flex flex-col">
               <div tw="text-zinc-50 flex text-7xl font-medium tracking-tight">
                 {siteConfig.name}
@@ -59,9 +77,6 @@ export async function GET(request: Request) {
               <div tw="text-zinc-400 text-4xl flex mt-10">
                 {siteConfig.description}
               </div>
-            </div>
-            <div tw="text-zinc-500 text-2xl flex mt-8">
-              spell.sh
             </div>
           </div>
         )}

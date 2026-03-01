@@ -6,7 +6,7 @@ const docSchema = await getDocSchema();
 
 export default function Home() {
   return (
-    <div className="flex relative min-h-dvh pt-14">
+    <div className="flex relative min-h-dvh pt-14 ">
       <SiteHeader docSchema={docSchema} />
       <Hero />
     </div>

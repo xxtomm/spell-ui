@@ -1,51 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with
-[`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<img alt="Spell UI - Beautiful UI components for modern React" src="https://spell.sh/og?title=Spell%20UI&description=Beautiful%2C%20sophisticated%20UI%20components" width="100%">
 
-## Getting Started
+<h3 align="center">Spell UI</h3>
 
-First, run the development server:
+<p align="center">
+  Beautiful, sophisticated UI components designed for modern React and Tailwind CSS applications.
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<div align="center">
+  <a href="https://github.com/xxtomm/spell-ui/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/xxtomm/spell-ui"></a>
+  <a href="https://x.com/tomm_ui"><img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/tomm_ui"></a>
+  <a href="https://github.com/xxtomm/spell-ui/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
+  <a href="https://discord.gg/CxzqwQ2EAa"><img alt="Discord" src="https://img.shields.io/badge/Discord-join-blue.svg"></a>
+</div>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the
-result.
+## Documentation
 
-You can start editing the page by modifying `app/page.tsx`. The page
-auto-updates as you edit the file.
+Visit https://spell.sh/docs to view the documentation.
 
-This project uses
-[`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)
-to automatically optimize and load [Geist](https://vercel.com/font), a new font
-family for Vercel.
+## Contributing
 
-## Learn More
+Visit our [contributing guide](https://github.com/xxtomm/spell-ui/blob/main/CONTRIBUTING.md) to learn how to contribute.
 
-To learn more about Next.js, take a look at the following resources:
+## Community
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Have questions, comments or feedback? [Join our Discord](https://discord.gg/CxzqwQ2EAa).
 
-You can check out
-[the Next.js GitHub repository](https://github.com/vercel/next.js) - your
-feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the
-[Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
-from the creators of Next.js.
-
-Check out our
-[Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying)
-for more details.
-
-# spell-ui
+Licensed under the [MIT license](https://github.com/xxtomm/spell-ui/blob/main/LICENSE).

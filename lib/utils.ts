@@ -56,7 +56,7 @@ export function constructMetadata({
       creator: siteConfig.links.tom.replace("https://x.com/", "@"),
     },
     metadataBase: new URL(siteConfig.url),
-    icons: "/favicon.ico",
+    icons: "/icon.svg",
     ...props,
   };
 }

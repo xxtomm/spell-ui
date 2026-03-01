@@ -42,12 +42,3 @@ export interface Registry {
   items: RegistryItem[];
 }
 
-export interface TableOfContents {
-  items?: TocItem[];
-}
-
-export interface TocItem {
-  title: string;
-  url: string;
-  items?: TocItem[];
-}
