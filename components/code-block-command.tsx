@@ -30,10 +30,10 @@ export function CodeBlockCommand(
       };
     }
     return {
-      pnpm: `pnpm dlx shadcn@latest add "https://spell.sh/r/${item}.json"`,
-      npm: `npx shadcn@latest add "https://spell.sh/r/${item}.json"`,
-      yarn: `yarn dlx shadcn@latest add "https://spell.sh/r/${item}.json"`,
-      bun: `bunx --bun shadcn@latest add "https://spell.sh/r/${item}.json"`,
+      pnpm: `pnpm dlx shadcn@latest add @spell/${item}`,
+      npm: `npx shadcn@latest add @spell/${item}`,
+      yarn: `yarn dlx shadcn@latest add @spell/${item}`,
+      bun: `bunx --bun shadcn@latest add @spell/${item}`,
     };
   }, [item, mcp]);
 
