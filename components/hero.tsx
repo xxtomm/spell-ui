@@ -12,8 +12,23 @@ import { ShimmerText } from "@/registry/spell-ui/shimmer-text";
 
 export function Hero() {
   return (
-    <div className="flex flex-col items-center w-full py-12 md:py-24 gap-8 md:gap-16 px-4">
+    <div className="flex flex-col items-center w-full pt-6 pb-12 md:pt-14 md:pb-24 gap-8 md:gap-16 px-4">
+      {/* To hide Product Hunt banner: (1) remove the <a> block below, (2) replace this div's className with: flex flex-col items-center w-full py-12 md:py-24 gap-8 md:gap-16 px-4 */}
       <div className="flex flex-col items-center text-center gap-6 max-w-[700px]">
+        <a
+          href="https://www.producthunt.com/products/spell-ui?utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-spell-ui"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-opacity hover:opacity-80"
+        >
+          <img
+            alt="Spell UI - Refined UI components for Design Engineers | Product Hunt"
+            width={250}
+            height={54}
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1091005&theme=dark&t=1772806141498"
+            className="h-10 w-[210px]"
+          />
+        </a>
         <BlurReveal letterSpacing="-0.020em" className="font-medium text-3xl md:text-4xl lg:text-5xl tracking-tight">
           Refined UI components for Design Engineers
         </BlurReveal>
