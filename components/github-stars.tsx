@@ -1,12 +1,29 @@
+"use client";
+
 import * as React from "react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
 import { siteConfig } from "@/lib/config";
-import { getGitHubStars } from "@/lib/github";
 
 export function GithubStars() {
+  const [stars, setStars] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    fetch("/api/github/stars")
+      .then((res) => res.json())
+      .then((data: { stars: number }) => setStars(data.stars))
+      .catch(() => setStars(0));
+  }, []);
+
+  const displayValue =
+    stars === null
+      ? null
+      : stars >= 1000
+        ? `${(stars / 1000).toFixed(1)}k`
+        : stars;
+
   return (
     <Button
       asChild
@@ -19,19 +36,13 @@ export function GithubStars() {
         rel="noopener noreferrer"
       >
         <SiGithub />
-        <React.Suspense fallback={<Skeleton className="h-4 w-8" />}>
-          <StarsCount />
-        </React.Suspense>
+        {displayValue === null ? (
+          <Skeleton className="h-4 w-6 rounded-sm" />
+        ) : (
+          <span className="tabular-nums">{displayValue}</span>
+        )}
         <span className="sr-only">Open Github</span>
       </Link>
     </Button>
   );
-}
-
-async function StarsCount() {
-  const count = await getGitHubStars();
-  const displayValue =
-    count >= 1000 ? `${(count / 1000).toFixed(1)}k` : count;
-
-  return <span className="tabular-nums">{displayValue}</span>;
 }
