@@ -8,7 +8,7 @@ export function Demo() {
           value="https://spell.sh"
           size={140}
           fgColor="#c2410c"
-          bgColor="white"
+          bgColor="var(--background)"
         />
       </div>
       <div className="w-[105px] md:w-[140px] rounded-lg p-2 shadow-[0_0_0_1px_rgba(0,0,0,.08),_0px_2px_2px_rgba(0,0,0,.04)] dark:border [&_svg]:w-full [&_svg]:h-auto">
@@ -16,7 +16,7 @@ export function Demo() {
           value="https://spell.sh"
           size={140}
           fgColor="#1d4ed8"
-          bgColor="white"
+          bgColor="var(--background)"
         />
       </div>
       <div className="w-[105px] md:w-[140px] rounded-lg p-2 shadow-[0_0_0_1px_rgba(0,0,0,.08),_0px_2px_2px_rgba(0,0,0,.04)] dark:border [&_svg]:w-full [&_svg]:h-auto">
@@ -24,7 +24,7 @@ export function Demo() {
           value="https://spell.sh"
           size={140}
           fgColor="#15803d"
-          bgColor="white"
+          bgColor="var(--background)"
         />
       </div>
     </div>
