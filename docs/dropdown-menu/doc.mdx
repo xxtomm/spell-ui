@@ -1,0 +1,413 @@
+import { Demo } from './demo'
+import { Demo as DemoTriggers } from './demo-triggers'
+import { Demo as DemoShortcuts } from './demo-shortcuts'
+import { Demo as DemoSubmenu } from './demo-submenu'
+import { Demo as DemoDisabled } from './demo-disabled'
+import { Demo as DemoAlign } from './demo-align'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="dropdown-menu">
+```tsx file=../../registry/spell-ui/dropdown-menu.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Trigger types
+
+Three built-in trigger styles — default, split, and icon. The split trigger has two separate click zones: the label fires an action, the chevron opens the dropdown. The icon trigger renders just a chevron by default but accepts any custom icon.
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoTriggers />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-triggers.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Keyboard shortcuts
+
+Use `DropdownMenuShortcut` inside any `DropdownMenuItem` to show a right-aligned keyboard hint.
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoShortcuts />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-shortcuts.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Sub menus
+
+Nest `DropdownMenuSub` inside any group to create a flyout sub-menu. Wrap the content in `DropdownMenuPortal` so it renders outside any overflow constraints.
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSubmenu />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-submenu.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Disabled items
+
+Pass `disabled` to any `DropdownMenuItem` to prevent interaction and dim the item.
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoDisabled />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-disabled.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+### Alignment
+
+Control where the panel appears relative to the trigger using the `align` prop on `DropdownMenuContent`.
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoAlign />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-align.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuSplitTrigger,
+  DropdownMenuIconTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
+} from "@/registry/spell-ui/dropdown-menu"
+```
+
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuGroup>
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Settings</DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem>Log out</DropdownMenuItem>
+    </DropdownMenuGroup>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+## Props
+
+### DropdownMenu
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "The trigger and content of the dropdown"
+    },
+    {
+      name: "open",
+      type: "boolean",
+      nameDetails: "Controlled open state"
+    },
+    {
+      name: "defaultOpen",
+      type: "boolean",
+      default: "false",
+      nameDetails: "The initial open state when uncontrolled"
+    },
+    {
+      name: "onOpenChange",
+      type: "(open: boolean) => void",
+      nameDetails: "Callback fired when the open state changes"
+    }
+  ]}
+/>
+
+### DropdownMenuTrigger
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "Label text shown inside the trigger button"
+    },
+    {
+      name: "asChild",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Merges trigger behaviour onto the child element instead of rendering its own button"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuSplitTrigger
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "Label text shown in the left action section"
+    },
+    {
+      name: "onActionClick",
+      type: "() => void",
+      nameDetails: "Fired when the label section is clicked — independent of the dropdown"
+    },
+    {
+      name: "disabled",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Disables both sections of the trigger"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuIconTrigger
+
+<PropsTable
+  data={[
+    {
+      name: "icon",
+      type: "React.ReactNode",
+      nameDetails: "Custom icon to render — defaults to a ChevronDown if not provided"
+    },
+    {
+      name: "disabled",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Disables the trigger"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuContent
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "The items and groups inside the dropdown panel"
+    },
+    {
+      name: "align",
+      type: "'start' | 'center' | 'end'",
+      default: "'start'",
+      nameDetails: "Horizontal alignment of the panel relative to the trigger"
+    },
+    {
+      name: "sideOffset",
+      type: "number",
+      default: "4",
+      nameDetails: "Gap in pixels between the trigger and the dropdown panel"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuItem
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "The content of the menu item"
+    },
+    {
+      name: "disabled",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Prevents interaction and dims the item"
+    },
+    {
+      name: "inset",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Adds extra left padding to align with labelled items"
+    },
+    {
+      name: "onClick",
+      type: "() => void",
+      nameDetails: "Click handler — the menu closes automatically after firing"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuLabel
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "The label text for a group of items"
+    },
+    {
+      name: "inset",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Adds extra left padding to align with menu items"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuShortcut
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "The keyboard shortcut to display, e.g. ⇧⌘P"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuSub
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "Must contain a DropdownMenuSubTrigger and DropdownMenuSubContent"
+    }
+  ]}
+/>
+
+### DropdownMenuSubTrigger
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "The label for the sub-menu trigger row"
+    },
+    {
+      name: "inset",
+      type: "boolean",
+      default: "false",
+      nameDetails: "Adds extra left padding"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuSubContent
+
+<PropsTable
+  data={[
+    {
+      name: "children",
+      type: "React.ReactNode",
+      required: true,
+      nameDetails: "The items inside the sub-menu panel"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply"
+    }
+  ]}
+/>
+
+### DropdownMenuSeparator
+
+<PropsTable
+  data={[
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes to apply to the divider line"
+    }
+  ]}
+/>
