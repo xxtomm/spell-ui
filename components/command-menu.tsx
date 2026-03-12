@@ -50,18 +50,15 @@ export function SearchForm({ docSchema }: { docSchema: DocSchema }) {
 
   const groupedItems = useMemo<PageGroup[]>(() => {
     return docSchema.map((group) => {
-      const isComponentGroup = group.title === "Components";
+      const isComponentGroup = group.title !== "Getting Started";
       return {
         value: group.title,
-        items: group.items.map((item) => {
-          const url = `/docs/${item.id}`;
-          return {
-            value: item.id,
-            label: item.title,
-            url,
-            isComponent: isComponentGroup,
-          };
-        }),
+        items: group.items.map((item) => ({
+          value: item.id,
+          label: item.title,
+          url: `/docs/${item.id}`,
+          isComponent: isComponentGroup,
+        })),
       };
     });
   }, [docSchema]);

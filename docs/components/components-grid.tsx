@@ -3,8 +3,9 @@ import Link from "next/link";
 
 export async function ComponentsGrid() {
   const schema = await getDocSchema();
-  const componentsSection = schema.find((section) => section.title === "Components");
-  const components = componentsSection?.items ?? [];
+  const components = schema
+    .filter((section) => section.title !== "Getting Started")
+    .flatMap((section) => section.items);
 
   return (
     <div className="not-prose grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-x-8 lg:gap-x-8 lg:gap-y-6">

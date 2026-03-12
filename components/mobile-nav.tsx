@@ -60,13 +60,13 @@ export function MobileNav({
       >
         <div className="flex flex-col gap-12 overflow-auto px-4 py-6">
           <div className="flex flex-col gap-8">
-            {docSchema.map((group, index) => (
+            {docSchema.map((section, index) => (
               <div key={index} className="flex flex-col gap-4">
                 <div className="text-muted-foreground text-sm font-medium">
-                  {group.title}
+                  {section.title}
                 </div>
                 <div className="flex flex-col gap-3">
-                  {group.items.map((item) => (
+                  {section.items.map((item) => (
                     <MobileLink
                       key={item.id}
                       href={`/docs/${item.id}`}

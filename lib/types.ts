@@ -20,6 +20,7 @@ export interface RegistryItem {
   type: "registry:component" | "registry:hook" | "registry:lib";
   title: string;
   description: string;
+  category?: string;
   files: Array<{
     path: string;
     type: string;
