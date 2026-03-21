@@ -79,6 +79,14 @@ export function MobileNav({
               </div>
             ))}
           </div>
+          <div className="flex flex-col gap-4 pt-4 border-t border-border">
+            <MobileLink href="/login" onOpenChange={setOpen}>
+              Log in
+            </MobileLink>
+            <MobileLink href="/sponsor" onOpenChange={setOpen}>
+              Sponsor
+            </MobileLink>
+          </div>
         </div>
       </PopoverContent>
     </Popover>

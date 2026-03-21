@@ -2,8 +2,9 @@ import { DocSchema } from "@/lib/types";
 import { SearchForm } from "./command-menu";
 import { MobileNav } from "./mobile-nav";
 import { SpellLogo } from "./spell-logo";
-import { ThemeToggle } from "./theme-toggle";
+import { ConditionalThemeToggle } from "./conditional-theme-toggle";
 import { GithubStars } from "./github-stars";
+import { AuthButton } from "./auth-button";
 import Link from "next/link";
 
 export default function SiteHeader({ docSchema }: { docSchema?: DocSchema }) {
@@ -40,9 +41,8 @@ export default function SiteHeader({ docSchema }: { docSchema?: DocSchema }) {
               MCP
             </Link>
             <Link
-              href="#"
-              className="pointer-events-none text-muted-foreground/50 hover:text-foreground transition-colors"
-              aria-disabled="true"
+              href="/sponsor"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               Sponsor
             </Link>
@@ -51,7 +51,8 @@ export default function SiteHeader({ docSchema }: { docSchema?: DocSchema }) {
         <div className="flex gap-2 lg:gap-3 items-center">
           {docSchema && <SearchForm docSchema={docSchema} />}
           <GithubStars />
-          <ThemeToggle />
+          <ConditionalThemeToggle />
+          <AuthButton />
         </div>
       </div>
     </header>
