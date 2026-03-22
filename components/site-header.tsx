@@ -16,7 +16,7 @@ export default function SiteHeader({ docSchema }: { docSchema?: DocSchema }) {
             {docSchema && <MobileNav docSchema={docSchema} className="md:hidden" />}
             <Link href="/" className="flex items-center gap-1.5">
               <SpellLogo size={24} />
-              <h1 className="hidden md:inline font-medium" translate="no">
+              <h1 className="hidden md:inline font-medium text-nowrap" translate="no">
                 Spell UI
               </h1>
             </Link>
@@ -51,8 +51,8 @@ export default function SiteHeader({ docSchema }: { docSchema?: DocSchema }) {
         <div className="flex gap-2 lg:gap-3 items-center">
           {docSchema && <SearchForm docSchema={docSchema} />}
           <GithubStars />
-          <ConditionalThemeToggle />
           <AuthButton />
+          <ConditionalThemeToggle />
         </div>
       </div>
     </header>

@@ -12,18 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export function AuthButton() {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
-
-  if (isPending) {
-    return <Skeleton className="size-8 shrink-0 rounded-full" aria-hidden />;
-  }
 
   if (session?.user) {
     const userInitial =
@@ -112,7 +107,7 @@ export function AuthButton() {
       variant="outline"
       className="h-8 px-3 cursor-pointer dark:bg-background dark:hover:bg-input/20 shadow-none"
     >
-      <Link href="/login">Sign In</Link>
+      <Link href="/login">Sign in</Link>
     </Button>
   );
 }

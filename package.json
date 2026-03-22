@@ -79,7 +79,6 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.181.0",
     "@types/unist": "^3.0.3",
-    "baseline-browser-mapping": "^2.10.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
