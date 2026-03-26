@@ -1,0 +1,23 @@
+name: Apply schema migrations
+
+# 👉 Only run this workflow when a change is made to the main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  apply_migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install dependencies & tooling
+        run: |
+          npm install -g pnpm
+          pnpm install
+      - name: Apply migrations
+        run: pnpm drizzle:migrate
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
