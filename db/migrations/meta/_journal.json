@@ -8,6 +8,34 @@
       "when": 1773976523286,
       "tag": "0000_damp_slapstick",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1774149472572,
+      "tag": "0001_free_purple_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774271239634,
+      "tag": "0002_outstanding_warbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1774371193381,
+      "tag": "0003_lying_kylun",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1774407689629,
+      "tag": "0004_green_magma",
+      "breakpoints": true
     }
   ]
 }

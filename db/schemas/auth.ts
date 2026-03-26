@@ -10,6 +10,7 @@ export const users = sqliteTable("users", {
     .default(false)
     .notNull(),
   image: text("image"),
+  username: text("username").unique(),
   ...timestamps,
 });
 

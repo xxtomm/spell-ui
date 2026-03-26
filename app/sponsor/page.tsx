@@ -6,6 +6,10 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Badge } from "@/registry/spell-ui/badge";
 import { BlurReveal } from "@/registry/spell-ui/blur-reveal";
+import { whop } from "@/lib/whop";
+import { SponsorSection } from "@/components/sponsor-section";
+import { SponsorCheckoutButton } from "./sponsor-checkout-button";
+import { SponsorSuccessOverlay } from "./sponsor-success-overlay";
 
 type SponsorFeatureLine =
   | string
@@ -19,6 +23,7 @@ interface SponsorTierConfig {
   price: number;
   priceDisplay?: string;
   envKey: string;
+  planEnvKey: string;
   highlight: SponsorHighlightKind | null;
   baseTierLabel: string | null;
   features: readonly SponsorFeatureLine[];
@@ -30,6 +35,7 @@ const SPONSOR_TIERS = [
     title: "Silver",
     price: 10,
     envKey: "WHOP_CHECKOUT_URL_SILVER",
+    planEnvKey: "WHOP_PLAN_ID_SILVER",
     highlight: null,
     baseTierLabel: null,
     features: [
@@ -47,12 +53,13 @@ const SPONSOR_TIERS = [
     price: 30,
     priceDisplay: "$30",
     envKey: "WHOP_CHECKOUT_URL_GOLD",
+    planEnvKey: "WHOP_PLAN_ID_GOLD",
     highlight: "bestValue",
     baseTierLabel: "Silver",
     features: [
       {
         label: "Medium logo & link:",
-        sublines: ["Sponsor section", "GitHub README", "Docs footer"],
+        sublines: ["Sponsor section", "GitHub README", "Site Footer"],
       },
     ] satisfies SponsorFeatureLine[],
   },
@@ -61,6 +68,7 @@ const SPONSOR_TIERS = [
     title: "Platinum",
     price: 100,
     envKey: "WHOP_CHECKOUT_URL_PLATINUM",
+    planEnvKey: "WHOP_PLAN_ID_PLATINUM",
     highlight: null,
     baseTierLabel: "Gold",
     features: [
@@ -69,7 +77,7 @@ const SPONSOR_TIERS = [
         sublines: [
           "Sponsor section",
           "GitHub README",
-          "Docs footer",
+          "Site Footer",
           "Homepage mention",
         ],
       },
@@ -80,6 +88,7 @@ const SPONSOR_TIERS = [
     title: "Diamond",
     price: 500,
     envKey: "WHOP_CHECKOUT_URL_DIAMOND",
+    planEnvKey: "WHOP_PLAN_ID_DIAMOND",
     highlight: "topTier",
     baseTierLabel: "Platinum",
     features: [
@@ -89,7 +98,7 @@ const SPONSOR_TIERS = [
         sublines: [
           "Sponsor section",
           "GitHub README",
-          "Docs footer",
+          "Site Footer",
           "Homepage feature",
         ],
       },
@@ -101,7 +110,7 @@ type SponsorTierId = (typeof SPONSOR_TIERS)[number]["id"];
 
 type SponsorTierRow = (typeof SPONSOR_TIERS)[number];
 
-type SponsorTierWithCheckout = SponsorTierRow & { checkoutUrl: string };
+type SponsorTierWithCheckout = SponsorTierRow & { checkoutUrl: string; planId: string };
 
 type SponsorFeatureIconKind = "heart" | "role" | "logo" | "earlyAccess";
 
@@ -294,13 +303,31 @@ function SponsorHighlightBadge({ kind }: { kind: SponsorHighlightKind }) {
   );
 }
 
-export default async function SponsorPage() {
+async function verifyCheckoutSuccess(paymentId: string | undefined): Promise<boolean> {
+  if (!paymentId || !whop) return false;
+  try {
+    const payment = await whop.payments.retrieve(paymentId);
+    return payment.status === "paid";
+  } catch {
+    return false;
+  }
+}
+
+export default async function SponsorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout_status?: string; payment_id?: string }>;
+}) {
+  const { checkout_status, payment_id } = await searchParams;
+  const isVerifiedSuccess =
+    checkout_status === "success" && (await verifyCheckoutSuccess(payment_id));
   const docSchema = await getDocSchema();
   const sponsorTiers = SPONSOR_TIERS.map((tier) => ({
     ...tier,
     checkoutUrl: process.env[tier.envKey] ?? "",
+    planId: process.env[tier.planEnvKey] ?? "",
   })).filter((tier): tier is SponsorTierWithCheckout =>
-    Boolean(tier.checkoutUrl),
+    Boolean(tier.planId),
   );
 
   return (
@@ -322,6 +349,8 @@ export default async function SponsorPage() {
             </p>
           </div>
 
+          <SponsorSection />
+
           {sponsorTiers.length > 0 ? (
             <section
               aria-label="Sponsorship plans"
@@ -338,6 +367,7 @@ export default async function SponsorPage() {
                       : `$${tier.price}`
                   }
                   checkoutUrl={tier.checkoutUrl}
+                  planId={tier.planId}
                   highlight={tier.highlight}
                   baseTierLabel={tier.baseTierLabel}
                   featureLines={tier.features}
@@ -366,6 +396,7 @@ export default async function SponsorPage() {
           )}
         </div>
       </main>
+      {isVerifiedSuccess && <SponsorSuccessOverlay />}
     </div>
   );
 }
@@ -375,6 +406,7 @@ interface SponsorPlanCardProps {
   title: string;
   priceLabel: string;
   checkoutUrl: string;
+  planId: string;
   highlight: SponsorHighlightKind | null;
   baseTierLabel: string | null;
   featureLines: readonly SponsorFeatureLine[];
@@ -385,6 +417,7 @@ function SponsorPlanCard({
   title,
   priceLabel,
   checkoutUrl,
+  planId,
   highlight,
   baseTierLabel,
   featureLines,
@@ -443,14 +476,10 @@ function SponsorPlanCard({
       <div className="mt-auto pt-1 sm:pt-2">
         {tierId === "diamond" ? (
           <ShinyButton asChild sheen size="lg" className="w-full shadow-none">
-            <a
-              href={checkoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <SponsorCheckoutButton checkoutUrl={checkoutUrl} planId={planId} tierId={tierId}>
               Start sponsorship
               <span className="sr-only"> (opens in a new tab)</span>
-            </a>
+            </SponsorCheckoutButton>
           </ShinyButton>
         ) : (
           <Button
@@ -462,14 +491,10 @@ function SponsorPlanCard({
               tierId !== "platinum" && "bg-background dark:bg-background",
             )}
           >
-            <a
-              href={checkoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <SponsorCheckoutButton checkoutUrl={checkoutUrl} planId={planId} tierId={tierId}>
               Start sponsorship
               <span className="sr-only"> (opens in a new tab)</span>
-            </a>
+            </SponsorCheckoutButton>
           </Button>
         )}
       </div>

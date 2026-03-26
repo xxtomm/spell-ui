@@ -1,0 +1,1 @@
+ALTER TABLE `sponsors` ADD `logo_dark_url` text;

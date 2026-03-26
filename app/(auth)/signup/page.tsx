@@ -45,7 +45,7 @@ export default function SignUpPage() {
 
       <div className="mt-4 w-full">
         <div className="mx-auto flex w-full max-w-sm flex-col gap-3">
-          <Button
+          {/* <Button
             type="button"
             className="w-full bg-zinc-100 hover:bg-zinc-100/90 text-zinc-900 transition-transform duration-150 ease-out will-change-transform active:scale-[0.97] cursor-pointer shadow-none"
             size="lg"
@@ -54,7 +54,7 @@ export default function SignUpPage() {
             aria-label="Sign up with Google"
           >
             <GoogleIcon />
-          </Button>
+          </Button> */}
 
           <Button
             type="button"

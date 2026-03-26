@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/libsql/web";
 import * as authSchema from "./schemas/auth";
+import * as sponsorSchema from "./schemas/sponsor";
 
 export const db = drizzle({
   connection: {
@@ -8,5 +9,6 @@ export const db = drizzle({
   },
   schema: {
     ...authSchema,
+    ...sponsorSchema,
   },
 });
