@@ -60,6 +60,25 @@ export function MobileNav({
       >
         <div className="flex flex-col gap-12 overflow-auto px-4 py-6">
           <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-4">
+              <div className="text-muted-foreground text-sm font-medium">
+                Site
+              </div>
+              <div className="flex flex-col gap-3">
+                <MobileLink href="/docs/introduction" onOpenChange={setOpen}>
+                  Docs
+                </MobileLink>
+                <MobileLink href="/docs/components" onOpenChange={setOpen}>
+                  Components
+                </MobileLink>
+                <MobileLink href="/docs/mcp" onOpenChange={setOpen}>
+                  MCP
+                </MobileLink>
+                <MobileLink href="/sponsor" onOpenChange={setOpen}>
+                  Sponsor
+                </MobileLink>
+              </div>
+            </div>
             {docSchema.map((section, index) => (
               <div key={index} className="flex flex-col gap-4">
                 <div className="text-muted-foreground text-sm font-medium">
@@ -78,6 +97,11 @@ export function MobileNav({
                 </div>
               </div>
             ))}
+          </div>
+          <div className="flex flex-col gap-4 border-t border-border pt-4">
+            <MobileLink href="/login" onOpenChange={setOpen}>
+              Log in
+            </MobileLink>
           </div>
         </div>
       </PopoverContent>
