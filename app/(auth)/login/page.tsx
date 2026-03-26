@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SiGithub } from "@icons-pack/react-simple-icons";
@@ -11,6 +11,14 @@ import { GoogleIcon } from "@/components/auth/google-icon";
 import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
