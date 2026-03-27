@@ -8,6 +8,7 @@ import { Badge } from "@/registry/spell-ui/badge";
 import { BlurReveal } from "@/registry/spell-ui/blur-reveal";
 import { whop } from "@/lib/whop";
 import { SponsorSection } from "@/components/sponsor-section";
+import { SiteFooter } from "@/components/site-footer";
 import { SponsorCheckoutButton } from "./sponsor-checkout-button";
 import { SponsorSuccessOverlay } from "./sponsor-success-overlay";
 
@@ -331,7 +332,7 @@ export default async function SponsorPage({
   );
 
   return (
-    <div className="relative flex min-h-dvh pt-14">
+    <div className="relative flex flex-col min-h-dvh pt-14">
       <SiteHeader docSchema={docSchema} />
       <main className="flex min-h-0 flex-1 flex-col justify-center px-4 py-12 sm:px-5 sm:py-16 md:px-6">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10 md:gap-12">
@@ -396,6 +397,7 @@ export default async function SponsorPage({
           )}
         </div>
       </main>
+      <SiteFooter />
       {isVerifiedSuccess && <SponsorSuccessOverlay />}
     </div>
   );
