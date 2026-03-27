@@ -328,7 +328,7 @@ export default async function SponsorPage({
     checkoutUrl: process.env[tier.envKey] ?? "",
     planId: process.env[tier.planEnvKey] ?? "",
   })).filter((tier): tier is SponsorTierWithCheckout =>
-    Boolean(tier.planId),
+    Boolean(tier.checkoutUrl),
   );
 
   return (
@@ -478,7 +478,7 @@ function SponsorPlanCard({
       <div className="mt-auto pt-1 sm:pt-2">
         {tierId === "diamond" ? (
           <ShinyButton asChild sheen size="lg" className="w-full shadow-none">
-            <SponsorCheckoutButton checkoutUrl={checkoutUrl} planId={planId} tierId={tierId}>
+            <SponsorCheckoutButton checkoutUrl={checkoutUrl} tierId={tierId}>
               Start sponsorship
               <span className="sr-only"> (opens in a new tab)</span>
             </SponsorCheckoutButton>
@@ -493,7 +493,7 @@ function SponsorPlanCard({
               tierId !== "platinum" && "bg-background dark:bg-background",
             )}
           >
-            <SponsorCheckoutButton checkoutUrl={checkoutUrl} planId={planId} tierId={tierId}>
+            <SponsorCheckoutButton checkoutUrl={checkoutUrl} tierId={tierId}>
               Start sponsorship
               <span className="sr-only"> (opens in a new tab)</span>
             </SponsorCheckoutButton>
