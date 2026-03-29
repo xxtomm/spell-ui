@@ -270,7 +270,7 @@
           "type": "registry:component"
         }
       ],
-      "dependencies": [],
+      "dependencies": ["motion"],
       "registryDependencies": [],
       "category": "display"
     },
