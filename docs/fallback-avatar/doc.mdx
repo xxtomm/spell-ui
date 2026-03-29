@@ -1,0 +1,72 @@
+import { Demo } from './demo'
+import { DemoSizes } from './demo-sizes'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="fallback-avatar">
+```tsx file=../../registry/spell-ui/fallback-avatar.tsx
+```
+</InstallationTabs>
+
+## Examples
+
+### Sizes
+
+<DemoCanvas>
+  <DemoPreview>
+    <DemoSizes />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo-sizes.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Usage
+
+```tsx
+import FallbackAvatar from "@/components/fallback-avatar";
+```
+
+```tsx
+<FallbackAvatar name="username" size={32} />
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "name",
+      type: "string",
+      nameDetails: "The string used to deterministically derive unique colors and blob positions"
+    },
+    {
+      name: "size",
+      type: "number",
+      default: "32",
+      nameDetails: "Pixel size of the avatar"
+    },
+    {
+      name: "animated",
+      type: "boolean",
+      default: "true",
+      nameDetails: "When true, blobs orbit and breathe on hover"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes"
+    }
+  ]}
+/>

@@ -453,6 +453,21 @@
       "dependencies": ["qrcode"],
       "registryDependencies": [],
       "category": "display"
+    },
+    {
+      "name": "fallback-avatar",
+      "type": "registry:component",
+      "title": "Fallback Avatar",
+      "description": "A unique gradient avatar generated from a name string.",
+      "files": [
+        {
+          "path": "registry/spell-ui/fallback-avatar.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "display"
     }
   ]
 }

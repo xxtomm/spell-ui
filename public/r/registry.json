@@ -453,6 +453,21 @@
       "dependencies": ["qrcode"],
       "registryDependencies": [],
       "category": "display"
+    },
+    {
+      "name": "fallback-avatar",
+      "type": "registry:component",
+      "title": "Fallback Avatar",
+      "description": "A WebGL avatar with radial gradient blobs blended in screen mode. Deterministic colors from a name string, with hover animation.",
+      "files": [
+        {
+          "path": "registry/spell-ui/fallback-avatar.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "display"
     }
   ]
 }
