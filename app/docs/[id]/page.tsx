@@ -1,6 +1,5 @@
-import { Badge } from "@/registry/spell-ui/badge";
 import { allDocItems, getDoc, getDocSchema } from "@/lib/doc";
-import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DocsTableOfContents } from "@/components/toc";
@@ -8,18 +7,9 @@ import { getTableOfContents } from "@/lib/toc";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { DocCopySection } from "@/components/doc-copy-section";
 import { siteConfig } from "@/lib/config";
 import { absoluteUrl, buildOgUrl, constructMetadata } from "@/lib/utils";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 export async function generateMetadata({
   params,
@@ -97,135 +87,173 @@ export default async function DocPage({
   }
 
   return (
-    <div className="container py-8 md:py-12">
-      <div className="xl:grid xl:grid-cols-[10px_1fr_200px] lg:grid-cols-[0px_1fr_200px] xl:gap-8 max-w-[1600px] mx-auto">
-        <div className="hidden xl:block" />
-        <article className="max-w-4xl prose dark:prose-invert w-full">
-          <header className="not-prose mb-8">
-            <Breadcrumb className="mb-2">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/docs/introduction">Docs</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
+    <div
+      className="px-4 py-4"
+      style={{ fontFamily: "Tahoma, Verdana, Arial, sans-serif", backgroundColor: "#D4D0C8", minHeight: "100vh", paddingBottom: "32px" }}
+    >
+      <div className="xl:grid xl:grid-cols-[1fr_190px] xl:gap-4 max-w-[1400px] mx-auto">
+        {/* Main content panel — Win2k sunken panel */}
+        <div
+          className="win2k-panel"
+          style={{ backgroundColor: "#FFFFFF" }}
+        >
+          {/* Document title bar */}
+          <div
+            className="win2k-titlebar px-2 py-1"
+            style={{ fontSize: "11px" }}
+          >
+            <span>📄</span>
+            <span>{item.title} — Spell UI Docs</span>
+          </div>
+
+          <article
+            className="prose w-full p-4"
+            style={{ fontFamily: "Tahoma, Verdana, Arial, sans-serif", maxWidth: "none" }}
+          >
+            <header className="not-prose mb-4">
+              {/* Win2k breadcrumb toolbar */}
+              <div
+                className="flex items-center gap-1 mb-3 text-[11px] px-1 py-1 win2k-raised"
+                style={{ fontSize: "11px", backgroundColor: "#D4D0C8" }}
+              >
+                <span style={{ color: "#808080" }}>📁</span>
+                <Link href="/docs/introduction" style={{ color: "#0000FF", textDecoration: "none", fontSize: "11px" }}>Docs</Link>
+                <span style={{ color: "#808080" }}>›</span>
                 {isGettingStarted ? (
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>{item.title}</BreadcrumbPage>
-                  </BreadcrumbItem>
+                  <span style={{ fontSize: "11px", fontWeight: "bold" }}>{item.title}</span>
                 ) : (
                   <>
-                    <BreadcrumbItem>
-                      <BreadcrumbLink href="/docs/components">Components</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{item.title}</BreadcrumbPage>
-                    </BreadcrumbItem>
+                    <Link href="/docs/components" style={{ color: "#0000FF", textDecoration: "none", fontSize: "11px" }}>Components</Link>
+                    <span style={{ color: "#808080" }}>›</span>
+                    <span style={{ fontSize: "11px", fontWeight: "bold" }}>{item.title}</span>
                   </>
                 )}
-              </BreadcrumbList>
-            </Breadcrumb>
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <h1 className="scroll-m-20 text-3xl font-semibold tracking-tighter">
-                  {item.title}
-                </h1>
-                <p className="text-base text-muted-foreground">
-                  {item.description}
-                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <DocCopySection content={rawContent} url={`/docs/${id}`} />
-                <Button
-                  variant="secondary"
-                  className="rounded-full size-8 shadow-none active:scale-[0.97] will-change-transform ease-out duration-150 transition-transform"
-                  size="icon"
-                  disabled={!prevDoc}
-                  asChild={!!prevDoc}
-                >
-                  {prevDoc
-                    ? (
-                      <Link
-                        href={`/docs/${prevDoc.id}`}
-                        title={prevDoc.title}
-                      >
-                        <ArrowLeft className="text-muted-foreground" />
-                      </Link>
-                    )
-                    : (
-                      <span>
-                        <ArrowLeft className="text-muted-foreground" />
-                      </span>
-                    )}
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="rounded-full size-8 shadow-none active:scale-[0.97] will-change-transform ease-out duration-300 transition-colors"
-                  size="icon"
-                  disabled={!nextDoc}
-                  asChild={!!nextDoc}
-                >
-                  {nextDoc
-                    ? (
-                      <Link
-                        href={`/docs/${nextDoc.id}`}
-                        title={nextDoc.title}
-                      >
-                        <ArrowRight className="text-muted-foreground" />
-                      </Link>
-                    )
-                    : (
-                      <span>
-                        <ArrowRight className="text-muted-foreground" />
-                      </span>
-                    )}
-                </Button>
-              </div>
-            </div>
 
-            {item.meta?.docs && item.meta?.docs.length > 0 && (
-              <div className="flex items-center space-x-2 pt-4">
-                {item.meta?.docs?.map((doc) => (
-                  <Badge key={doc.title} variant="secondary" asChild>
-                    <a href={doc.url} target="_blank" rel="noopener noreferrer">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h1
+                    style={{
+                      fontFamily: "Tahoma, Verdana, Arial, sans-serif",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      color: "#000000",
+                      margin: "0 0 4px 0",
+                      lineHeight: "1.3",
+                    }}
+                  >
+                    {item.title}
+                  </h1>
+                  <p
+                    style={{
+                      fontFamily: "Tahoma, Verdana, Arial, sans-serif",
+                      fontSize: "12px",
+                      color: "#444444",
+                      margin: "0",
+                    }}
+                  >
+                    {item.description}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <DocCopySection content={rawContent} url={`/docs/${id}`} />
+                  <button
+                    className="win2k-button text-[11px] flex items-center gap-1"
+                    style={{ opacity: prevDoc ? 1 : 0.4, cursor: prevDoc ? "pointer" : "default" }}
+                  >
+                    {prevDoc ? (
+                      <Link href={`/docs/${prevDoc.id}`} title={prevDoc.title} style={{ textDecoration: "none", color: "#000000" }}>
+                        ◀ Back
+                      </Link>
+                    ) : (
+                      <span>◀ Back</span>
+                    )}
+                  </button>
+                  <button
+                    className="win2k-button text-[11px] flex items-center gap-1"
+                    style={{ opacity: nextDoc ? 1 : 0.4, cursor: nextDoc ? "pointer" : "default" }}
+                  >
+                    {nextDoc ? (
+                      <Link href={`/docs/${nextDoc.id}`} title={nextDoc.title} style={{ textDecoration: "none", color: "#000000" }}>
+                        Next ▶
+                      </Link>
+                    ) : (
+                      <span>Next ▶</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {item.meta?.docs && item.meta?.docs.length > 0 && (
+                <div className="flex items-center gap-2 mt-3 flex-wrap">
+                  {item.meta?.docs?.map((doc) => (
+                    <a
+                      key={doc.title}
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="win2k-button text-[11px] flex items-center gap-1"
+                      style={{ textDecoration: "none", color: "#000000" }}
+                    >
                       {doc.title}
-                      <ExternalLink className="w-4 h-4" />
+                      <ExternalLink style={{ width: "12px", height: "12px" }} />
                     </a>
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </header>
-          <Doc />
+                  ))}
+                </div>
+              )}
 
-          <nav className="not-prose flex items-center justify-between mt-12 pt-12 border-t">
-            {prevDoc ? (
-              <Link
-                href={`/docs/${prevDoc.id}`}
-                className="max-w-40 flex group flex-col font-medium items-start gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors ease-out duration-200"
-              >
-                <span className="transition-colors text-muted-foreground/75 group-hover:text-muted-foreground ease-out duration-200">Previous</span>
-                <span className="truncate">{prevDoc.title}</span>
-              </Link>
-            ) : (
-              <div />
-            )}
-            {nextDoc ? (
-              <Link
-                href={`/docs/${nextDoc.id}`}
-                className="max-w-40 flex group flex-col font-medium items-end gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors ease-out duration-200"
-              >
-                <span className="transition-colors text-muted-foreground/75 group-hover:text-muted-foreground ease-out duration-200">Next</span>
-                <span className="truncate">{nextDoc.title}</span>
-              </Link>
-            ) : (
-              <div />
-            )}
-          </nav>
-        </article>
+              {/* Separator rule */}
+              <div
+                className="mt-3"
+                style={{ borderTop: "1px solid #808080", borderBottom: "1px solid #FFFFFF" }}
+              />
+            </header>
 
-        <aside className="hidden xl:block sticky top-[90px] h-fit">
-          <DocsTableOfContents toc={toc} docId={id} />
+            <Doc />
+
+            {/* Bottom navigation */}
+            <nav
+              className="not-prose flex items-center justify-between mt-6 pt-3"
+              style={{ borderTop: "1px solid #808080", borderBottom: "none" }}
+            >
+              {prevDoc ? (
+                <Link
+                  href={`/docs/${prevDoc.id}`}
+                  className="win2k-button text-[11px]"
+                  style={{ textDecoration: "none", color: "#000000" }}
+                >
+                  ◀ {prevDoc.title}
+                </Link>
+              ) : (
+                <div />
+              )}
+              {nextDoc ? (
+                <Link
+                  href={`/docs/${nextDoc.id}`}
+                  className="win2k-button text-[11px]"
+                  style={{ textDecoration: "none", color: "#000000" }}
+                >
+                  {nextDoc.title} ▶
+                </Link>
+              ) : (
+                <div />
+              )}
+            </nav>
+          </article>
+        </div>
+
+        {/* TOC — Win2k panel */}
+        <aside className="hidden xl:block">
+          <div className="win2k-panel sticky top-[90px] h-fit">
+            <div
+              className="win2k-titlebar px-2 py-1 text-[11px]"
+            >
+              📋 On This Page
+            </div>
+            <div style={{ backgroundColor: "#D4D0C8" }}>
+              <DocsTableOfContents toc={toc} docId={id} />
+            </div>
+          </div>
         </aside>
       </div>
     </div>

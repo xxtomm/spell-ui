@@ -56,74 +56,89 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --rotating-border-color: var(--color-neutral-200);
+  /* Windows 2000 color palette */
+  --win2k-silver: #D4D0C8;
+  --win2k-white: #FFFFFF;
+  --win2k-dark: #404040;
+  --win2k-black: #000000;
+  --win2k-teal: #008080;
+  --win2k-blue-link: #0000FF;
+  --win2k-highlight: #0A246A;
+  --win2k-highlight-text: #FFFFFF;
+  --win2k-shadow: #808080;
+  --win2k-dark-shadow: #404040;
+  --win2k-light: #FFFFFF;
+  --win2k-button-face: #D4D0C8;
+
+  --radius: 0rem;
+  --background: #D4D0C8;
+  --foreground: #000000;
+  --card: #D4D0C8;
+  --card-foreground: #000000;
+  --popover: #D4D0C8;
+  --popover-foreground: #000000;
+  --primary: #000080;
+  --primary-foreground: #FFFFFF;
+  --secondary: #C0C0C0;
+  --secondary-foreground: #000000;
+  --muted: #C8C4BC;
+  --muted-foreground: #444444;
+  --accent: #0A246A;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF0000;
+  --border: #808080;
+  --input: #FFFFFF;
+  --ring: #0000FF;
+  --chart-1: #008080;
+  --chart-2: #000080;
+  --chart-3: #800000;
+  --chart-4: #008000;
+  --chart-5: #800080;
+  --sidebar: #D4D0C8;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #000080;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #0A246A;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #808080;
+  --sidebar-ring: #0000FF;
+  --rotating-border-color: #808080;
 }
 
+/* Win2000 forces light mode always — no dark variant needed */
 .dark {
-  --background: oklch(0.1149 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(22.213% 0.00003 271.152);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.1149 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-  --rotating-border-color: var(--muted);
+  --background: #D4D0C8;
+  --foreground: #000000;
+  --card: #D4D0C8;
+  --card-foreground: #000000;
+  --popover: #D4D0C8;
+  --popover-foreground: #000000;
+  --primary: #000080;
+  --primary-foreground: #FFFFFF;
+  --secondary: #C0C0C0;
+  --secondary-foreground: #000000;
+  --muted: #C8C4BC;
+  --muted-foreground: #444444;
+  --accent: #0A246A;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF0000;
+  --border: #808080;
+  --input: #FFFFFF;
+  --ring: #0000FF;
+  --chart-1: #008080;
+  --chart-2: #000080;
+  --chart-3: #800000;
+  --chart-4: #008000;
+  --chart-5: #800080;
+  --sidebar: #D4D0C8;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #000080;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #0A246A;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #808080;
+  --sidebar-ring: #0000FF;
+  --rotating-border-color: #808080;
 }
 
 @layer base {
@@ -132,7 +147,180 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: Tahoma, Verdana, Arial, sans-serif !important;
+    font-size: 11px;
   }
+  a {
+    color: #0000FF;
+    text-decoration: underline;
+  }
+  a:visited {
+    color: #800080;
+  }
+  a:hover {
+    color: #0000CC;
+  }
+}
+
+/* Windows 2000 raised/sunken border utilities */
+.win2k-raised {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #FFFFFF #808080 #808080 #FFFFFF;
+  box-shadow: inset 1px 1px 0 #DFDFDF, inset -1px -1px 0 #404040;
+}
+
+.win2k-sunken {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #808080 #FFFFFF #FFFFFF #808080;
+  box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #DFDFDF;
+}
+
+.win2k-button {
+  background-color: #D4D0C8;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #FFFFFF #808080 #808080 #FFFFFF;
+  box-shadow: inset 1px 1px 0 #DFDFDF, inset -1px -1px 0 #404040;
+  padding: 3px 8px;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+  font-size: 11px;
+  color: #000000;
+  cursor: pointer;
+}
+
+.win2k-button:active {
+  border-color: #808080 #FFFFFF #FFFFFF #808080;
+  box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #DFDFDF;
+}
+
+.win2k-titlebar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  color: #FFFFFF;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.win2k-menubar {
+  background-color: #D4D0C8;
+  border-bottom: 1px solid #808080;
+  padding: 2px 4px;
+  display: flex;
+  gap: 0;
+}
+
+.win2k-menubar-item {
+  padding: 3px 8px;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+  font-size: 11px;
+  color: #000000;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.win2k-menubar-item:hover {
+  background-color: #0A246A;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.win2k-panel {
+  background-color: #D4D0C8;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #FFFFFF #808080 #808080 #FFFFFF;
+  box-shadow: inset 1px 1px 0 #DFDFDF, inset -1px -1px 0 #404040;
+}
+
+.win2k-inset {
+  background-color: #FFFFFF;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #808080 #FFFFFF #FFFFFF #808080;
+  box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #DFDFDF;
+}
+
+.win2k-selected {
+  background-color: #0A246A !important;
+  color: #FFFFFF !important;
+}
+
+/* Override shiki code blocks for Win2k feel */
+.shiki,
+.shiki span {
+  color: var(--shiki-light) !important;
+  background-color: var(--shiki-light-bg) !important;
+  font-family: "Courier New", Courier, monospace !important;
+  font-size: 11px !important;
+}
+
+/* Win2k prose overrides */
+.prose {
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+  font-size: 12px;
+  color: #000000;
+}
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-family: Tahoma, Verdana, Arial, sans-serif;
+  color: #000000;
+}
+.prose a {
+  color: #0000FF;
+}
+.prose code {
+  font-family: "Courier New", Courier, monospace !important;
+  font-size: 11px !important;
+  background-color: #FFFFFF;
+  border: 1px solid #808080;
+  padding: 0 3px;
+  color: #000000;
+}
+.prose pre {
+  background-color: #FFFFFF !important;
+  border: 2px solid;
+  border-color: #808080 #FFFFFF #FFFFFF #808080;
+  box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #DFDFDF;
+  border-radius: 0 !important;
+  font-family: "Courier New", Courier, monospace !important;
+  font-size: 11px !important;
+}
+.prose pre code {
+  border: none;
+  background: none;
+  padding: 0;
+}
+.prose blockquote {
+  border-left: 3px solid #808080;
+  background-color: #E8E4DC;
+  padding: 4px 8px;
+  font-style: normal;
+  color: #000000;
+}
+.prose table {
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.prose th {
+  background-color: #D4D0C8;
+  border: 1px solid #808080;
+  padding: 3px 6px;
+  font-weight: bold;
+}
+.prose td {
+  border: 1px solid #808080;
+  padding: 3px 6px;
+}
+.prose hr {
+  border: none;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #FFFFFF;
 }
 
 @utility container {
@@ -172,8 +360,8 @@ summary {
 
 .dark .shiki,
 .dark .shiki span {
-  color: var(--shiki-dark) !important;
-  background-color: #0f0f0f !important;
+  color: var(--shiki-light) !important;
+  background-color: var(--shiki-light-bg) !important;
 }
 
 .subheading-anchor {

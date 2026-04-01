@@ -71,45 +71,52 @@ export function DocsTableOfContents({
 
   return (
     <div
-      className={cn(
-        "flex flex-col gap-2 p-4 pt-0 text-sm",
-        className,
-      )}
+      className={cn("flex flex-col p-2 text-[11px]", className)}
+      style={{ fontFamily: "Tahoma, Verdana, Arial, sans-serif", backgroundColor: "#D4D0C8" }}
     >
-      <p className="text-primary bg-background sticky top-0 h-6 mb-2 text-[0.85rem] flex gap-1.5 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 items-center">
-        <MenuLeft />
-        On This Page
-      </p>
       {toc.map((item) => (
         <a
           key={item.url}
           href={item.url}
-          className="text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:font-medium text-[0.9rem] no-underline transition-colors data-[depth=3]:pl-4 data-[depth=4]:pl-6"
+          style={{
+            display: "block",
+            padding: "2px 4px",
+            fontSize: "11px",
+            textDecoration: "none",
+            fontFamily: "Tahoma, Verdana, Arial, sans-serif",
+            paddingLeft: item.depth >= 3 ? (item.depth >= 4 ? "20px" : "12px") : "4px",
+            backgroundColor: item.url === `#${activeHeading}` ? "#0A246A" : "transparent",
+            color: item.url === `#${activeHeading}` ? "#FFFFFF" : "#0000FF",
+            fontWeight: item.url === `#${activeHeading}` ? "bold" : "normal",
+          }}
           data-active={item.url === `#${activeHeading}`}
           data-depth={item.depth}
         >
           {item.title}
         </a>
       ))}
-      <Separator orientation="horizontal" className="my-2" />
-      <div className="flex flex-col gap-2">
+      <div
+        className="my-2"
+        style={{ borderTop: "1px solid #808080", borderBottom: "1px solid #FFFFFF" }}
+      />
+      <div className="flex flex-col gap-1">
         {docId && (
           <Link
             href={`${siteConfig.links.github}/edit/main/docs/${docId}/doc.mdx`}
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors hover:text-foreground text-muted-foreground [&_svg]:size-3 flex gap-1.5 items-center"
+            style={{ color: "#0000FF", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}
             onClick={() => trackEvent("click_edit_page", { doc: docId })}
           >
-            <SquarePen />
+            <SquarePen style={{ width: "11px", height: "11px" }} />
             Edit this page
           </Link>
         )}
         <Link
           href={siteConfig.links.tom}
-          className="transition-colors hover:text-foreground text-muted-foreground [&_svg]:size-3 flex gap-1.5 items-center"
+          style={{ color: "#0000FF", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}
         >
-          <SiX className="pl-[1px]" />
+          <SiX style={{ width: "11px", height: "11px" }} />
           <span>Follow @tomm_ui</span>
         </Link>
       </div>
