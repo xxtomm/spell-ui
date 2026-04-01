@@ -11,7 +11,8 @@ export function CommandCopyButton({ command }: { command: string }) {
   const handleClick = () => {
     setCopied(true);
     navigator.clipboard.writeText(command);
-    trackEvent("copy_install_command", { command });
+    const pm = command.startsWith("pnpm") ? "pnpm" : command.startsWith("bun") ? "bun" : command.startsWith("yarn") ? "yarn" : "npm";
+    trackEvent("copy_install_command", { command, pm });
     setTimeout(() => {
       setCopied(false);
     }, 1500);
