@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CornerDownLeft, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { useIsMac } from "@/hooks/use-is-mac";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useConfig } from "@/hooks/use-config";
+import { trackEvent } from "@/lib/events";
 
 interface PageItem {
   value: string;
@@ -47,6 +48,25 @@ export function SearchForm({ docSchema }: { docSchema: DocSchema }) {
   const { copyToClipboard } = useCopyToClipboard();
   const [config] = useConfig();
   const packageManager = config.packageManager;
+
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const lastTrackedQueryRef = useRef<string>("");
+
+  const trackSearchQuery = useCallback((query: string) => {
+    const trimmed = query.trim();
+    if (trimmed && trimmed !== lastTrackedQueryRef.current) {
+      lastTrackedQueryRef.current = trimmed;
+      trackEvent("search_query", { query: trimmed });
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const groupedItems = useMemo<PageGroup[]>(() => {
     return docSchema.map((group) => {
@@ -115,8 +135,9 @@ export function SearchForm({ docSchema }: { docSchema: DocSchema }) {
       }
 
       if (e.key === "c" && (e.metaKey || e.ctrlKey)) {
-        if (selectedType === "page" || selectedType === "component") {
+        if (selectedType === "component" && copyPayload) {
           copyToClipboard(copyPayload);
+          trackEvent("copy_install_command", { command: copyPayload, pm: packageManager });
         }
       }
     };
@@ -149,7 +170,17 @@ export function SearchForm({ docSchema }: { docSchema: DocSchema }) {
               handlePageHighlight(item);
             }}
           >
-            <CommandInput placeholder="Type a command or search..." />
+            <CommandInput
+              placeholder="Type a command or search..."
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                if (searchTimeoutRef.current) {
+                  clearTimeout(searchTimeoutRef.current);
+                }
+                searchTimeoutRef.current = setTimeout(() => {
+                  trackSearchQuery(e.target.value);
+                }, 500);
+              }}
+            />
             <CommandPanel>
               <CommandEmpty>The search results could not be found.</CommandEmpty>
               <CommandList>

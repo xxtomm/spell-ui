@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/events";
 import { Check, Terminal } from "lucide-react";
 import { useState } from "react";
 
@@ -10,6 +11,7 @@ export function CommandCopyButton({ command }: { command: string }) {
   const handleClick = () => {
     setCopied(true);
     navigator.clipboard.writeText(command);
+    trackEvent("copy_install_command", { command });
     setTimeout(() => {
       setCopied(false);
     }, 1500);

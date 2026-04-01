@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { trackEvent } from "@/lib/events";
 import { cn } from "@/lib/utils";
 import { SquarePen } from "lucide-react";
 import { Separator } from "./ui/separator";
@@ -98,6 +99,7 @@ export function DocsTableOfContents({
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-foreground text-muted-foreground [&_svg]:size-3 flex gap-1.5 items-center"
+            onClick={() => trackEvent("click_edit_page", { doc: docId })}
           >
             <SquarePen />
             Edit this page

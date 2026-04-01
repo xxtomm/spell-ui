@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { trackEvent } from "@/lib/events";
 import { cn } from "@/lib/utils";
 import { SiClaude, SiOpenai, SiV0 } from "@icons-pack/react-simple-icons";
 
@@ -37,6 +38,7 @@ export function DocCopySection({ content, url }: DocCopySectionProps) {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(content);
+      trackEvent("copy_page", { url });
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (err) {
@@ -60,6 +62,7 @@ export function DocCopySection({ content, url }: DocCopySectionProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2"
+          onClick={() => trackEvent("view_markdown", { url: mdUrl })}
         >
           <svg strokeLinejoin="round" viewBox="0 0 22 16" className="h-4 w-4">
             <path
@@ -79,6 +82,7 @@ export function DocCopySection({ content, url }: DocCopySectionProps) {
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2"
+        onClick={() => trackEvent("open_in_v0", { url })}
       >
         <SiV0 />
         Open in v0
@@ -90,6 +94,7 @@ export function DocCopySection({ content, url }: DocCopySectionProps) {
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2"
+        onClick={() => trackEvent("open_in_chatgpt", { url })}
       >
         <SiOpenai />
         Open in ChatGPT
@@ -101,6 +106,7 @@ export function DocCopySection({ content, url }: DocCopySectionProps) {
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2"
+        onClick={() => trackEvent("open_in_claude", { url })}
       >
         <SiClaude />
         Open in Claude

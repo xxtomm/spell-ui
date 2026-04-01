@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/events";
 import { CheckIcon, Copy } from "lucide-react";
 import { useState } from "react";
 
@@ -19,6 +20,7 @@ export function CopyCodeButton() {
         if (!pre) return;
 
         navigator.clipboard.writeText(pre.textContent ?? "");
+        trackEvent("copy_code");
         setIsCopied(true);
         setTimeout(() => {
           setIsCopied(false);

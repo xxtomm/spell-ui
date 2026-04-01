@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useConfig } from "@/hooks/use-config";
+import { trackEvent } from "@/lib/events";
 import { cn } from "@/lib/utils";
 
 interface CodeBlockCommandProps {
@@ -53,11 +54,13 @@ export function CodeBlockCommand(
     >
       <Tabs
         value={config.packageManager}
-        onValueChange={(value) =>
+        onValueChange={(value) => {
           setConfig({
             ...config,
             packageManager: value as "pnpm" | "npm" | "yarn" | "bun",
-          })}
+          });
+          trackEvent("select_package_manager", { pm: value });
+        }}
         className="gap-0"
       >
         <div className="relative flex items-center gap-2 border-b px-4 py-2.5 bg-background/50">
