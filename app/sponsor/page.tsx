@@ -19,7 +19,7 @@ type SponsorFeatureLine =
 type SponsorHighlightKind = "bestValue" | "topTier";
 
 interface SponsorTierConfig {
-  id: "silver" | "gold" | "platinum" | "diamond";
+  id: "gold" | "platinum" | "diamond";
   title: string;
   price: number;
   priceDisplay?: string;
@@ -32,23 +32,6 @@ interface SponsorTierConfig {
 
 const SPONSOR_TIERS = [
   {
-    id: "silver",
-    title: "Silver",
-    price: 10,
-    envKey: "WHOP_CHECKOUT_URL_SILVER",
-    planEnvKey: "WHOP_PLAN_ID_SILVER",
-    highlight: null,
-    baseTierLabel: null,
-    features: [
-      "Support Spell UI",
-      "Custom Role on Discord server",
-      {
-        label: "Small logo & link:",
-        sublines: ["Sponsor section", "GitHub README"],
-      },
-    ] satisfies SponsorFeatureLine[],
-  },
-  {
     id: "gold",
     title: "Gold",
     price: 30,
@@ -56,8 +39,10 @@ const SPONSOR_TIERS = [
     envKey: "WHOP_CHECKOUT_URL_GOLD",
     planEnvKey: "WHOP_PLAN_ID_GOLD",
     highlight: "bestValue",
-    baseTierLabel: "Silver",
+    baseTierLabel: null,
     features: [
+      "Support Spell UI",
+      "Custom Role on Discord server",
       {
         label: "Medium logo & link:",
         sublines: ["Sponsor section", "GitHub README", "Site Footer"],
@@ -67,7 +52,7 @@ const SPONSOR_TIERS = [
   {
     id: "platinum",
     title: "Platinum",
-    price: 100,
+    price: 199,
     envKey: "WHOP_CHECKOUT_URL_PLATINUM",
     planEnvKey: "WHOP_PLAN_ID_PLATINUM",
     highlight: null,
@@ -87,7 +72,7 @@ const SPONSOR_TIERS = [
   {
     id: "diamond",
     title: "Diamond",
-    price: 500,
+    price: 499,
     envKey: "WHOP_CHECKOUT_URL_DIAMOND",
     planEnvKey: "WHOP_PLAN_ID_DIAMOND",
     highlight: "topTier",
@@ -355,8 +340,15 @@ export default async function SponsorPage({
           {sponsorTiers.length > 0 ? (
             <section
               aria-label="Sponsorship plans"
-              className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:grid-cols-4"
+              className="mx-auto flex w-full max-w-4xl flex-col gap-4 sm:gap-5 md:gap-6"
             >
+              <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-center text-sm text-foreground">
+                <span>
+                  Use code <code className="rounded bg-primary/10 px-1.5 py-0.5 font-mono font-semibold text-primary">SPELL20</code> for 20% off — limited to the first 4 sponsors
+                </span>
+              </div>
+              <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:grid-cols-3"
+              >
               {sponsorTiers.map((tier) => (
                 <SponsorPlanCard
                   key={tier.id}
@@ -374,6 +366,7 @@ export default async function SponsorPage({
                   featureLines={tier.features}
                 />
               ))}
+              </div>
             </section>
           ) : (
             <section

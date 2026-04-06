@@ -6,20 +6,18 @@ import { eq } from "drizzle-orm";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-const TIER_ORDER = ["diamond", "platinum", "gold", "silver"] as const;
+const TIER_ORDER = ["diamond", "platinum", "gold"] as const;
 
 const TIER_LABELS: Record<string, string> = {
   diamond: "Diamond Sponsor",
   platinum: "Platinum Sponsor",
   gold: "Gold Sponsor",
-  silver: "Silver Sponsor",
 };
 
 const TIER_LOGO_SIZE: Record<string, string> = {
   diamond: "h-12 sm:h-14",
   platinum: "h-11 sm:h-12",
   gold: "h-10 sm:h-11",
-  silver: "h-9 sm:h-10",
 };
 
 interface SponsorRow {
