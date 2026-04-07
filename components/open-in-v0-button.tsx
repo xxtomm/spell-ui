@@ -1,4 +1,7 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/events";
 import { siteConfig } from "@/lib/config";
 
 export function OpenInV0Button({ id }: { id: string }) {
@@ -17,6 +20,7 @@ export function OpenInV0Button({ id }: { id: string }) {
         href={`https://v0.dev/chat/api/open?url=${url}`}
         target="_blank"
         rel="noreferrer"
+        onClick={() => trackEvent("open_in_v0", { url })}
       >
         Open in{" "}
         <svg

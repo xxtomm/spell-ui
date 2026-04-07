@@ -42,6 +42,7 @@ export function CodeBlockCommand(
     const command = commands[config.packageManager];
     if (command) {
       copyToClipboard(command);
+      trackEvent("copy_install_command", { command, pm: config.packageManager });
     }
   }, [config.packageManager, commands, copyToClipboard]);
 
