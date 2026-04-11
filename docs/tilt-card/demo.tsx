@@ -24,7 +24,7 @@ export function Demo() {
         tiltLimit={10}
         scale={1.05}
         perspective={1200}
-        className="aspect-video w-[360px] rounded-2xl bg-gradient-to-br from-neutral-100 via-neutral-200 to-neutral-300 dark:from-neutral-700 dark:via-neutral-800 dark:to-neutral-900 overflow-hidden flex flex-col justify-between p-6 cursor-pointer shadow-[0px_8px_16px_rgba(0,0,0,0.08),0px_16px_32px_rgba(0,0,0,0.06),0px_24px_48px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(0,0,0,0.06)] dark:shadow-[0px_8px_16px_rgba(0,0,0,0.3),0px_16px_32px_rgba(0,0,0,0.2),0px_24px_48px_rgba(0,0,0,0.1),inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+        className="aspect-video w-[360px] rounded-2xl bg-gradient-to-br from-neutral-100 via-neutral-200 to-neutral-300 dark:from-neutral-800 dark:via-neutral-900 dark:to-neutral-950 overflow-hidden flex flex-col justify-between p-6 cursor-pointer shadow-[0px_8px_16px_rgba(0,0,0,0.08),0px_16px_32px_rgba(0,0,0,0.06),0px_24px_48px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(0,0,0,0.06)] dark:shadow-[0px_8px_16px_rgba(0,0,0,0.3),0px_16px_32px_rgba(0,0,0,0.2),0px_24px_48px_rgba(0,0,0,0.1),inset_0_0_0_1px_rgba(255,255,255,0.06)]"
       >
         <div className="flex justify-between items-start">
           <SpellLogo />
