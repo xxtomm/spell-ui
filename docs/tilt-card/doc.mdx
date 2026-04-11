@@ -1,0 +1,83 @@
+import { Demo } from './demo'
+
+<DemoCanvas>
+  <DemoPreview>
+    <Demo />
+  </DemoPreview>
+  <DemoCode>
+    ```tsx file=./demo.tsx
+    ```
+  </DemoCode>
+</DemoCanvas>
+
+## Installation
+
+<InstallationTabs item="tilt-card">
+```tsx file=../../registry/spell-ui/tilt-card.tsx
+```
+</InstallationTabs>
+
+## Usage
+
+```tsx
+import { TiltCard } from "@/components/tilt-card";
+```
+```tsx
+<TiltCard tiltLimit={15} scale={1.05} perspective={1200}>
+  <div className="w-80 h-48 rounded-2xl bg-neutral-100 dark:bg-neutral-900 p-6">
+    Your content here 
+  </div>
+</TiltCard>
+```
+
+## Props
+
+<PropsTable
+  data={[
+    {
+      name: "tiltLimit",
+      type: "number",
+      default: "15",
+      nameDetails: "Maximum tilt angle in degrees"
+    },
+    {
+      name: "scale",
+      type: "number",
+      default: "1.05",
+      nameDetails: "Scale factor on hover"
+    },
+    {
+      name: "perspective",
+      type: "number",
+      default: "1200",
+      nameDetails: "Perspective distance in pixels"
+    },
+    {
+      name: "effect",
+      type: "\"gravitate\" | \"evade\"",
+      default: "\"evade\"",
+      nameDetails: "Tilt direction: follows cursor or tilts away"
+    },
+    {
+      name: "spotlight",
+      type: "boolean",
+      default: "true",
+      nameDetails: "Show a spotlight that follows the cursor on hover"
+    },
+    {
+      name: "children",
+      type: "React.ReactNode",
+      nameDetails: "Card content"
+    },
+    {
+      name: "className",
+      type: "string",
+      nameDetails: "Additional CSS classes"
+    },
+    {
+      name: "style",
+      type: "React.CSSProperties",
+      nameDetails: "Additional inline styles"
+    }
+  ]}
+/>

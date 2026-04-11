@@ -260,6 +260,21 @@
       "category": "animation"
     },
     {
+      "name": "tilt-card",
+      "type": "registry:component",
+      "title": "Tilt Card",
+      "description": "Interactive 3D tilt card with perspective hover effect and spotlight.",
+      "files": [
+        {
+          "path": "registry/spell-ui/tilt-card.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "category": "interactive"
+    },
+    {
       "name": "marquee",
       "type": "registry:component",
       "title": "Marquee",

@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/events";
 import { CheckIcon, Copy } from "lucide-react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function CopyCodeButton() {
   const [isCopied, setIsCopied] = useState(false);
+  const pathname = usePathname();
 
   return (
     <Button
@@ -20,7 +22,7 @@ export function CopyCodeButton() {
         if (!pre) return;
 
         navigator.clipboard.writeText(pre.textContent ?? "");
-        trackEvent("copy_code");
+        trackEvent("copy_code", { path: pathname });
         setIsCopied(true);
         setTimeout(() => {
           setIsCopied(false);

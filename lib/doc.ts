@@ -10,6 +10,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   button: "Buttons",
   feedback: "Feedback",
   background: "Backgrounds",
+  interactive: "Interactive",
 };
 
 const CATEGORY_ORDER = [
@@ -18,6 +19,7 @@ const CATEGORY_ORDER = [
   "input",
   "feedback",
   "background",
+  "interactive",
 ];
 
 function toDocItem(item: RegistryItem): DocItem {

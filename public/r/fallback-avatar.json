@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "fallback-avatar",
   "title": "Fallback Avatar",
-  "description": "A WebGL avatar with radial gradient blobs blended in screen mode. Deterministic colors from a name string, with hover animation.",
+  "description": "A unique gradient avatar generated from a name string.",
   "dependencies": [],
   "registryDependencies": [],
   "files": [

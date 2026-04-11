@@ -8,7 +8,7 @@ import { SquarePen } from "lucide-react";
 import { Separator } from "./ui/separator";
 import Link from "next/link";
 import { siteConfig } from "@/lib/config";
-import { SiX } from "@icons-pack/react-simple-icons";
+import { SiX, SiDiscord } from "@icons-pack/react-simple-icons";
 import MenuLeft from "./icons/menu-left";
 
 function useActiveItem(itemIds: string[]) {
@@ -111,6 +111,15 @@ export function DocsTableOfContents({
         >
           <SiX className="pl-[1px]" />
           <span>Follow @tomm_ui</span>
+        </Link>
+        <Link
+          href={siteConfig.links.discord}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-colors hover:text-foreground text-muted-foreground [&_svg]:size-3 flex gap-1.5 items-center"
+        >
+          <SiDiscord />
+          Join community
         </Link>
       </div>
     </div>
