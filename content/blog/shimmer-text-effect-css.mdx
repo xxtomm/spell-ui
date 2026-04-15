@@ -1,0 +1,214 @@
+---
+title: "How to Create a Shimmer Text Effect with CSS"
+description: "Step-by-step guide to building a shimmer text effect using CSS gradients, background-clip, and keyframe animations. Includes customization tips and live examples."
+image: "https://images.unsplash.com/photo-1579547945413-497e1b99dac0?w=1200&h=630&fit=crop"
+tag: "Animation"
+publishedOn: "2025-07-08"
+featured: false
+---
+
+The shimmer text effect — a gradient highlight that sweeps across text — is one of those small details that can make a heading feel alive. You see it on product landing pages, pricing highlights, and hero sections. It's surprisingly simple to build with pure CSS.
+
+Here's how it works, step by step.
+
+## The Core Technique
+
+The shimmer effect relies on three CSS properties working together:
+
+1. **`background: linear-gradient(...)`** — a gradient with a highlight band
+2. **`background-clip: text`** — clips the background to the text shape
+3. **`animation`** — moves the gradient position across the text
+
+Let's build it.
+
+## Step 1: Set Up the Gradient Background
+
+Start with a linear gradient that includes a bright highlight band:
+
+```css
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #334155 0%,
+    #334155 40%,
+    #e2e8f0 50%,
+    #334155 60%,
+    #334155 100%
+  );
+  background-size: 200% 100%;
+}
+```
+
+The gradient is mostly a dark color (`#334155`) with a light highlight (`#e2e8f0`) in the center. Setting `background-size: 200% 100%` makes the gradient twice as wide as the element, so we can slide it across.
+
+## Step 2: Clip the Background to Text
+
+```css
+.shimmer {
+  /* ...gradient from above */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+```
+
+`background-clip: text` makes the gradient only visible through the text glyphs. The `-webkit-` prefix is still needed for Safari. Setting `color: transparent` (along with `-webkit-text-fill-color: transparent`) ensures the text color doesn't paint over the gradient.
+
+## Step 3: Animate the Position
+
+```css
+@keyframes shimmer-slide {
+  0% {
+    background-position: 100% center;
+  }
+  100% {
+    background-position: -100% center;
+  }
+}
+
+.shimmer {
+  /* ...gradient and clipping from above */
+  animation: shimmer-slide 3s ease-in-out infinite;
+}
+```
+
+The animation shifts `background-position` from right to left, creating the illusion of a light sweeping across the text.
+
+## Complete Code
+
+Here's the full implementation:
+
+```css
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #334155 0%,
+    #334155 40%,
+    #e2e8f0 50%,
+    #334155 60%,
+    #334155 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer-slide 3s ease-in-out infinite;
+}
+
+@keyframes shimmer-slide {
+  0% {
+    background-position: 100% center;
+  }
+  100% {
+    background-position: -100% center;
+  }
+}
+```
+
+Apply the `.shimmer` class to any text element and you're done.
+
+## Variations
+
+### Color Shimmer
+
+Instead of a light-on-dark highlight, use two colors:
+
+```css
+.shimmer-color {
+  background: linear-gradient(
+    90deg,
+    #6366f1 0%,
+    #6366f1 40%,
+    #ec4899 50%,
+    #6366f1 60%,
+    #6366f1 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-slide 3s ease-in-out infinite;
+}
+```
+
+This creates a pink highlight sweeping across indigo text.
+
+### Slower, Subtler Shimmer
+
+For a more understated effect, widen the highlight band, soften the color difference, and slow the animation:
+
+```css
+.shimmer-subtle {
+  background: linear-gradient(
+    90deg,
+    #64748b 0%,
+    #64748b 30%,
+    #94a3b8 50%,
+    #64748b 70%,
+    #64748b 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-slide 5s ease-in-out infinite;
+}
+```
+
+### Single Sweep (No Loop)
+
+If you want the shimmer to play once when the element enters the viewport rather than looping:
+
+```css
+.shimmer-once {
+  /* ...same gradient and clipping */
+  animation: shimmer-slide 1.5s ease-out forwards;
+  background-position: 100% center;
+}
+```
+
+Pair this with IntersectionObserver to trigger the animation on scroll.
+
+## Dark Mode
+
+For dark backgrounds, invert the colors — use light text as the base with a brighter white as the highlight:
+
+```css
+.shimmer-dark {
+  background: linear-gradient(
+    90deg,
+    #94a3b8 0%,
+    #94a3b8 40%,
+    #f8fafc 50%,
+    #94a3b8 60%,
+    #94a3b8 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-slide 3s ease-in-out infinite;
+}
+```
+
+## Performance Notes
+
+The shimmer effect is lightweight. Animating `background-position` on a text element is cheap because:
+
+- The element is typically small (a heading)
+- No layout or paint is triggered — just compositing
+- `background-clip: text` is well-optimized in modern browsers
+
+That said, avoid applying this to large blocks of body text. It's meant for headings and short phrases.
+
+## Browser Support
+
+`background-clip: text` is supported in all modern browsers. The `-webkit-` prefix is still recommended for Safari compatibility. This technique works in Chrome, Firefox, Safari, and Edge.
+
+## Ready-Made Alternative
+
+If you want this effect without writing the CSS yourself, [Spell UI](https://spell.sh) has a `ShimmerText` component that wraps this technique with configurable colors, speed, and animation direction. Install it via the CLI and drop it into your JSX.
+
+But honestly, the CSS is simple enough that building it yourself is a perfectly good option. Copy the snippet above, adjust the colors to match your brand, and you're set.

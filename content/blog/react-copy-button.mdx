@@ -1,0 +1,227 @@
+---
+title: "Building a Copy-to-Clipboard Button in React"
+description: "Learn how to build a polished copy-to-clipboard button in React with the Clipboard API, visual feedback, timeout reset, and a graceful fallback for older browsers."
+image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=630&fit=crop"
+tag: "Components"
+publishedOn: "2026-03-15"
+featured: false
+---
+
+Copy buttons are one of those small interactions that users notice when they're missing. Code blocks, API keys, invite links, color values -- anywhere you display text that someone might want to reuse, a copy button saves them from selecting, right-clicking, and hoping they got the whole string.
+
+Here's how to build one properly, including the clipboard API, feedback animation, timeout management, and a fallback for browsers that don't support the modern API.
+
+## The Clipboard API
+
+The modern way to copy text is `navigator.clipboard.writeText()`. It returns a promise and requires a secure context (HTTPS or localhost).
+
+```js
+function CopyButton({ text }) {
+  const [copied, setCopied] = React.useState(false)
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+    } catch (err) {
+      console.error("Failed to copy:", err)
+    }
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted transition-colors"
+      aria-label={copied ? "Copied" : "Copy to clipboard"}
+    >
+      {copied ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
+      {copied ? "Copied" : "Copy"}
+    </button>
+  )
+}
+```
+
+The `copied` state drives both the icon swap and the label change. But there's a problem: the button stays in the "Copied" state forever. You need a timeout to reset it.
+
+## Auto-Reset with Timeout
+
+After a brief feedback window, the button should return to its default state.
+
+```js
+const timeoutRef = React.useRef(null)
+
+async function handleCopy() {
+  try {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+
+    // Clear any existing timeout to prevent race conditions
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+
+    timeoutRef.current = setTimeout(() => {
+      setCopied(false)
+    }, 2000)
+  } catch (err) {
+    console.error("Failed to copy:", err)
+  }
+}
+
+// Clean up on unmount
+React.useEffect(() => {
+  return () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+  }
+}, [])
+```
+
+Two seconds is a comfortable duration. Shorter than that and the feedback feels rushed. Longer and it blocks subsequent copies.
+
+The `clearTimeout` before setting a new one handles the case where a user clicks the button rapidly. Without it, the first timeout would reset the state while the user expects it to still show "Copied" from their most recent click.
+
+## Feedback Animation
+
+A static icon swap works, but a smooth transition adds visual feedback. CSS transitions handle this well:
+
+```css
+.copy-icon {
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.copy-icon-enter {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.copy-icon-active {
+  opacity: 1;
+  transform: scale(1);
+}
+```
+
+In React, you can achieve this with conditional classes:
+
+```js
+<span className={`inline-flex transition-all duration-150 ${copied ? "scale-100 opacity-100" : "scale-100 opacity-100"}`}>
+  {copied ? <CheckIcon className="h-4 w-4 text-green-500" /> : <CopyIcon className="h-4 w-4" />}
+</span>
+```
+
+For a crossfade effect, animate both icons simultaneously -- the copy icon fades out and scales down while the check icon fades in and scales up:
+
+```js
+<span className="relative h-4 w-4">
+  <CopyIcon className={`absolute inset-0 h-4 w-4 transition-all duration-200 ${
+    copied ? "opacity-0 scale-50" : "opacity-100 scale-100"
+  }`} />
+  <CheckIcon className={`absolute inset-0 h-4 w-4 text-green-500 transition-all duration-200 ${
+    copied ? "opacity-100 scale-100" : "opacity-0 scale-50"
+  }`} />
+</span>
+```
+
+Stacking both icons with `absolute inset-0` and toggling their opacity creates a smooth crossfade without layout shifts.
+
+## Fallback for Older Browsers
+
+The Clipboard API isn't available in every environment. Some older browsers, WebViews, and non-secure contexts don't support it. The classic fallback uses a temporary textarea element:
+
+```js
+function copyFallback(text) {
+  const textarea = document.createElement("textarea")
+  textarea.value = text
+  textarea.setAttribute("readonly", "")
+  textarea.style.position = "absolute"
+  textarea.style.left = "-9999px"
+  document.body.appendChild(textarea)
+  textarea.select()
+  let success = false
+  try {
+    success = document.execCommand("copy")
+  } catch (err) {
+    console.error("Fallback copy failed:", err)
+  }
+  document.body.removeChild(textarea)
+  return success
+}
+```
+
+Combine both approaches:
+
+```js
+async function handleCopy() {
+  let success = false
+
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text)
+      success = true
+    } catch {
+      success = copyFallback(text)
+    }
+  } else {
+    success = copyFallback(text)
+  }
+
+  if (success) {
+    setCopied(true)
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => setCopied(false), 2000)
+  }
+}
+```
+
+The `window.isSecureContext` check catches cases where the Clipboard API exists but will fail due to an insecure context.
+
+## Spell UI's Approach
+
+The [CopyButton component in Spell UI](https://spell.sh) adds a blur transition between icons. The outgoing icon blurs and fades while the incoming icon sharpens into focus, making the state change feel intentional rather than abrupt. The component handles the timeout reset and fallback internally, so you just pass a `text` prop.
+
+## Extracting a Reusable Hook
+
+If you use copy-to-clipboard in multiple places, extract the logic into a hook:
+
+```js
+function useCopyToClipboard(duration = 2000) {
+  const [copied, setCopied] = React.useState(false)
+  const timeoutRef = React.useRef(null)
+
+  const copy = React.useCallback(async (text) => {
+    let success = false
+
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text)
+        success = true
+      } catch {
+        success = copyFallback(text)
+      }
+    } else {
+      success = copyFallback(text)
+    }
+
+    if (success) {
+      setCopied(true)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => setCopied(false), duration)
+    }
+
+    return success
+  }, [duration])
+
+  React.useEffect(() => () => clearTimeout(timeoutRef.current), [])
+
+  return { copied, copy }
+}
+```
+
+Usage becomes minimal:
+
+```js
+const { copied, copy } = useCopyToClipboard()
+
+<button onClick={() => copy("npm install spell-ui")}>
+  {copied ? "Copied!" : "Copy"}
+</button>
+```
+
+Clean, reusable, and handles all the edge cases in one place.

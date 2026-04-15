@@ -1,0 +1,207 @@
+---
+title: "How to Create an Accessible Modal Dialog in React"
+description: "Build an accessible modal dialog in React with focus trapping, scroll lock, keyboard handling, ARIA attributes, portal rendering, and exit animations."
+image: "/og?title=How+to+Create+an+Accessible+Modal+Dialog+in+React"
+tag: "Components"
+publishedOn: "2025-09-18"
+featured: false
+---
+
+Modals are one of the most misused patterns on the web. Done poorly, they trap keyboard users, break scroll behavior, and confuse screen readers. Done well, they feel like a natural extension of the page. Here's how to build one that gets the details right.
+
+## Portal Rendering
+
+A modal should render outside the normal DOM tree. If it's nested inside a container with `overflow: hidden` or a stacking context with a low `z-index`, it can get clipped or hidden behind other elements.
+
+React portals solve this:
+
+```js
+function Modal({ isOpen, onClose, children }) {
+  if (!isOpen) return null
+
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="relative z-10 w-full max-w-lg rounded-lg border border-border bg-card p-6 shadow-xl"
+      >
+        {children}
+      </div>
+    </div>,
+    document.body
+  )
+}
+```
+
+The backdrop is a full-screen overlay with a semi-transparent background. Clicking it closes the modal. The dialog itself sits on top of the backdrop with `relative z-10`.
+
+## Scroll Lock
+
+When a modal is open, the page behind it shouldn't scroll. The simplest approach is to toggle `overflow: hidden` on the body:
+
+```js
+React.useEffect(() => {
+  if (!isOpen) return
+
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+  document.body.style.overflow = "hidden"
+  document.body.style.paddingRight = scrollbarWidth + "px"
+
+  return () => {
+    document.body.style.overflow = ""
+    document.body.style.paddingRight = ""
+  }
+}, [isOpen])
+```
+
+The `paddingRight` compensation prevents a layout shift when the scrollbar disappears. Without it, the entire page jitters slightly when the modal opens on Windows browsers and any system showing permanent scrollbars.
+
+## Escape Key
+
+Users expect Escape to close the modal. Add a keydown listener:
+
+```js
+React.useEffect(() => {
+  if (!isOpen) return
+
+  function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      onClose()
+    }
+  }
+
+  document.addEventListener("keydown", handleKeyDown)
+  return () => document.removeEventListener("keydown", handleKeyDown)
+}, [isOpen, onClose])
+```
+
+If you have nested modals (a confirmation dialog inside an edit dialog, for example), make sure only the topmost modal responds to Escape. You can use `event.stopPropagation()` or track modal depth in context.
+
+## Focus Trapping
+
+This is the most important accessibility requirement and the one most implementations skip. When a modal is open, pressing Tab should cycle focus only through elements inside the modal, never escaping to the page behind.
+
+```js
+function useFocusTrap(ref, isOpen) {
+  React.useEffect(() => {
+    if (!isOpen || !ref.current) return
+
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    const focusableElements = ref.current.querySelectorAll(focusableSelector)
+    const firstElement = focusableElements[0]
+    const lastElement = focusableElements[focusableElements.length - 1]
+
+    // Focus the first element when the modal opens
+    firstElement?.focus()
+
+    function handleTab(event) {
+      if (event.key !== "Tab") return
+
+      if (event.shiftKey) {
+        if (document.activeElement === firstElement) {
+          event.preventDefault()
+          lastElement?.focus()
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          event.preventDefault()
+          firstElement?.focus()
+        }
+      }
+    }
+
+    ref.current.addEventListener("keydown", handleTab)
+    const currentRef = ref.current
+    return () => currentRef.removeEventListener("keydown", handleTab)
+  }, [ref, isOpen])
+}
+```
+
+Use this hook by passing a ref to the dialog container:
+
+```js
+const dialogRef = React.useRef(null)
+useFocusTrap(dialogRef, isOpen)
+```
+
+## Restoring Focus
+
+When the modal closes, focus should return to the element that opened it. Without this, focus jumps to the top of the page, which is disorienting.
+
+```js
+React.useEffect(() => {
+  if (!isOpen) return
+
+  const previouslyFocused = document.activeElement
+
+  return () => {
+    if (previouslyFocused instanceof HTMLElement) {
+      previouslyFocused.focus()
+    }
+  }
+}, [isOpen])
+```
+
+This captures the active element when the modal opens and restores it on cleanup.
+
+## ARIA Attributes
+
+The dialog element needs three attributes:
+
+- `role="dialog"` tells screen readers this is a dialog.
+- `aria-modal="true"` tells assistive technology that the rest of the page is inert.
+- `aria-labelledby` should point to the modal's title element.
+
+```js
+<div role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <h2 id="modal-title">Confirm Deletion</h2>
+  <p>This action cannot be undone.</p>
+  <div className="flex justify-end gap-3 mt-4">
+    <button onClick={onClose} className="rounded-md px-4 py-2 text-sm border border-border hover:bg-muted">Cancel</button>
+    <button onClick={onConfirm} className="rounded-md px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700">Delete</button>
+  </div>
+</div>
+```
+
+## Animation
+
+A modal that appears instantly feels jarring. A subtle scale and fade works well:
+
+```css
+.modal-overlay {
+  animation: fadeIn 150ms ease-out;
+}
+
+.modal-content {
+  animation: scaleIn 150ms ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+```
+
+Keep the duration short. Anything over 200ms starts to feel sluggish for something users interact with frequently.
+
+## The Checklist
+
+Before shipping a modal:
+
+- Portal rendering prevents clipping issues.
+- Scroll lock prevents background scrolling, with scrollbar compensation.
+- Escape key closes the modal.
+- Focus is trapped inside the modal while open.
+- Focus returns to the trigger element on close.
+- ARIA attributes are set correctly.
+- Clicking the backdrop closes the modal.
+- Animations are subtle and fast.
+
+That's a lot of behavior for what looks like a simple overlay. But each piece exists because real users hit real problems without it. Build the foundation once and reuse it across every modal in your application.

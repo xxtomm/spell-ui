@@ -1,0 +1,182 @@
+---
+title: "A Practical Guide to React Custom Hooks with Examples"
+description: "Learn to build real-world React custom hooks: useLocalStorage, useMediaQuery, useDebounce, and useIntersectionObserver, with full implementations and usage examples."
+image: "/og?title=A+Practical+Guide+to+React+Custom+Hooks"
+tag: "React"
+publishedOn: "2025-08-22"
+featured: false
+---
+
+## Beyond useState and useEffect
+
+[React](https://react.dev)'s built-in hooks handle the fundamentals, but real applications demand patterns that come up again and again: persisting state, responding to screen size, debouncing inputs, detecting element visibility. Custom hooks let you extract these patterns into reusable, testable functions.
+
+Here are four hooks I reach for in nearly every project, with full implementations you can drop into your codebase.
+
+## useLocalStorage
+
+Syncing state with `localStorage` seems simple until you handle SSR, serialization errors, and storage events from other tabs.
+
+```js
+import { useState, useEffect, useCallback } from "react"
+
+function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    if (typeof window === "undefined") return initialValue
+    try {
+      const item = window.localStorage.getItem(key)
+      return item ? JSON.parse(item) : initialValue
+    } catch (error) {
+      console.warn(`Error reading localStorage key "${key}":`, error)
+      return initialValue
+    }
+  })
+
+  const setValue = useCallback(
+    (value) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value
+        setStoredValue(valueToStore)
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore))
+        }
+      } catch (error) {
+        console.warn(`Error setting localStorage key "${key}":`, error)
+      }
+    },
+    [key, storedValue]
+  )
+
+  return [storedValue, setValue]
+}
+```
+
+Usage is identical to `useState`:
+
+```js
+const [theme, setTheme] = useLocalStorage("theme", "light")
+```
+
+The value persists across page reloads. The lazy initializer in `useState` ensures we only read from `localStorage` once on mount, and the SSR guard prevents errors during server rendering.
+
+## useMediaQuery
+
+Responsive behavior often needs to live in JavaScript, not just CSS. This hook subscribes to a media query and returns whether it currently matches.
+
+```js
+import { useState, useEffect } from "react"
+
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query)
+    setMatches(mediaQuery.matches)
+
+    function handleChange(event) {
+      setMatches(event.matches)
+    }
+
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
+  }, [query])
+
+  return matches
+}
+```
+
+```js
+const isMobile = useMediaQuery("(max-width: 768px)")
+const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
+```
+
+This is especially useful for conditionally rendering entirely different component trees based on screen size, something CSS alone cannot do.
+
+## useDebounce
+
+Search inputs, API calls triggered by user typing, and resize handlers all benefit from debouncing. This hook delays updating a value until a specified period of inactivity.
+
+```js
+import { useState, useEffect } from "react"
+
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => clearTimeout(timer)
+  }, [value, delay])
+
+  return debouncedValue
+}
+```
+
+Pair it with a search input to avoid firing an API call on every keystroke:
+
+```js
+const [search, setSearch] = useState("")
+const debouncedSearch = useDebounce(search, 300)
+
+useEffect(() => {
+  if (debouncedSearch) {
+    fetchResults(debouncedSearch)
+  }
+}, [debouncedSearch])
+```
+
+The cleanup function in `useEffect` cancels the previous timer whenever the value changes, so only the final value after the user stops typing triggers the effect.
+
+## useIntersectionObserver
+
+Detecting when an element enters the viewport is the foundation of lazy loading, infinite scroll, and scroll-triggered animations. The Intersection Observer API is capable but verbose. This hook wraps it cleanly.
+
+```js
+import { useState, useEffect, useRef } from "react"
+
+function useIntersectionObserver(options) {
+  const ref = useRef(null)
+  const [entry, setEntry] = useState(null)
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+
+    const observer = new IntersectionObserver(
+      ([observerEntry]) => setEntry(observerEntry),
+      options
+    )
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [options?.threshold, options?.root, options?.rootMargin])
+
+  return { ref, entry, isIntersecting: entry?.isIntersecting ?? false }
+}
+```
+
+```js
+const { ref, isIntersecting } = useIntersectionObserver({
+  threshold: 0.1,
+  rootMargin: "50px",
+})
+
+// Fade in when visible
+<div ref={ref} style={{ opacity: isIntersecting ? 1 : 0 }}>
+  Content appears on scroll
+</div>
+```
+
+## Principles for Writing Good Hooks
+
+These four hooks share common traits worth noting:
+
+1. **They return the minimal interface.** Each hook returns only what the consumer needs.
+2. **They handle cleanup.** Every subscription and timer is properly torn down in the effect cleanup function.
+3. **They handle edge cases.** SSR guards, error boundaries around `localStorage`, and null checks for refs.
+4. **They are composable.** `useDebounce` and `useLocalStorage` can be combined: debounce a value before persisting it.
+
+Custom hooks are the primary mechanism for code reuse in modern React. When you find yourself writing the same `useEffect` pattern in multiple components, that is your signal to extract a hook.

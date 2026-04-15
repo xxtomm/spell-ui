@@ -1,0 +1,244 @@
+---
+title: "Next.js API Routes and Server Actions Explained"
+description: "A practical guide to Next.js Route Handlers and Server Actions — when to use each, form handling, validation, error handling, and real-world patterns."
+image: "/og?title=Next.js+API+Routes+and+Server+Actions+Explained"
+tag: "Next.js"
+publishedOn: "2026-02-20"
+featured: false
+---
+
+[Next.js](https://nextjs.org) gives you two ways to run server-side logic: Route Handlers (the successor to API routes) and Server Actions. They solve different problems, and knowing when to use each will save you from writing unnecessary code.
+
+## Route Handlers
+
+Route Handlers are the App Router equivalent of API routes. They live inside the `app/` directory in a `route.js` file and export functions named after HTTP methods.
+
+```js
+// app/api/users/route.js
+import { NextResponse } from "next/server"
+
+export async function GET() {
+  const users = await db.user.findMany()
+  return NextResponse.json(users)
+}
+
+export async function POST(request) {
+  const body = await request.json()
+  const user = await db.user.create({ data: body })
+  return NextResponse.json(user, { status: 201 })
+}
+```
+
+### Dynamic Route Handlers
+
+Use dynamic segments just like pages:
+
+```js
+// app/api/users/[id]/route.js
+export async function GET(request, { params }) {
+  const user = await db.user.findUnique({
+    where: { id: params.id },
+  })
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "User not found" },
+      { status: 404 }
+    )
+  }
+
+  return NextResponse.json(user)
+}
+
+export async function DELETE(request, { params }) {
+  await db.user.delete({ where: { id: params.id } })
+  return new Response(null, { status: 204 })
+}
+```
+
+### When to Use Route Handlers
+
+- Building a public API that external clients consume
+- Webhook endpoints ([Stripe](https://stripe.com), GitHub, etc.)
+- Endpoints that need specific HTTP methods (PUT, PATCH, DELETE)
+- Integration with third-party services that post data to your server
+
+## Server Actions
+
+Server Actions are functions that run on the server but can be called directly from client components. No API route needed. No fetch call. You define a function, mark it with `"use server"`, and call it from a form or event handler.
+
+### Basic Server Action
+
+```js
+// app/actions.js
+"use server"
+
+import { revalidatePath } from "next/cache"
+
+export async function createPost(formData) {
+  const title = formData.get("title")
+  const content = formData.get("content")
+
+  await db.post.create({
+    data: { title, content },
+  })
+
+  revalidatePath("/posts")
+}
+```
+
+### Using in a Form
+
+```js
+// app/posts/new/page.js
+import { createPost } from "@/app/actions"
+
+export default function NewPostPage() {
+  return (
+    <form action={createPost}>
+      <input name="title" placeholder="Title" required />
+      <textarea name="content" placeholder="Content" required />
+      <button type="submit">Create Post</button>
+    </form>
+  )
+}
+```
+
+The form works without JavaScript. It submits to the server, runs the action, and the page updates. Progressive enhancement by default.
+
+### Client-Side Usage
+
+For more control — loading states, optimistic updates, error handling — use the `useActionState` hook:
+
+```js
+"use client"
+
+import { useActionState } from "react"
+import { createPost } from "@/app/actions"
+
+export function CreatePostForm() {
+  const [state, action, isPending] = useActionState(createPost, null)
+
+  return (
+    <form action={action}>
+      <input name="title" placeholder="Title" required />
+      <textarea name="content" placeholder="Content" required />
+      <button disabled={isPending}>
+        {isPending ? "Creating..." : "Create Post"}
+      </button>
+      {state?.error && <p className="text-red-500">{state.error}</p>}
+    </form>
+  )
+}
+```
+
+## Validation
+
+Never trust client-side input. Validate inside your Server Action with a library like Zod:
+
+```js
+"use server"
+
+import { z } from "zod"
+
+const PostSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200),
+  content: z.string().min(1, "Content is required"),
+})
+
+export async function createPost(prevState, formData) {
+  const parsed = PostSchema.safeParse({
+    title: formData.get("title"),
+    content: formData.get("content"),
+  })
+
+  if (!parsed.success) {
+    return {
+      error: parsed.error.flatten().fieldErrors,
+    }
+  }
+
+  await db.post.create({ data: parsed.data })
+  revalidatePath("/posts")
+  return { success: true }
+}
+```
+
+Return validation errors as state rather than throwing. This lets the client display field-level errors without a page refresh.
+
+## Error Handling in Route Handlers
+
+Structure your error responses consistently:
+
+```js
+// app/api/posts/route.js
+export async function POST(request) {
+  try {
+    const body = await request.json()
+
+    const parsed = PostSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 }
+      )
+    }
+
+    const post = await db.post.create({ data: parsed.data })
+    return NextResponse.json(post, { status: 201 })
+  } catch (error) {
+    console.error("Failed to create post:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}
+```
+
+## Route Handlers vs. Server Actions
+
+Use this decision framework:
+
+| Use Case | Best Choice |
+|---|---|
+| Form submissions | Server Actions |
+| Data mutations from UI | Server Actions |
+| Public REST API | Route Handlers |
+| Webhook endpoints | Route Handlers |
+| File uploads | Either (Route Handlers for large files) |
+| Third-party integrations | Route Handlers |
+| CRUD from your own UI | Server Actions |
+
+Server Actions cut boilerplate. Instead of creating an API route, writing a fetch call, handling the response, and managing loading state, you define a function and call it. For internal mutations, they're almost always the better choice.
+
+Route Handlers are still the right choice for proper HTTP endpoints — webhooks, public APIs, or endpoints consumed by mobile apps.
+
+## CORS for Route Handlers
+
+If your API is consumed by external origins:
+
+```js
+export async function GET(request) {
+  const data = await getData()
+
+  return NextResponse.json(data, {
+    headers: {
+      "Access-Control-Allow-Origin": "https://allowed-origin.com",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    },
+  })
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    headers: {
+      "Access-Control-Allow-Origin": "https://allowed-origin.com",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  })
+}
+```
+
+Pick the right tool for the job. Server Actions for your own UI mutations. Route Handlers for everything else. Both run on the server, both have full access to your backend — the difference is in how they're invoked and who consumes them.

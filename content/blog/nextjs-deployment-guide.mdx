@@ -1,0 +1,193 @@
+---
+title: "Deploying Next.js: Vercel, Docker, and Self-Hosting"
+description: "A practical guide to deploying Next.js applications — Vercel for zero-config, Docker for containers, and standalone output for self-hosted environments."
+image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=1200&h=630&fit=crop"
+tag: "Next.js"
+publishedOn: "2025-12-05"
+featured: false
+---
+
+Building a [Next.js](https://nextjs.org) app is half the work. Getting it running in production — reliably and without surprises — is the other half. Your deployment strategy depends on your infrastructure, budget, and how much operational complexity you want to manage.
+
+Here are three approaches, from simplest to most hands-on.
+
+## Vercel: Zero-Config Deployment
+
+[Vercel](https://vercel.com) built Next.js, and it shows. Deploying to Vercel is the path of least resistance.
+
+### Setup
+
+1. Push your code to GitHub, GitLab, or Bitbucket
+2. Connect the repository to Vercel at [vercel.com](https://vercel.com)
+3. Vercel auto-detects Next.js and configures the build
+
+Every push to `main` triggers a production deploy. Every pull request gets a preview deployment with a unique URL.
+
+### Environment Variables
+
+Set them in the Vercel dashboard under Project Settings > Environment Variables. You can scope variables to Production, Preview, or Development:
+
+```bash
+# These are set in the Vercel dashboard, not committed to git
+DATABASE_URL=postgresql://...
+AUTH_SECRET=your-secret
+NEXT_PUBLIC_API_URL=https://api.myapp.com
+```
+
+Variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. Everything else stays server-side.
+
+### When Vercel Makes Sense
+
+- Small teams that don't want to manage infrastructure
+- Projects that benefit from edge functions and CDN
+- When preview deployments per PR are valuable to your workflow
+
+### When It Doesn't
+
+- You need to control the server environment
+- Costs scale unfavorably for your traffic pattern
+- Compliance requires hosting in specific regions or on-premise
+
+## Docker: Containerized Deployment
+
+[Docker](https://www.docker.com) gives you a portable, reproducible build that runs anywhere — AWS ECS, Google Cloud Run, Railway, or your own servers.
+
+### Standalone Output
+
+First, enable standalone output in your Next.js config:
+
+```js
+// next.config.js
+module.exports = {
+  output: "standalone",
+}
+```
+
+This tells Next.js to bundle only the files needed for production, including a minimal Node.js server. The output is self-contained — no `node_modules` required.
+
+### Dockerfile
+
+Here's a production-ready multi-stage Dockerfile:
+
+```bash
+FROM node:20-alpine AS base
+
+# Install dependencies
+FROM base AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Build the application
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
+```
+
+### Building and Running
+
+```bash
+docker build -t my-nextjs-app .
+docker run -p 3000:3000 --env-file .env.production my-nextjs-app
+```
+
+### Multi-Stage Build Explained
+
+The Dockerfile uses three stages:
+
+1. **deps** — Installs `node_modules` in an isolated layer. This layer is cached and only rebuilds when `package.json` changes.
+2. **builder** — Copies source code and runs the build. The standalone output goes to `.next/standalone`.
+3. **runner** — Copies only the production artifacts. No source code, no dev dependencies. The final image is typically 100-150MB.
+
+### Image Size Tips
+
+- Use `node:20-alpine` instead of `node:20` (saves ~700MB)
+- Don't copy `node_modules` into the final stage — standalone mode includes what it needs
+- Add a `.dockerignore` file:
+
+```bash
+node_modules
+.next
+.git
+*.md
+```
+
+## Self-Hosting Without Docker
+
+If you prefer running Next.js directly on a VPS or bare metal server:
+
+```bash
+npm run build
+npm start
+```
+
+This starts the Next.js production server on port 3000. Put it behind a reverse proxy like Nginx or Caddy:
+
+```bash
+# /etc/caddy/Caddyfile
+myapp.com {
+  reverse_proxy localhost:3000
+}
+```
+
+Caddy handles HTTPS automatically. For Nginx, you'd configure SSL certificates separately with Let's Encrypt.
+
+### Process Management
+
+Use PM2 to keep your app running and restart it on crashes:
+
+```bash
+npm install -g pm2
+pm2 start npm --name "my-app" -- start
+pm2 save
+pm2 startup
+```
+
+## Environment Variables Across Environments
+
+Regardless of where you deploy, handle environment variables carefully:
+
+- **Keep `.env` files out of git.** Add them to `.gitignore`.
+- **Use `.env.local` for development** and set production values in your hosting platform.
+- **Validate required variables at startup** to fail fast:
+
+```js
+// lib/env.js
+function requireEnv(name) {
+  const value = process.env[name]
+  if (!value) throw new Error("Missing required env var: " + name)
+  return value
+}
+
+export const env = {
+  databaseUrl: requireEnv("DATABASE_URL"),
+  authSecret: requireEnv("AUTH_SECRET"),
+}
+```
+
+## Which Should You Choose?
+
+**Vercel** if you want zero ops and your budget allows it. **Docker** if you need portability, run on your own infrastructure, or want consistent environments across teams. **Bare metal / VPS** if you're cost-conscious and comfortable managing a server.
+
+Start with Vercel for speed. Move to Docker when you need more control. That's the path most teams follow, and it works.

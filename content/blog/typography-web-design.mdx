@@ -1,0 +1,152 @@
+---
+title: "Typography Best Practices for Web Design"
+description: "Practical typography advice for web designers and developers — font pairing, sizing scales, line height, variable fonts, and performance-optimized loading."
+image: "/og?title=Typography+Best+Practices+for+Web+Design"
+tag: "Design"
+publishedOn: "2025-11-12"
+featured: false
+---
+
+Typography carries more weight than any other design element. Users can forgive an ugly color palette. They won't forgive text that's hard to read. The difference between an interface that feels professional and one that feels amateur is almost always typographic.
+
+Here's what matters in practice.
+
+## Font Pairing Without Overthinking
+
+The simplest approach: use one font family for everything. A well-designed typeface like Inter, Geist, or IBM Plex Sans has enough weights and widths to handle headings, body text, labels, and captions.
+
+If you want two fonts, follow one rule: pair a serif with a sans-serif, or a geometric sans with a humanist sans. Don't pair two fonts from the same category unless you know exactly why.
+
+Reliable pairings that work:
+
+- **Geist Sans + Geist Mono** — Modern, clean. The mono weight works well for code snippets and data.
+- **Inter + Newsreader** — Inter for UI, Newsreader for long-form content.
+- **DM Sans + DM Serif Display** — Same family, designed to work together.
+- **Space Grotesk + Space Mono** — Geometric with a technical feel.
+
+Stop at two families. Three fonts on a page is almost always one too many.
+
+## Sizing Scales That Actually Scale
+
+Random font sizes create visual chaos. Use a modular scale — a set of sizes based on a consistent ratio.
+
+The most practical scale for web interfaces uses a 1.25 ratio (Major Third):
+
+```css
+:root {
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.25rem;    /* 20px */
+  --text-xl: 1.563rem;   /* 25px */
+  --text-2xl: 1.953rem;  /* 31px */
+  --text-3xl: 2.441rem;  /* 39px */
+  --text-4xl: 3.052rem;  /* 49px */
+}
+```
+
+You don't need to hit every step. Most interfaces use four to six sizes from this scale. The point is that the relationships between sizes feel intentional, not arbitrary.
+
+For responsive headings, use `clamp()` to fluidly scale between mobile and desktop sizes:
+
+```css
+h1 {
+  font-size: clamp(2rem, 5vw + 1rem, 3.5rem);
+}
+```
+
+This gives you a minimum of 2rem, a maximum of 3.5rem, and fluid scaling in between. No breakpoints needed.
+
+## Line Height Rules
+
+Line height (leading) controls readability more than font size does. Text with the wrong line height is exhausting to read, even if the font size is perfect.
+
+**Body text:** 1.5 to 1.7. This gives enough space between lines for comfortable reading. Longer lines need more line height.
+
+**Headings:** 1.1 to 1.3. Large text needs tighter leading or the lines feel disconnected.
+
+**UI labels and buttons:** 1 to 1.2. Compact elements need tight line height to stay visually cohesive.
+
+```css
+body {
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  line-height: 1.15;
+}
+
+.btn, .label, .badge {
+  line-height: 1;
+}
+```
+
+A related detail: set `text-wrap: balance` on headings. It prevents awkward single-word orphans on the last line.
+
+```css
+h1, h2, h3 {
+  text-wrap: balance;
+}
+```
+
+Browser support is solid in 2025, and it makes a visible difference on two- and three-line headings.
+
+## Variable Fonts Are Worth It
+
+Variable fonts bundle multiple weights (and sometimes widths, optical sizes, and italics) into a single file. Instead of loading Regular, Medium, Semi-Bold, and Bold as four separate files, you load one that interpolates between them.
+
+Performance benefits aside, variable fonts let you use precise weights like 550 or 630 — values that don't exist in static fonts. This gives you finer control over typographic hierarchy.
+
+```css
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+.heading {
+  font-weight: 680;
+}
+
+.subheading {
+  font-weight: 550;
+}
+
+.body {
+  font-weight: 400;
+}
+```
+
+Three distinct levels of emphasis from a single font file.
+
+## Loading Strategy
+
+Font loading affects both performance and visual stability. A poorly loaded font causes a flash of unstyled text (FOUT) or a flash of invisible text (FOIT).
+
+The best approach in 2025:
+
+1. **Self-host your fonts.** Google Fonts adds a DNS lookup and connection to a third-party server. Download the files and serve them from your own domain.
+
+2. **Use `font-display: swap`.** The text shows immediately in a fallback font, then swaps when the custom font loads. Users see content instantly.
+
+3. **Preload your primary font.** Add a preload hint in the document head so the browser fetches the font before it encounters it in CSS.
+
+4. **Subset aggressively.** If you only use Latin characters, don't ship Cyrillic and Greek glyphs. Tools like `glyphhanger` or `fonttools` can strip unused character sets.
+
+5. **Use WOFF2.** It's the smallest format with universal browser support. You don't need WOFF, TTF, or EOT anymore.
+
+A single variable WOFF2 file, self-hosted, preloaded, and subsetted to Latin. That's the entire font loading strategy. It's fast, stable, and covers every browser your users actually have.
+
+## The Quick Audit
+
+Run this checklist on your next project:
+
+- Is body text at least 16px?
+- Is body line height between 1.5 and 1.7?
+- Are heading line heights tighter (1.1–1.3)?
+- Do you have no more than two font families?
+- Is every font size from a consistent scale?
+- Are fonts self-hosted and using `font-display: swap`?
+
+If you answer yes to all six, your typography is in good shape. Everything else is refinement.

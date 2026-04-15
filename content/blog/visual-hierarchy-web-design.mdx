@@ -1,0 +1,135 @@
+---
+title: "Visual Hierarchy in Web Design: A Practical Guide"
+description: "Learn how to guide users' eyes through your interface using size, color, contrast, spacing, and typography weight. Practical techniques for better visual hierarchy."
+image: "/og?title=Visual+Hierarchy+in+Web+Design:+A+Practical+Guide"
+tag: "Design"
+publishedOn: "2025-03-02"
+featured: false
+---
+
+Every time a user lands on your page, their brain runs a split-second calculation: what matters here? Visual hierarchy is how you answer that question before they consciously ask it.
+
+Most designers understand hierarchy in theory. The hard part is applying it consistently. Here are the techniques that actually work.
+
+## Size Is the Loudest Signal
+
+Bigger elements get seen first. This isn't a design principle — it's a biological fact. Your visual cortex processes large objects before small ones.
+
+The practical rule: create at least three distinct size tiers on every screen. A heading, a subheading, and body text. A hero image, a card image, and a thumbnail. When everything is the same size, nothing stands out.
+
+```css
+.heading-primary {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.heading-secondary {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.body-text {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+```
+
+Notice the ratios. The primary heading is 3x the body text, the secondary is 1.5x. That gap needs to be significant enough that users perceive the difference instantly.
+
+One detail worth getting right early: add `-webkit-font-smoothing: antialiased` on your body element. On macOS, the default subpixel rendering makes text appear heavier than the designer intended, which throws off your weight-based hierarchy. Grayscale antialiasing produces crisper results that match what you see in Figma.
+
+For headings, use `text-wrap: balance` to distribute text evenly across lines. This prevents orphaned words sitting alone on the last line of a heading, which disrupts the visual weight of the block.
+
+## Color and Contrast Direct Attention
+
+A single colored element on a monochrome page will pull every eye in the room. This is the isolation effect — our brains prioritize things that break the pattern.
+
+Use this deliberately. Your primary call-to-action should be the most saturated, highest-contrast element on the screen. Secondary actions get muted colors. Tertiary actions can be text links.
+
+```css
+.btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.btn-tertiary {
+  background-color: transparent;
+  color: #6b7280;
+  text-decoration: underline;
+}
+```
+
+Three buttons, three levels of visual importance. The user knows which one you want them to click without reading a single label.
+
+## Spacing Creates Grouping
+
+The Gestalt principle of proximity: things close together are perceived as related. Things far apart are perceived as separate.
+
+This means whitespace isn't empty — it's structural. The space between a heading and its paragraph should be smaller than the space between two sections. The padding inside a card should be smaller than the gap between cards.
+
+```css
+.section {
+  padding-block: 4rem;
+}
+
+.section-header {
+  margin-bottom: 1rem;
+}
+
+.card-grid {
+  gap: 2rem;
+}
+
+.card {
+  padding: 1.5rem;
+}
+```
+
+When spacing is inconsistent, users can't tell where one group ends and another begins. They have to read to understand the structure instead of seeing it.
+
+## Typography Weight Adds Layers
+
+Font weight is an underused hierarchy tool. Most designs jump straight from regular (400) to bold (700) and miss everything in between. Variable fonts give you the full spectrum.
+
+Use weight to create emphasis within the same size tier. A semi-bold label next to regular body text. A medium-weight caption that sits between a bold heading and light metadata.
+
+```css
+.label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.meta {
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+```
+
+Same font size, completely different visual weight. The label reads as important. The metadata reads as supplementary.
+
+## Putting It Together
+
+Hierarchy isn't one technique — it's the combination. The strongest designs layer multiple signals on top of each other. A heading is large, bold, and high-contrast. A footnote is small, light, and muted.
+
+Here's the checklist I run through on every layout:
+
+1. **Squint test.** Blur your eyes. Can you still tell what's most important? If not, your size and contrast ratios need work.
+2. **Three-level check.** Does every screen have a clear primary, secondary, and tertiary level?
+3. **Spacing audit.** Are related items closer together than unrelated items everywhere?
+4. **One focal point.** Each section should have exactly one element that draws the eye first.
+
+Taste in visual hierarchy means balancing composition, proportion, and clarity. Train your eye by studying why layouts succeed — not just copying them. Ask what makes a particular arrangement feel right, then reverse-engineer the spacing ratios, the contrast levels, the weight distribution. That analytical habit is what turns good hierarchy instincts into reliable skill.
+
+Visual hierarchy makes an interface work. When the hierarchy is clear, users don't think about where to look. They just know.

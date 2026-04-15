@@ -1,0 +1,236 @@
+---
+title: "A Practical Guide to Motion (Framer Motion) for React"
+description: "Everything you need to know to use Motion effectively — motion components, variants, gestures, layout animations, and exit animations with real examples."
+image: "/og?title=A+Practical+Guide+to+Motion+for+React"
+tag: "Animation"
+publishedOn: "2025-09-12"
+featured: false
+---
+
+[Motion](https://motion.dev) is the most widely used animation library in the [React](https://react.dev) ecosystem, and for good reason. It balances expressiveness and ease of use better than any other library in the space. But the docs are dense, and it's easy to miss the patterns that make it actually useful in production.
+
+> **Note:** Motion was formerly known as Framer Motion. The library has been renamed and now lives at [motion.dev](https://motion.dev) with the [npm package `motion`](https://www.npmjs.com/package/motion).
+
+This is the guide I wish I'd had when I started using it.
+
+## The Basics: motion Components
+
+Every Motion animation starts with a `motion` component. These are enhanced HTML elements that accept animation props:
+
+```js
+// motion.div, motion.span, motion.h1, etc.
+// Key props:
+// - initial: starting state
+// - animate: target state
+// - transition: how it gets there
+
+// Example config:
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: "easeOut" },
+};
+```
+
+The `initial` → `animate` pattern is the foundation. Motion interpolates between the two states automatically.
+
+### Transition Config
+
+The `transition` prop controls the animation curve:
+
+```js
+// Duration-based (default)
+{ duration: 0.5, ease: "easeOut" }
+
+// Spring physics (more natural feel)
+{ type: "spring", stiffness: 300, damping: 24 }
+
+// Spring shorthand
+{ type: "spring", bounce: 0.25 }
+
+// Tween with custom bezier
+{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }
+```
+
+My default for most UI animations: `{ type: "spring", stiffness: 400, damping: 30 }`. It's snappy without being abrupt.
+
+## Variants: Orchestrating Multiple Elements
+
+Variants let you define named animation states and orchestrate children automatically:
+
+```js
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4 },
+  },
+};
+
+// Parent uses containerVariants, children use itemVariants
+// Children automatically stagger by 80ms
+```
+
+The parent's `staggerChildren` property adds a delay between each child's animation. You don't need to manually calculate delays — Motion handles it.
+
+### Variant Propagation
+
+When a parent changes its variant (e.g., from `"hidden"` to `"visible"`), all children with matching variant names animate too. This propagation is automatic and is one of Motion's best features.
+
+## AnimatePresence: Exit Animations
+
+Removing elements from the [DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) with animation is one of React's hardest problems. Once a component unmounts, it's gone — you can't animate it out. `AnimatePresence` solves this.
+
+```js
+// Wrap conditional renders with AnimatePresence
+// Add exit prop to define the leave animation
+// Use key prop so Motion can track elements
+
+// Exit animation config:
+const exitConfig = {
+  initial: { opacity: 0, scale: 0.95 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.95 },
+  transition: { duration: 0.2 },
+};
+```
+
+Common gotcha: `AnimatePresence` needs a `key` prop on its direct children to track them. Without it, exit animations won't fire.
+
+### mode="wait"
+
+By default, entering and exiting elements animate simultaneously. Use `mode="wait"` to make the exiting element fully leave before the entering one appears. This is essential for route transitions.
+
+## Gestures
+
+Motion has built-in gesture support:
+
+```js
+// Hover, tap, drag — all declarative
+const gestureConfig = {
+  whileHover: { scale: 1.05 },
+  whileTap: { scale: 0.97 },
+  transition: { type: "spring", stiffness: 400, damping: 17 },
+};
+
+// Drag with constraints
+const dragConfig = {
+  drag: true,
+  dragConstraints: { left: -100, right: 100, top: -100, bottom: 100 },
+  dragElastic: 0.1,
+};
+```
+
+`whileHover` and `whileTap` are remarkably useful. They handle the hover/active states with spring physics, which feels significantly better than [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS) `:hover` transitions.
+
+Motion provides six gesture types: `hover`, `tap`, `pan`, `drag`, `focus`, and `inView`. Each works through corresponding `while-` props (`whileHover`, `whileTap`, `whileFocus`, etc.), keeping gesture-driven animations fully declarative.
+
+`whileTap` auto-cancels if the pointer moves too far from the element, which prevents conflicts with drag interactions on the same component. It also responds to the keyboard Return key automatically — you get that accessibility behavior for free without any extra work.
+
+`whileFocus` follows the same logic as `:focus-visible`, so it only activates for keyboard navigation rather than every click. Keep focus animations subtle — a gentle scale or border highlight works well, but anything too dramatic can disorient keyboard users who are tabbing through a form.
+
+Springs outperform standard easing functions for gesture feedback because they respond to velocity, not just time. Motion's spring animations run on the compositor thread, so they match CSS transition performance while giving you physics-based feel that duration-based curves can't replicate.
+
+## Layout Animations
+
+This is Motion's best feature. Add `layout` to a motion component and it automatically animates when its size or position changes in the DOM:
+
+```js
+// Just add layout={true} to the element
+// Motion handles FLIP animation automatically
+// Works across parent changes, reorders, and size changes
+```
+
+This is how you build smooth list reordering, expanding cards, shared element transitions, and accordion components without manually calculating positions.
+
+### layoutId for Shared Element Transitions
+
+Give two elements the same `layoutId` and Motion will animate between them when one mounts and the other unmounts:
+
+```js
+// Element A: layoutId="hero-image"
+// Element B: layoutId="hero-image"
+// When A unmounts and B mounts,
+// Motion animates position + size between them
+```
+
+This is the foundation of shared element transitions between pages or between a list view and detail view.
+
+One important gotcha: keep components with `layoutId` outside of `AnimatePresence`. Placing them inside triggers initial and exit animations simultaneously with layout animations, and the result looks broken — especially opacity transitions that fade in and cross-fade at the same time.
+
+For layout animation springs, I've landed on `{ type: "spring", duration: 0.55, bounce: 0.1 }` as a reliable default. It's smooth enough to feel polished but fast enough that the UI doesn't feel laggy during transitions.
+
+The practical uses for `layoutId` go beyond page transitions. Tab switches with active indicators that slide between tabs, card-to-dialog expansions where a thumbnail morphs into a full detail view, and content that reshapes between different-sized containers — these all become straightforward with layout animations instead of manual position calculations.
+
+## useInView: Scroll-Triggered Animations
+
+```js
+// Detect when an element enters the viewport
+// ref: attach to the element
+// isInView: boolean that triggers animation
+
+// Options:
+// - once: true → only trigger on first entry
+// - margin: "-100px" → trigger before element is fully visible
+// - amount: 0.5 → trigger when 50% visible
+```
+
+Pair `useInView` with `initial`/`animate` to trigger entrance animations on scroll without any additional library.
+
+## Common Patterns
+
+### Page Transition Wrapper
+
+```js
+// Wrap page content with:
+// initial={{ opacity: 0 }}
+// animate={{ opacity: 1 }}
+// exit={{ opacity: 0 }}
+// Inside AnimatePresence with mode="wait"
+```
+
+### Staggered List
+
+```js
+// Parent: variants with staggerChildren: 0.06
+// Children: variants with y: 16, opacity: 0 → y: 0, opacity: 1
+// Trigger: whileInView="visible" initial="hidden" on parent
+// viewport={{ once: true }}
+```
+
+### Expandable Card
+
+```js
+// Card: layout={true}
+// Content: AnimatePresence for conditional content
+// Height change animates automatically via layout
+```
+
+## Performance Tips
+
+1. **Use `layout` carefully** — it's powerful but measures the DOM on every render. Don't put it on hundreds of elements
+2. **Prefer `transform` values** (`x`, `y`, `scale`, `rotate`) over `width`, `height`, `top`, `left`
+3. **Use `lazy` motion components** if you're loading Motion on a page that doesn't immediately need animations — it code-splits the animation engine
+4. **Set `willChange: "transform"` on frequently animated elements** to hint GPU compositing
+5. **Avoid animating `filter`** (blur, brightness, etc.) on mobile — it's expensive
+
+## When Not to Use Motion
+
+It's not always the right tool:
+
+- **Simple hover effects** → CSS transitions are simpler and lighter
+- **Scroll-progress animations** → CSS `scroll-timeline` or GSAP ScrollTrigger are better suited
+- **Complex timeline sequences** → [GSAP](https://gsap.com)'s timeline API handles choreographed animations better
+- **Bundle size is critical** → Consider whether you need the full feature set or can get by with CSS alone
+
+For everything else — page transitions, gesture interactions, layout animations, orchestrated entrance effects — Motion is hard to beat.

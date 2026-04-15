@@ -1,0 +1,118 @@
+---
+title: "How to Optimize Images for Web Performance"
+description: "A practical guide to image optimization — modern formats, lazy loading, responsive images, and delivery strategies that cut page weight without sacrificing quality."
+image: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=1200&h=630&fit=crop"
+tag: "Performance"
+publishedOn: "2025-03-20"
+featured: false
+---
+
+Images account for nearly half of the average page's total weight. Optimizing them is the highest-impact performance win most sites can make, and it requires no code changes.
+
+Here's how to do it properly.
+
+## Use Modern Formats
+
+JPEG and PNG are legacy formats at this point. Two modern alternatives compress significantly better at equivalent visual quality.
+
+**WebP** delivers 25-35% smaller files than JPEG with broad browser support (96%+ globally). It handles both lossy and lossless compression, plus transparency.
+
+**AVIF** goes further — 40-50% smaller than JPEG in many cases. Browser support is catching up fast, with Chrome, Firefox, and Safari all on board.
+
+Serve them with the `<picture>` element to provide fallbacks:
+
+```html
+<picture>
+  <source srcset="/hero.avif" type="image/avif" />
+  <source srcset="/hero.webp" type="image/webp" />
+  <img src="/hero.jpg" alt="Hero image" />
+</picture>
+```
+
+Or let your build tool or CDN handle format negotiation automatically using the `Accept` header.
+
+## Lazy Load Below-the-Fold Images
+
+Images the user hasn't scrolled to yet shouldn't block the initial page load. Native lazy loading is the simplest approach:
+
+```html
+<img src="/product.webp" alt="Product shot" loading="lazy" />
+```
+
+The browser defers loading until the image is near the viewport. Two important rules:
+
+1. **Never lazy load above-the-fold images.** Your hero image, logo, and anything visible on initial load should use `loading="eager"` (or just omit the attribute — eager is the default).
+2. **Always set width and height attributes.** Without explicit dimensions, the browser can't reserve space before the image loads, causing layout shift.
+
+## Implement Responsive Images with srcset
+
+Serving a 2000px image to a 400px mobile screen wastes bandwidth. The `srcset` attribute lets the browser choose the right size:
+
+```html
+<img
+  srcset="/photo-400.webp 400w, /photo-800.webp 800w, /photo-1200.webp 1200w"
+  sizes="(max-width: 600px) 400px, (max-width: 1000px) 800px, 1200px"
+  src="/photo-800.webp"
+  alt="Responsive photo"
+/>
+```
+
+The `sizes` attribute tells the browser how wide the image will display at each breakpoint. The browser then picks the smallest file that covers that size at the device's pixel density.
+
+## Use Next.js Image Component
+
+If you're on [Next.js](https://nextjs.org), the built-in `Image` component handles most of this automatically:
+
+```js
+import Image from "next/image";
+
+// In your component:
+// <Image src="/hero.jpg" alt="Hero" width={1200} height={630} priority />
+```
+
+It generates multiple sizes, converts to WebP/AVIF, lazy loads by default, and prevents layout shift. Use the `priority` prop for above-the-fold images to preload them.
+
+The `sizes` prop matters for performance. Without it, Next.js assumes the image is full-width, which may generate larger files than needed:
+
+```js
+// Tell Next.js the image is never wider than 768px
+// sizes="(max-width: 768px) 100vw, 768px"
+```
+
+## Optimize at the Source
+
+Before worrying about delivery, compress your source images:
+
+- **Set quality to 75-85 for lossy formats.** Most users can't distinguish quality above this range.
+- **Strip metadata.** EXIF data, color profiles, and thumbnails add kilobytes. Tools like `sharp` or `squoosh` handle this.
+- **Resize to the maximum display size.** A 4000px photo displayed at 1200px max is wasting 3/4 of its pixels.
+
+```bash
+# Using sharp-cli to batch process
+npx sharp-cli -i ./images/*.jpg -o ./optimized/ --webp --quality 80 --resize 1600
+```
+
+## Serve Through a CDN
+
+A CDN does three things for image performance:
+
+1. **Edge caching.** Images load from the server closest to the user.
+2. **Automatic format negotiation.** Services like Cloudflare, Imgix, and [Vercel](https://vercel.com) Image Optimization detect the browser's supported formats and serve the smallest option.
+3. **On-the-fly resizing.** Request any size via URL parameters instead of pre-generating every variant.
+
+Set aggressive cache headers. Images rarely change — a `Cache-Control: public, max-age=31536000, immutable` header eliminates redundant downloads entirely.
+
+## The Checklist
+
+Run through this for every project:
+
+- Serve WebP or AVIF with JPEG fallbacks
+- Lazy load everything below the fold
+- Set explicit width and height on every image
+- Use srcset and sizes for responsive images
+- Compress to 75-85% quality
+- Strip unnecessary metadata
+- Serve through a CDN with long cache TTLs
+- Preload your LCP image with `priority` or `<link rel="preload">`
+
+Most of these are set-and-forget. Spend an afternoon implementing them and your page weight drops by 40-60% with no visible quality loss.

@@ -1,0 +1,154 @@
+---
+title: "How to Design a Startup Landing Page on a Budget"
+description: "Practical strategies for building a professional, high-converting startup landing page without a design team. Covers tools, frameworks, templates, and free resources."
+image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&h=630&fit=crop"
+tag: "Landing Pages"
+publishedOn: "2026-01-25"
+featured: false
+---
+
+Early-stage startups face a specific design problem: you need a landing page that looks credible enough to earn trust, but you don't have the budget for a design team, and you can't spend three weeks pixel-pushing when you should be shipping product.
+
+The good news: the right tools and a few smart design decisions can get you a professional-looking landing page in a weekend. Here's how.
+
+## Choose the Right Stack
+
+Your landing page framework should be fast to build with, fast to load, and easy to update. For most startups, these are the strongest options:
+
+**[Next.js](https://nextjs.org) + [Tailwind CSS](https://tailwindcss.com).** If your product is already built on [React](https://react.dev), this is the obvious choice. Next.js gives you static site generation for fast load times, and Tailwind CSS lets you style everything without writing custom CSS files. The combination is fast to build with and performs well out of the box.
+
+**Astro.** If your landing page is mostly static content with minimal interactivity, Astro is hard to beat. It ships zero JavaScript by default and lets you use React, Vue, or Svelte components only where needed.
+
+**Framer or Webflow.** If you're a non-technical founder, these visual builders produce professional results without code. The tradeoff is less control and higher monthly costs as you scale.
+
+For most technical founders, Next.js + Tailwind is the sweet spot. You can go from zero to deployed in a weekend.
+
+## Use Pre-Built Components
+
+This is where most founders waste time — building common UI patterns from scratch. You don't need to design a pricing table or testimonial section from zero.
+
+Resources that save significant time:
+
+**[shadcn/ui](https://ui.shadcn.com)** is the best option for React component primitives. Buttons, cards, dialogs, accordions — all accessible, customizable, and copy-paste ready. It's not a dependency; you own the code.
+
+**Tailwind UI** offers professionally designed page sections and templates. It's paid ($299 one-time) but the quality justifies the cost if you're building multiple pages.
+
+**[Spell UI](https://spell.sh)** provides animated components built specifically for landing pages — text animations, card effects, gradient backgrounds, and interactive elements. If you want your page to feel polished without hand-coding animations, it's a practical option. Components install via the shadcn CLI, so they integrate into an existing Tailwind project in seconds.
+
+**Aceternity UI and Magic UI** are other community-driven component collections worth exploring for specific effects and patterns.
+
+The strategy is composability: pick the best components from multiple sources rather than locking into a single template.
+
+## Typography Makes or Breaks It
+
+The fastest way to make a landing page look amateur is bad typography. And the fastest way to make it look professional is good typography.
+
+Rules that consistently work:
+
+**Use one font family.** Inter, Geist, or DM Sans for a clean modern feel. Two font families maximum — one for headings, one for body. Three is almost always a mess.
+
+**Set a clear size hierarchy.** Hero headline at 48-64px, section headings at 28-36px, body text at 16-18px. Use `clamp()` for responsive sizing:
+
+```css
+/* Responsive type scale */
+.hero-title {
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+.section-title {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.body-text {
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.7;
+}
+```
+
+**Negative letter-spacing on headings.** Tighten tracking on headlines by -0.02 to -0.03em. This single detail makes headings feel deliberate rather than default.
+
+**Constrain line lengths.** Body text should max out around 65-75 characters per line. Use `max-width: 640px` on text containers to prevent eye-straining wide lines.
+
+## Color Palette on a Budget
+
+You don't need a brand designer to pick good colors. Start with this formula:
+
+1. **One primary color** — for CTAs and key accents
+2. **Neutral backgrounds** — white/off-white or dark gray/near-black
+3. **Muted text** — not pure black or pure white; use opacity or gray variants for secondary text
+
+For dark themes (which work well for developer tools and technical products):
+
+```css
+:root {
+  --bg-primary: #09090b;
+  --bg-secondary: #18181b;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --accent: #3b82f6;
+}
+```
+
+For light themes:
+
+```css
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f4f5;
+  --text-primary: #18181b;
+  --text-secondary: #71717a;
+  --accent: #2563eb;
+}
+```
+
+These palettes are borrowed from Tailwind's Zinc scale, which is why they feel balanced. You can swap the accent color to match your brand.
+
+## Free Assets That Look Professional
+
+**Icons.** Lucide (lucide.dev) is the best free icon set for SaaS landing pages. Clean, consistent, and available as React components.
+
+**Illustrations.** Avoid generic stock illustrations. If you need visuals, use real product screenshots. If your product isn't built yet, use simple geometric shapes or gradients instead of clip-art style illustrations.
+
+**Backgrounds.** Subtle gradient meshes, dot grids, or noise overlays add depth without being distracting. These can be done in pure CSS:
+
+```css
+/* Subtle dot grid background */
+.dot-background {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.08) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+```
+
+## Deploy for Free
+
+For a startup landing page, there's no reason to pay for hosting:
+
+- **[Vercel](https://vercel.com)** — Best for Next.js projects, generous free tier
+- **Netlify** — Excellent free tier, great for static sites
+- **Cloudflare Pages** — Fastest global CDN, unlimited bandwidth on free tier
+
+All three support custom domains, HTTPS, and preview deployments. Pick whichever matches your stack.
+
+## The Weekend Landing Page Playbook
+
+If you're building your startup landing page this weekend, here's the plan:
+
+**Saturday morning:** Set up Next.js + Tailwind. Install shadcn/ui. Pick your font (Inter or Geist) and color palette. Build the hero section with headline, subheadline, and CTA.
+
+**Saturday afternoon:** Add the features section (3 feature blocks), a social proof bar (even "Backed by Y Combinator" or "Featured in TechCrunch" counts), and a final CTA section.
+
+**Sunday morning:** Polish typography, add hover states to buttons and cards, implement a simple scroll-reveal animation on feature sections.
+
+**Sunday afternoon:** Deploy to Vercel. Set up your custom domain. Test on mobile. Ship it.
+
+This is not a perfect landing page. It's a working one. And a working landing page that's live today beats a perfect one that ships next month.
+
+Start scrappy, measure what matters, and iterate based on real user behavior. The budget constraint forces focus — and focus is usually what makes landing pages good in the first place.

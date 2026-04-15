@@ -1,0 +1,235 @@
+---
+title: "Next.js SEO: The Complete Guide to Search Optimization"
+description: "Master SEO in Next.js — the Metadata API, dynamic Open Graph images, sitemaps, robots.txt, structured data, and canonical URLs explained with practical examples."
+image: "https://images.unsplash.com/photo-1562577309-2592ab84b1bc?w=1200&h=630&fit=crop"
+tag: "Next.js"
+publishedOn: "2025-06-30"
+featured: false
+---
+
+[Next.js](https://nextjs.org) gives you more SEO control out of the box than any other [React](https://react.dev) framework. The problem is that most of the features are buried in the docs. Here's everything you need to implement proper SEO in a Next.js project, with code you can copy directly.
+
+## The Metadata API
+
+The App Router replaced the old `Head` component with a dedicated Metadata API. You export a `metadata` object or a `generateMetadata` function from any page or layout.
+
+### Static Metadata
+
+For pages where the metadata doesn't change:
+
+```js
+// app/about/page.js
+export const metadata = {
+  title: "About Us",
+  description: "Learn about our team and mission.",
+  openGraph: {
+    title: "About Us",
+    description: "Learn about our team and mission.",
+    url: "https://myapp.com/about",
+    type: "website",
+  },
+}
+```
+
+### Dynamic Metadata
+
+For pages where metadata depends on data — blog posts, product pages, user profiles:
+
+```js
+// app/blog/[slug]/page.js
+export async function generateMetadata({ params }) {
+  const post = await getPost(params.slug)
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.publishedAt,
+      authors: [post.author],
+    },
+  }
+}
+```
+
+Next.js deduplicates the data fetch — if your page component also calls `getPost(params.slug)`, it only runs once.
+
+### Title Templates
+
+Set a template in your root layout so every page inherits a consistent format:
+
+```js
+// app/layout.js
+export const metadata = {
+  title: {
+    default: "My App",
+    template: "%s | My App",
+  },
+  description: "Default description for my app.",
+}
+```
+
+Now a page with `title: "About Us"` renders as "About Us | My App" in the browser tab.
+
+## Open Graph Images
+
+Dynamic OG images boost your SEO and click-through rates on social platforms. Next.js lets you generate them with JSX using the `ImageResponse` API:
+
+```js
+// app/og/route.js
+import { ImageResponse } from "next/og"
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url)
+  const title = searchParams.get("title") || "My App"
+
+  return new ImageResponse(
+    (
+      <div style={{
+        display: "flex",
+        fontSize: 60,
+        background: "black",
+        color: "white",
+        width: "100%",
+        height: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        {title}
+      </div>
+    ),
+    { width: 1200, height: 630 }
+  )
+}
+```
+
+Reference this in your metadata:
+
+```js
+openGraph: {
+  images: ["/og?title=Your+Page+Title"],
+}
+```
+
+## Sitemap
+
+Next.js supports programmatic sitemaps. Create a `sitemap.js` file at the app root:
+
+```js
+// app/sitemap.js
+export default async function sitemap() {
+  const posts = await getAllPosts()
+
+  const blogEntries = posts.map(post => ({
+    url: `https://myapp.com/blog/${post.slug}`,
+    lastModified: post.updatedAt,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }))
+
+  return [
+    {
+      url: "https://myapp.com",
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 1,
+    },
+    {
+      url: "https://myapp.com/about",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    ...blogEntries,
+  ]
+}
+```
+
+Next.js automatically serves this at `/sitemap.xml`.
+
+## Robots.txt
+
+Same pattern — create a `robots.js` file:
+
+```js
+// app/robots.js
+export default function robots() {
+  return {
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/api/", "/dashboard/"],
+      },
+    ],
+    sitemap: "https://myapp.com/sitemap.xml",
+  }
+}
+```
+
+## Structured Data (JSON-LD)
+
+Structured data helps search engines understand your content. Add it as a script tag in your page component:
+
+```js
+// app/blog/[slug]/page.js
+export default async function BlogPost({ params }) {
+  const post = await getPost(params.slug)
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.publishedAt,
+    author: {
+      "@type": "Person",
+      name: post.author,
+    },
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <article>
+        <h1>{post.title}</h1>
+        {/* post content */}
+      </article>
+    </>
+  )
+}
+```
+
+## Canonical URLs
+
+Prevent duplicate content issues by setting canonical URLs in your metadata:
+
+```js
+export const metadata = {
+  alternates: {
+    canonical: "https://myapp.com/blog/my-post",
+  },
+}
+```
+
+For dynamic pages, set this inside `generateMetadata` using the current URL.
+
+## Quick Wins Checklist
+
+Before shipping, verify these:
+
+1. Every page has a unique `title` and `description`
+2. Open Graph tags are set with proper images
+3. Sitemap is generated and includes all public pages
+4. `robots.txt` blocks private routes
+5. Structured data is added to content pages
+6. Canonical URLs are set on pages accessible via multiple URLs
+7. Images have `alt` text (Next.js `Image` component enforces this)
+8. Pages are server-rendered — client-only content won't be indexed
+
+SEO in Next.js is a checklist. Run through it once, automate what you can with `generateMetadata`, and you'll outrank 90% of React apps.

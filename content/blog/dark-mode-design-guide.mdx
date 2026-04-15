@@ -1,0 +1,155 @@
+---
+title: "Dark Mode Design: Best Practices and Common Mistakes"
+description: "How to design dark mode interfaces that actually look good — color adaptation, contrast ratios, image handling, detecting user preferences, and common mistakes."
+image: "https://images.unsplash.com/photo-1532003885409-ed84d334f6cc?w=1200&h=630&fit=crop"
+tag: "Design"
+publishedOn: "2026-01-08"
+featured: false
+---
+
+Dark mode isn't a filter you apply to a light design. Every inverted-color implementation produces the same result: harsh white text, neon accent colors that vibrate against dark backgrounds, and images that look wrong.
+
+Good dark mode requires deliberate design decisions. Here's what those decisions are.
+
+## Don't Use Pure Black
+
+The most common dark mode mistake is using `#000000` as the background. Pure black creates maximum contrast with white text, which sounds good in theory but causes halation — a visual effect where bright text on a true black background appears to bleed and blur.
+
+Use a very dark gray instead. Something between `#0a0a0a` and `#171717`. The difference is subtle but significant for reading comfort.
+
+```css
+:root[data-theme="dark"] {
+  --bg-base: #0a0a0a;
+  --bg-raised: #141414;
+  --bg-overlay: #1c1c1c;
+  --bg-subtle: #262626;
+}
+```
+
+Create depth by layering progressively lighter grays. In light mode, elevation is communicated through shadows. In dark mode, elevation is communicated through surface lightness — higher elements are lighter.
+
+## Reduce Text Contrast
+
+Pure white text (`#ffffff`) on a dark background is too harsh for extended reading. The Material Design guidelines recommend `rgba(255, 255, 255, 0.87)` for primary text, and that's a good starting point.
+
+Build a text color system with three tiers:
+
+```css
+:root[data-theme="dark"] {
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.38);
+}
+```
+
+Primary text for headings and body copy. Secondary for labels, captions, and less important content. Tertiary for placeholders and disabled states.
+
+Check contrast ratios. The 0.87 opacity white on a `#0a0a0a` background gives you roughly a 17:1 ratio — well above WCAG requirements but soft enough to feel comfortable.
+
+## Desaturate Your Colors
+
+Saturated colors that look great on white can overwhelm on dark surfaces. A vibrant blue button that works in light mode looks like a neon sign in dark mode.
+
+Reduce saturation by 10–20% and increase lightness slightly for dark mode variants:
+
+```css
+/* Light mode */
+:root {
+  --primary: hsl(220, 90%, 50%);
+  --success: hsl(142, 76%, 36%);
+  --error: hsl(0, 84%, 50%);
+}
+
+/* Dark mode */
+:root[data-theme="dark"] {
+  --primary: hsl(220, 70%, 60%);
+  --success: hsl(142, 56%, 50%);
+  --error: hsl(0, 64%, 60%);
+}
+```
+
+Less saturation, more lightness. The colors still feel like the same hue but won't assault the eyes against a dark background.
+
+## Handle Images and Media
+
+Images designed for light backgrounds look wrong on dark surfaces. A product screenshot with a white background creates a blinding rectangle in an otherwise dark interface.
+
+Strategies that work:
+
+**Reduce image brightness.** A slight CSS filter dims images without altering their appearance dramatically.
+
+```css
+[data-theme="dark"] img {
+  filter: brightness(0.9);
+}
+```
+
+**Add a border or subtle background.** For screenshots and illustrations with transparent or white backgrounds, a faint border prevents them from floating awkwardly.
+
+**Provide dark variants.** For logos, illustrations, and diagrams, serve a dark-mode-specific version. This is extra work but produces the best results.
+
+**Use `mix-blend-mode` carefully.** Some decorative images blend nicely with `mix-blend-mode: lighten` on dark backgrounds, but test thoroughly — it can produce unexpected results.
+
+## Detecting User Preferences
+
+Respect the operating system preference as the default, then let users override it.
+
+```js
+// Check system preference
+const prefersDark = window.matchMedia(
+  '(prefers-color-scheme: dark)'
+).matches;
+
+// Listen for changes
+window.matchMedia('(prefers-color-scheme: dark)')
+  .addEventListener('change', (e) => {
+    if (!userHasManualPreference) {
+      setTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+```
+
+Store the user's manual choice in `localStorage` and check it on page load before the page renders. This prevents the flash of wrong theme that plagues many dark mode implementations.
+
+The CSS-only approach using `prefers-color-scheme` works for static sites:
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #0a0a0a;
+    --text-primary: rgba(255, 255, 255, 0.87);
+  }
+}
+```
+
+But if you need a manual toggle (and you should provide one), you'll need JavaScript to manage the state.
+
+## Borders and Dividers
+
+Light mode uses dark borders on light backgrounds. The instinct is to flip this for dark mode — light borders on dark backgrounds. But bright borders look heavy and distracting.
+
+Use very subtle borders with low opacity:
+
+```css
+:root[data-theme="dark"] {
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+}
+```
+
+At 10% opacity, borders provide structure without drawing attention. They separate content without creating a cage around every element.
+
+## The Checklist
+
+Before shipping dark mode, verify:
+
+- Background is dark gray, not pure black
+- Primary text is slightly off-white
+- Accent colors are desaturated compared to light mode
+- Images don't create harsh bright rectangles
+- Borders are subtle (under 20% opacity)
+- Focus states and outlines are still clearly visible
+- No flash of wrong theme on page load
+- A manual toggle exists and persists the user's choice
+
+Dark mode is a second design system, not a CSS trick. Treat it with the same care as your light theme, and users will actually prefer it.

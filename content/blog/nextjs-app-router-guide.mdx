@@ -1,0 +1,175 @@
+---
+title: "Next.js App Router: Everything You Need to Know"
+description: "A deep dive into the Next.js App Router — layouts, loading states, error boundaries, parallel routes, intercepting routes, and advanced patterns with examples."
+image: "/og?title=Next.js+App+Router:+Everything+You+Need+to+Know"
+tag: "Next.js"
+publishedOn: "2025-08-28"
+featured: false
+---
+
+The App Router is the biggest architectural shift in [Next.js](https://nextjs.org) history. It replaced the Pages Router's flat, page-centric model with a nested, layout-driven approach built on React Server Components. If you've been using Next.js for a while, some patterns feel unfamiliar. If you're starting fresh, you're in the right place.
+
+This guide covers the core concepts and the advanced features most tutorials skip.
+
+## Layouts: Persistent, Nested UI
+
+Layouts wrap pages and persist across navigations. The root layout is required and wraps your entire app:
+
+```js
+// app/layout.js
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+Nested layouts compose automatically. A layout in `app/dashboard/layout.js` wraps everything under `/dashboard` while the root layout wraps that:
+
+```js
+// app/dashboard/layout.js
+export default function DashboardLayout({ children }) {
+  return (
+    <div className="flex">
+      <aside>Sidebar</aside>
+      <main>{children}</main>
+    </div>
+  )
+}
+```
+
+When a user navigates from `/dashboard/analytics` to `/dashboard/settings`, the sidebar doesn't re-render. Only the `{children}` portion swaps. This is genuinely useful for complex apps with persistent navigation.
+
+## Loading States
+
+Drop a `loading.js` file in any route segment and Next.js wraps the page in a `Suspense` boundary automatically:
+
+```js
+// app/dashboard/loading.js
+export default function Loading() {
+  return <div className="animate-pulse">Loading...</div>
+}
+```
+
+This works because the App Router streams HTML using React's Suspense architecture. The layout renders immediately, the loading state shows, and the page content replaces it once data is ready. No client-side loading spinners or skeleton management required.
+
+## Error Boundaries
+
+The `error.js` convention catches errors in a route segment and its children:
+
+```js
+// app/dashboard/error.js
+"use client"
+
+export default function Error({ error, reset }) {
+  return (
+    <div>
+      <h2>Something went wrong</h2>
+      <p>{error.message}</p>
+      <button onClick={() => reset()}>Try again</button>
+    </div>
+  )
+}
+```
+
+Error boundaries must be client components because they use React's `useEffect` and event handlers internally. The `reset` function re-renders the segment, giving the user a recovery path without a full page reload.
+
+For catching errors in the root layout itself, use `global-error.js` at the app root.
+
+## Route Groups
+
+Parenthesized folder names create route groups — logical groupings that don't appear in the URL:
+
+```
+app/
+  (marketing)/
+    page.js           → /
+    about/page.js      → /about
+    pricing/page.js    → /pricing
+    layout.js          → marketing layout
+  (app)/
+    dashboard/page.js  → /dashboard
+    settings/page.js   → /settings
+    layout.js          → app layout
+```
+
+This lets you apply different layouts to different sections of your app without polluting the URL structure. Marketing pages get a public header and footer. App pages get a sidebar and nav bar.
+
+## Parallel Routes
+
+Parallel routes render multiple pages simultaneously in the same layout using named slots:
+
+```
+app/
+  dashboard/
+    @analytics/page.js
+    @activity/page.js
+    layout.js
+    page.js
+```
+
+```js
+// app/dashboard/layout.js
+export default function Layout({ children, analytics, activity }) {
+  return (
+    <div>
+      <div>{children}</div>
+      <div className="grid grid-cols-2">
+        <div>{analytics}</div>
+        <div>{activity}</div>
+      </div>
+    </div>
+  )
+}
+```
+
+Each slot loads independently and can have its own loading and error states. If one slot fails, the others keep working. For dashboards, this means a single slow query won't block the entire page.
+
+## Intercepting Routes
+
+Intercepting routes let you load a route within the current layout while preserving the URL. The classic use case is a photo feed — clicking a photo shows a modal, but the URL updates to `/photo/123`. If the user refreshes or shares the URL, they get the full page.
+
+The convention uses `(.)`, `(..)`, or `(...)` prefixes to match relative route segments:
+
+```
+app/
+  feed/
+    page.js
+    (.)photo/[id]/page.js    → intercepts /photo/[id] from /feed
+  photo/[id]/
+    page.js                   → full page version
+```
+
+The intercepting route renders in a modal within the feed layout. The regular route renders as a standalone page. Same URL, two presentations depending on how you got there.
+
+## The `not-found.js` Convention
+
+Custom 404 pages at any route level:
+
+```js
+// app/blog/[slug]/not-found.js
+export default function NotFound() {
+  return <div>This post does not exist.</div>
+}
+```
+
+Trigger it programmatically with the `notFound()` function from `next/navigation`:
+
+```js
+import { notFound } from "next/navigation"
+
+export default async function BlogPost({ params }) {
+  const post = await getPost(params.slug)
+  if (!post) notFound()
+
+  return <article>{/* post content */}</article>
+}
+```
+
+## When to Use the App Router
+
+The App Router is the recommended approach for all new Next.js projects. The Pages Router still works and will be supported, but new features ship exclusively in the App Router.
+
+If you're migrating an existing project, you can adopt incrementally — both routers work simultaneously. Move routes one at a time, starting with the simplest pages, and work your way up to the more complex ones.

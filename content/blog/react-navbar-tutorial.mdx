@@ -1,0 +1,127 @@
+---
+title: "Build a Modern Navbar in React and Tailwind CSS"
+description: "Step-by-step guide to building a responsive, sticky navbar in React with Tailwind CSS — mobile menu, backdrop blur, scroll behavior, and active link styling."
+image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=630&fit=crop"
+tag: "Components"
+publishedOn: "2025-02-25"
+featured: false
+---
+
+The navbar is usually the first component you build and the last one you get right. It needs to handle responsive layouts, scroll behavior, mobile menus, and look sharp across every breakpoint. Here's how to build one that covers all of those concerns using [React](https://react.dev) and [Tailwind CSS](https://tailwindcss.com).
+
+## The Base Structure
+
+Start with the outer container. A sticky navbar with backdrop blur stays visible on scroll without hiding page content.
+
+```js
+function Navbar() {
+  return (
+    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <a href="/" className="text-xl font-bold">Logo</a>
+        <div className="hidden md:flex items-center gap-6">
+          <a href="/features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
+          <a href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
+          <a href="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Docs</a>
+          <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">Get Started</button>
+        </div>
+      </div>
+    </nav>
+  )
+}
+```
+
+The `hidden md:flex` pattern on the link container hides navigation links on small screens. On mobile, those links will live inside a drawer instead.
+
+## Adding the Mobile Menu
+
+Mobile navigation requires local state to track whether the menu is open. A simple boolean toggle does the job.
+
+```js
+const [isOpen, setIsOpen] = React.useState(false)
+```
+
+Add a hamburger button that's only visible on small screens:
+
+```js
+<button
+  onClick={() => setIsOpen(!isOpen)}
+  className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground"
+  aria-expanded={isOpen}
+  aria-label="Toggle menu"
+>
+  {isOpen ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+</button>
+```
+
+Then render the mobile drawer conditionally below the main bar:
+
+```js
+{isOpen && (
+  <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-lg">
+    <div className="flex flex-col gap-1 px-4 py-4">
+      <a href="/features" className="rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">Features</a>
+      <a href="/pricing" className="rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">Pricing</a>
+      <a href="/docs" className="rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">Docs</a>
+    </div>
+  </div>
+)}
+```
+
+The `md:hidden` class ensures this panel never appears on desktop, even if `isOpen` somehow stays true.
+
+## Scroll-Aware Styling
+
+A common pattern is to add a shadow or change the background opacity once the user scrolls past a threshold. This makes the navbar feel more grounded when floating over content.
+
+```js
+const [scrolled, setScrolled] = React.useState(false)
+
+React.useEffect(() => {
+  function handleScroll() {
+    setScrolled(window.scrollY > 10)
+  }
+  window.addEventListener("scroll", handleScroll, { passive: true })
+  return () => window.removeEventListener("scroll", handleScroll)
+}, [])
+```
+
+Then apply the class conditionally:
+
+```js
+<nav className={`sticky top-0 z-50 w-full backdrop-blur-lg transition-all duration-200 ${
+  scrolled ? "bg-background/95 shadow-sm border-b border-border" : "bg-transparent"
+}`}>
+```
+
+The `{ passive: true }` option on the scroll listener is important. It tells the browser you won't call `preventDefault()`, which allows it to optimize scroll performance.
+
+## Closing the Mobile Menu on Navigation
+
+If you're using a client-side router like Next.js or React Router, the mobile menu stays open after clicking a link. Listen for route changes and close it:
+
+```js
+// Next.js App Router
+const pathname = usePathname()
+
+React.useEffect(() => {
+  setIsOpen(false)
+}, [pathname])
+```
+
+For React Router, the same pattern works with `useLocation()`.
+
+## Accessibility Details
+
+A few things to get right:
+
+- Set `aria-expanded` on the hamburger button so screen readers announce whether the menu is open.
+- Use `aria-label="Toggle navigation menu"` on the button since it has no visible text.
+- Make sure all links are actual `<a>` elements (or your router's link component), not `<div>`s with click handlers.
+- The mobile menu should be keyboard-navigable. Native anchor elements handle this automatically.
+
+## Putting It All Together
+
+With [Spell UI](https://spell.sh), the `Navbar` component handles sticky positioning, backdrop blur, mobile drawer, and scroll detection out of the box. But if you're building from scratch, the pattern above covers the core requirements. The trick is keeping the component simple — a navbar that tries to do too much becomes a maintenance problem fast.
+
+Start with the sticky container, add responsive visibility, wire up the mobile toggle, and layer in scroll behavior last. Each piece is straightforward on its own. The complexity only comes from combining them without the code becoming tangled.

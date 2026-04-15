@@ -1,0 +1,232 @@
+---
+title: "CSS Scroll-Triggered Animations: A Complete Guide"
+description: "Learn how to trigger CSS animations on scroll using IntersectionObserver, scroll-driven animations, and the CSS scroll-timeline spec with practical examples."
+image: "/og?title=CSS+Animation+on+Scroll:+A+Complete+Guide"
+tag: "Animation"
+publishedOn: "2025-05-20"
+featured: false
+---
+
+Scroll-triggered animations used to require heavy JavaScript libraries. In 2025, you can do most of it with CSS alone. Between [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver) for triggering, scroll-driven animations for progress-linked effects, and the new `scroll-timeline` spec, the native platform covers a lot of ground.
+
+Here's a practical guide to all three approaches.
+
+## Approach 1: IntersectionObserver + CSS Classes
+
+The most widely supported pattern. Use JavaScript to detect when an element enters the viewport, then toggle a CSS class that triggers the animation.
+
+```js
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("in-view");
+        observer.unobserve(entry.target); // animate once
+      }
+    });
+  },
+  {
+    threshold: 0.15,
+    rootMargin: "0px 0px -50px 0px",
+  }
+);
+
+document.querySelectorAll("[data-animate]").forEach((el) => {
+  observer.observe(el);
+});
+```
+
+```css
+[data-animate] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+[data-animate].in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+```
+
+This is the most reliable approach with near-universal browser support. Add `data-animate` to any element you want to animate and the observer handles the rest.
+
+### Staggering Multiple Elements
+
+To stagger children, use a CSS custom property for the delay:
+
+```css
+[data-animate-stagger] > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  transition-delay: calc(var(--i, 0) * 100ms);
+}
+
+[data-animate-stagger].in-view > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+```
+
+Set `--i` on each child element (0, 1, 2, ...) and they'll animate in sequence when the parent enters the viewport.
+
+## Approach 2: CSS Scroll-Driven Animations
+
+This is the modern approach. CSS scroll-driven animations link animation progress directly to scroll position — no JavaScript required.
+
+```css
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-reveal {
+  animation: fade-slide-up linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 40%;
+}
+```
+
+The key pieces:
+
+- `animation-timeline: view()` ties the animation to the element's visibility in the viewport
+- `animation-range: entry 0% entry 40%` means the animation runs from the moment the element starts entering the viewport until it's 40% visible
+
+This gives you smooth, scroll-linked animation without any JavaScript. The animation scrubs forward and backward as the user scrolls.
+
+### Scroll Progress Indicators
+
+A classic use case — a progress bar that fills as you scroll down the page:
+
+```css
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: #6366f1;
+  transform-origin: left;
+  animation: grow-width linear;
+  animation-timeline: scroll();
+}
+
+@keyframes grow-width {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+```
+
+`animation-timeline: scroll()` links to the scroll progress of the nearest scroll container (or the document). No JavaScript, no scroll event listeners, no `requestAnimationFrame`.
+
+### Parallax with Scroll-Driven Animations
+
+```css
+.parallax-bg {
+  animation: parallax linear;
+  animation-timeline: scroll();
+}
+
+@keyframes parallax {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-30%);
+  }
+}
+```
+
+This creates a parallax effect where the background moves at a slower rate than the scroll. Pure CSS, GPU-composited, and smooth.
+
+## Approach 3: CSS scroll-timeline (Named Timelines)
+
+For more complex scenarios, you can create named scroll timelines and reference them across elements:
+
+```css
+.scroll-container {
+  scroll-timeline-name: --section-scroll;
+  scroll-timeline-axis: block;
+}
+
+.animated-element {
+  animation: slide-in linear both;
+  animation-timeline: --section-scroll;
+  animation-range: 0% 50%;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+```
+
+Named timelines let you tie animations to specific scroll containers rather than the viewport. This works well for sectioned layouts where different content areas drive different animations.
+
+## Browser Support in 2025
+
+Scroll-driven animations (`animation-timeline`, `view()`, `scroll()`) are supported in Chrome, Edge, and Firefox. Safari added support in late 2024. For production apps that need to support older browsers, use IntersectionObserver as a fallback.
+
+A practical progressive enhancement strategy:
+
+```css
+/* Fallback: element is visible by default */
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+/* Modern browsers: animate on scroll */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: fade-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+}
+```
+
+## Timing and Easing for Scroll Animations
+
+The mechanics of triggering animations on scroll are only half the equation. How the animation feels once triggered depends on your timing and easing choices.
+
+Use `ease-out` for scroll-triggered entrances. Elements should arrive fast and decelerate into their final position, mimicking how physical objects slow down due to friction. `ease-in` or `linear` entrances feel robotic — the element drifts in at a constant speed with no sense of weight.
+
+Keep reveal durations under 400ms. Slower animations make the page feel heavy, like wading through molasses. Users are scrolling to consume content, not to watch it perform. Anything above half a second and the animation becomes an obstacle rather than a guide.
+
+Rather than animating an entire card or section as one block, stagger the child elements with 80-100ms delays between them. Animate the title first, then the description, then the buttons or metadata. This creates visual rhythm — the eye follows a sequence rather than absorbing a single block. The stagger pattern in Approach 1 above supports this directly with the `--i` custom property.
+
+One last technique borrowed from traditional animation: follow-through. Let elements slightly overshoot their final position, then settle back. A spring easing curve — or even a simple `cubic-bezier(0.34, 1.56, 0.64, 1)` — adds that subtle bounce. The overshoot should be small, maybe 4-6px past the resting point. This adds a sense of life without making the interface feel chaotic or imprecise.
+
+## Performance Tips
+
+1. **Stick to `transform` and `opacity`** — these are composited by the GPU and won't trigger layout or paint
+2. **Avoid animating `width`, `height`, `top`, `left`** — they trigger expensive layout recalculations on every frame
+3. **Use `will-change` intentionally** — add it before the animation starts, remove it after. Don't leave it on permanently
+4. **Limit simultaneous animations** — animating 50 elements at once will drop frames on mobile. Stagger them or animate only what's visible
+5. **Test scroll performance on real devices** — scroll-driven animations are smoother than JS-based alternatives, but complex effects can still cause jank on low-end hardware
+
+## Which Approach to Use
+
+- **Need to support all browsers** → IntersectionObserver + CSS transitions
+- **Want scroll-linked progress** → `animation-timeline: scroll()`
+- **Want viewport-triggered reveals** → `animation-timeline: view()`
+- **Complex multi-element choreography** → Named scroll timelines
+
+Start with IntersectionObserver if you need reliability. Add scroll-driven animations where progressive enhancement makes sense. The native CSS approach is the future, and browser support in 2025 is finally there.

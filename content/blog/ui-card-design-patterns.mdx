@@ -1,0 +1,131 @@
+---
+title: "UI Card Design Patterns and Best Practices"
+description: "Practical patterns for designing UI cards — layout structures, hover states, information density, responsive behavior, accessibility, and common mistakes to avoid."
+image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=1200&h=630&fit=crop"
+tag: "Design"
+publishedOn: "2025-05-10"
+featured: false
+---
+
+Cards are everywhere in modern interfaces. Dashboards, product grids, blog feeds, settings panels — if you're building UI, you're building cards. The pattern seems simple until you actually try to make cards that work across screen sizes, content lengths, and interaction states.
+
+Here's what I've learned from building (and rebuilding) card systems.
+
+## The Anatomy of a Good Card
+
+Every well-designed card has the same basic structure: a container, a media region, a content region, and an action region. Not every card needs all four, but the ordering should be consistent.
+
+```css
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+.card-media {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  width: 100%;
+}
+
+.card-content {
+  padding: 1.25rem;
+  flex: 1;
+}
+
+.card-actions {
+  padding: 0 1.25rem 1.25rem;
+  margin-top: auto;
+}
+```
+
+The `flex: 1` on the content region and `margin-top: auto` on the actions region are critical. They ensure the action area sticks to the bottom when cards in a grid have different content lengths.
+
+## Hover States That Add Value
+
+A hover state should communicate interactivity, not just decoration. The best hover effects are subtle and reinforce the card's clickable nature.
+
+```css
+.card-interactive {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.card-interactive:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+```
+
+Three states: resting, hover, and active. The slight lift on hover tells the user "this is clickable." The press-down on active gives tactile feedback. Keep the transition under 200ms or it feels sluggish.
+
+Avoid hover effects that change the card's size or reflow content. Border changes, padding shifts, or content reveals on hover cause layout jank in card grids.
+
+## Managing Information Density
+
+The hardest card design decision is how much to show. Too much content and the card becomes a wall of text. Too little and users have to click through to learn anything useful.
+
+A rule I follow: each card should answer one question. A product card answers "what is this and how much does it cost?" A blog card answers "what is this article about?" A profile card answers "who is this person?"
+
+Limit cards to three to five pieces of information:
+
+- **Primary:** Title or name
+- **Secondary:** Description or key detail
+- **Tertiary:** Metadata (date, price, tag)
+- **Optional:** Media (image, avatar)
+- **Optional:** Action (button, link)
+
+If you need more than five data points, you probably need a table, not a card.
+
+## Responsive Card Grids
+
+The CSS Grid `auto-fill` pattern is still the most reliable way to build responsive card grids without media queries:
+
+```css
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+```
+
+This gives you as many columns as will fit with a 300px minimum card width. On a wide screen you get four columns. On a phone you get one. No breakpoints needed.
+
+For cards where consistent height matters, add `grid-auto-rows: 1fr` to stretch all cards in a row to the same height.
+
+## Common Mistakes
+
+**Making the entire card a link but adding clickable elements inside.** Nested interactive elements break accessibility and create confusing click behavior. Either make the whole card one link or keep the link in the action area.
+
+**Using fixed heights.** Content varies. A card with a fixed height will either clip text or leave awkward empty space. Use `min-height` if you need consistency and let content grow.
+
+**No image containment.** Images inside cards often bleed into the background when their colors are similar to the card surface. Add `outline: 1px solid rgba(0,0,0,0.1)` with `outline-offset: -1px` to images. This creates subtle visual containment without a hard border. In dark mode, swap to `rgba(255,255,255,0.1)`.
+
+**Inconsistent border radius.** If your card has a 12px border radius, the image inside needs a matching radius (minus the padding) or the corners won't align. Using `overflow: hidden` on the card container handles this automatically.
+
+**Forgetting focus states.** Hover effects are meaningless for keyboard users. Every interactive card needs a visible focus outline with sufficient contrast.
+
+```css
+.card-interactive:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+```
+
+## Typography Details That Matter
+
+Two small CSS properties prevent common card text issues.
+
+For any numeric display that updates or appears in columns — prices, dates, counters, statistics — use `font-variant-numeric: tabular-nums`. This forces equal-width digits so numbers don't cause layout shift when they change. One caveat: some fonts like Inter change the visual appearance of numerals with this property (switching between old-style and lining figures), so test with your actual typeface before applying globally.
+
+For card titles, apply `text-wrap: balance` to distribute text evenly across lines. Without it, a two-line title might have 40 characters on the first line and 3 on the second — an orphaned word dangling alone. `balance` redistributes the text so both lines are roughly equal length, which looks far more polished in a card grid.
+
+Cards are one of those patterns that seem trivial until you handle the edge cases. Get the structure right, keep the content focused, and test with real data that varies in length. That's where card designs actually break.

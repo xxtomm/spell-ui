@@ -1,0 +1,108 @@
+---
+title: "Color Theory for Web Design: A Practical Breakdown"
+description: "A practical guide to color theory for web designers — color relationships, contrast ratios, dark mode palettes, and tools to build consistent color systems."
+image: "https://images.unsplash.com/photo-1525909002-1b05e0c869d8?w=1200&h=630&fit=crop"
+tag: "Design"
+publishedOn: "2025-07-18"
+featured: false
+---
+
+Color theory gets taught as if you need a fine arts degree to pick a button color. You don't. Most web design color decisions come down to a handful of practical rules and a good understanding of contrast.
+
+Here's the version of color theory that actually matters for building interfaces.
+
+## The Color Wheel, Briefly
+
+The color wheel arranges hues in a circle. You don't need to memorize it, but you should understand three relationships:
+
+**Complementary colors** sit opposite each other (blue and orange, red and green). They create maximum contrast. Use them sparingly — a complementary accent color against a dominant base.
+
+**Analogous colors** sit next to each other (blue, blue-green, green). They feel harmonious and calm. Good for backgrounds, gradients, and subtle brand palettes.
+
+**Split-complementary** takes one color and the two colors adjacent to its complement. This gives you contrast without the intensity of pure complementary schemes.
+
+In practice, most web interfaces use one primary hue, one neutral palette (grays), and one accent color. That's three colors, not twelve.
+
+## Building a Palette That Works
+
+Start with your primary color. Then generate a scale of that color from light to dark in 9-10 steps. Do the same for your gray. These scales become your design tokens.
+
+```css
+:root {
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
+
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+}
+```
+
+Use the 500-600 range for primary actions. The 100-200 range for backgrounds and badges. The 700-900 range for text on light backgrounds.
+
+## Contrast Ratios Are Non-Negotiable
+
+WCAG requires a 4.5:1 contrast ratio for normal text and 3:1 for large text. These aren't arbitrary numbers — they determine whether your interface is usable for people with low vision.
+
+Common failures:
+
+- **Light gray text on white.** Gray-400 on white usually fails. You need at least gray-500, sometimes gray-600.
+- **Colored text on colored backgrounds.** Blue text on a blue-tinted background might look fine to you but fail contrast checks.
+- **Placeholder text.** The default placeholder gray in most browsers fails WCAG. Use a darker shade or rely on labels instead.
+
+Test your colors with a contrast checker before committing to them. Chrome DevTools has one built in — inspect an element, check the color picker, and it shows the ratio right there.
+
+## Dark Mode Palettes
+
+Dark mode isn't "invert the colors." That approach produces eye-searing white text on pure black, which is harder to read than the light version.
+
+Good dark mode practices:
+
+**Don't use pure black.** A background of `#0a0a0a` or `#121212` is softer on the eyes than `#000000`. Slightly warm dark grays (`#1a1a1a`) feel more natural than cool ones.
+
+**Reduce white text brightness.** Use `rgba(255, 255, 255, 0.87)` for primary text and `rgba(255, 255, 255, 0.6)` for secondary text. Pure white on dark backgrounds creates too much contrast and causes halation.
+
+**Desaturate your colors.** Saturated colors that look great on white can vibrate painfully on dark backgrounds. Drop the saturation 10-20% for dark mode variants.
+
+```css
+[data-theme="dark"] {
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #262626;
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.38);
+  --primary-500: #60a5fa; /* lighter, less saturated */
+}
+```
+
+## Tools Worth Using
+
+**Realtime Colors** (realtimecolors.com) — Preview a full color palette on a realistic page layout. The fastest way to validate whether your palette actually works.
+
+**OKLCH Color Picker** — OKLCH is a newer color model designed to be perceptually uniform. Unlike HSL, identical lightness values in OKLCH actually look equally bright across different hues — set two colors to the same HSL lightness and you'll see they look noticeably different; OKLCH fixes that. It has three components: Lightness (0-1), Chroma (color intensity), and Hue (0-360 degrees). You can change hue while keeping lightness constant to build cohesive palettes, which is something HSL can't do reliably. In CSS it looks like `color: oklch(0.55 0.18 260)`, and you can use `@supports (color: oklch(0 0 0))` for fallback compatibility in older browsers. OKLCH also produces better gradients — it interpolates using lightness, chroma, and hue rather than raw RGB values, eliminating the muddy midpoints you get with sRGB gradient interpolation. Add `in oklch` to your CSS gradients (e.g., `linear-gradient(in oklch, ...)`) for smoother transitions. OKLCH interpolates hue in a circle, which can produce more vibrant results but sometimes unexpected intermediate colors — keep that in mind for wide hue shifts. Conic gradients rotate around a center point like color wheel slices, which makes them useful for charts and animated border effects. For animated gradients in general, stick to animating position, angle, or opacity rather than color stops — color stop animation is more computationally expensive.
+
+**Coolors** — Quick palette generation with export to CSS variables, Tailwind config, and more.
+
+**Chrome DevTools** — The built-in contrast checker and color picker are better than most standalone tools.
+
+## The Shortcut
+
+If you're starting from scratch, pick one blue between `hsl(220, 80%, 50%)` and `hsl(230, 70%, 55%)`. Pair it with Tailwind's default gray scale. Add a green for success, red for errors, yellow for warnings.
+
+That's a complete, functional color system. You can refine it later, but most interfaces need fewer colors than designers think. Two hues and a gray scale will carry you further than a twelve-color palette you never use consistently.

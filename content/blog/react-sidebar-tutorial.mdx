@@ -1,0 +1,167 @@
+---
+title: "How to Create a Responsive Sidebar in React"
+description: "Learn how to build a collapsible sidebar in React with keyboard navigation, mobile drawer support, smooth transitions, and persistent collapse state across sessions."
+image: "/og?title=How+to+Create+a+Responsive+Sidebar+in+React"
+tag: "Components"
+publishedOn: "2025-04-30"
+featured: false
+---
+
+Sidebars are a staple of dashboard layouts. They seem simple until you need to handle collapsing, mobile viewports, keyboard navigation, and persistent state. Here's a practical approach to building one that handles all of these without over-engineering.
+
+## Layout Foundation
+
+The sidebar and main content need to sit side by side with the sidebar taking a fixed width. CSS Grid or Flexbox both work. Flexbox is more intuitive here.
+
+```js
+function Layout({ children }) {
+  const [collapsed, setCollapsed] = React.useState(false)
+  const [mobileOpen, setMobileOpen] = React.useState(false)
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar collapsed={collapsed} mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <main className="flex-1 overflow-y-auto">
+        <Header onMenuClick={() => setMobileOpen(true)} onCollapseClick={() => setCollapsed(!collapsed)} />
+        {children}
+      </main>
+    </div>
+  )
+}
+```
+
+The `h-screen overflow-hidden` on the wrapper prevents double scrollbars. Only the `<main>` area scrolls.
+
+## The Sidebar Component
+
+The sidebar needs two modes: expanded (showing icons and labels) and collapsed (showing only icons). The width transition should be smooth.
+
+```js
+function Sidebar({ collapsed, mobileOpen, onClose }) {
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside className={`hidden lg:flex flex-col border-r border-border bg-card transition-all duration-300 ${
+        collapsed ? "w-16" : "w-64"
+      }`}>
+        <nav className="flex-1 px-2 py-4 space-y-1">
+          <SidebarItem icon={HomeIcon} label="Dashboard" href="/" collapsed={collapsed} />
+          <SidebarItem icon={InboxIcon} label="Inbox" href="/inbox" collapsed={collapsed} />
+          <SidebarItem icon={SettingsIcon} label="Settings" href="/settings" collapsed={collapsed} />
+        </nav>
+      </aside>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+          <aside className="relative z-10 flex h-full w-64 flex-col border-r border-border bg-card">
+            <nav className="flex-1 px-2 py-4 space-y-1">
+              <SidebarItem icon={HomeIcon} label="Dashboard" href="/" />
+              <SidebarItem icon={InboxIcon} label="Inbox" href="/inbox" />
+              <SidebarItem icon={SettingsIcon} label="Settings" href="/settings" />
+            </nav>
+          </aside>
+        </div>
+      )}
+    </>
+  )
+}
+```
+
+The desktop sidebar uses `hidden lg:flex` so it only appears on large screens. The mobile drawer is a fixed overlay with a backdrop.
+
+## Sidebar Item with Tooltip
+
+When collapsed, labels disappear. A tooltip on hover keeps the sidebar usable.
+
+```js
+function SidebarItem({ icon: Icon, label, href, collapsed }) {
+  return (
+    <a
+      href={href}
+      className="group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+    >
+      <Icon className="h-5 w-5 shrink-0" />
+      {!collapsed && <span>{label}</span>}
+      {collapsed && (
+        <span className="absolute left-full ml-2 rounded-md bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          {label}
+        </span>
+      )}
+    </a>
+  )
+}
+```
+
+The `shrink-0` on the icon prevents it from compressing when the sidebar animates. The tooltip uses `group-hover:opacity-100` so it only appears on hover.
+
+## Keyboard Navigation
+
+Sidebar links are already keyboard-navigable if you use proper `<a>` elements. But there are a couple of additions worth making.
+
+First, let users collapse and expand with a keyboard shortcut:
+
+```js
+React.useEffect(() => {
+  function handleKeyDown(e) {
+    if (e.key === "[" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault()
+      setCollapsed(prev => !prev)
+    }
+  }
+  document.addEventListener("keydown", handleKeyDown)
+  return () => document.removeEventListener("keydown", handleKeyDown)
+}, [])
+```
+
+Second, close the mobile drawer when pressing Escape:
+
+```js
+React.useEffect(() => {
+  function handleKeyDown(e) {
+    if (e.key === "Escape" && mobileOpen) {
+      onClose()
+    }
+  }
+  document.addEventListener("keydown", handleKeyDown)
+  return () => document.removeEventListener("keydown", handleKeyDown)
+}, [mobileOpen, onClose])
+```
+
+## Persisting Collapsed State
+
+Users expect the sidebar to stay collapsed if they collapsed it. Save the state to `localStorage`:
+
+```js
+const [collapsed, setCollapsed] = React.useState(() => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("sidebar-collapsed") === "true"
+  }
+  return false
+})
+
+React.useEffect(() => {
+  localStorage.setItem("sidebar-collapsed", String(collapsed))
+}, [collapsed])
+```
+
+The lazy initializer in `useState` avoids a hydration mismatch if you're using server-side rendering. The state reads from `localStorage` only on the client.
+
+## Handling Active State
+
+Highlight the current page's link. If you're using [Next.js](https://nextjs.org), `usePathname()` gives you the current route:
+
+```js
+const pathname = usePathname()
+const isActive = pathname === href
+
+// Add to the link className:
+// isActive ? "bg-muted text-foreground" : "text-muted-foreground"
+```
+
+For React Router, swap in `useLocation().pathname`.
+
+## Wrapping Up
+
+A sidebar needs four things: responsive visibility (hidden on mobile, visible on desktop), a collapsible state with smooth width transition, a mobile drawer with backdrop and Escape-to-close, and persisted user preference. Build each piece independently and compose them. The code stays manageable, and you avoid a monolithic sidebar component that tries to handle everything in one place.

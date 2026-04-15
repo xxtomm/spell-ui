@@ -1,0 +1,183 @@
+---
+title: "How to Structure Your Next.js Project for Scale"
+description: "A practical guide to organizing your Next.js codebase — directory structures, feature-based architecture, shared components, and configuration patterns that scale."
+image: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?w=1200&h=630&fit=crop"
+tag: "Next.js"
+publishedOn: "2025-04-25"
+featured: true
+---
+
+Every [Next.js](https://nextjs.org) project starts clean. Then features pile up, the components folder turns into a graveyard of single-use files, and nobody can find anything. I've refactored enough codebases to know that structure problems don't fix themselves — they compound.
+
+Here's how I organize Next.js projects that stay navigable as they grow.
+
+## The Default Structure Breaks Down Fast
+
+The out-of-the-box Next.js structure gives you `app/`, `public/`, and not much else. For a landing page, that's fine. For anything with multiple features, you need a plan.
+
+The two main approaches are **layer-based** and **feature-based** organization. Most teams should use a hybrid.
+
+## Layer-Based Structure
+
+Group files by their role in the application:
+
+```
+src/
+  app/              # Routes and pages
+  components/       # Shared UI components
+  lib/              # Utilities, helpers, config
+  hooks/            # Custom React hooks
+  types/            # TypeScript type definitions
+  styles/           # Global styles
+  constants/        # App-wide constants
+```
+
+This works well for small-to-medium projects. The downside: when you have 50 components in `components/` and 30 functions in `lib/`, finding what belongs to what becomes painful.
+
+## Feature-Based Structure
+
+Group files by what they do, not what they are:
+
+```
+src/
+  app/
+  features/
+    auth/
+      components/
+      hooks/
+      actions/
+      types.ts
+    dashboard/
+      components/
+      hooks/
+      actions/
+      types.ts
+    billing/
+      components/
+      hooks/
+      actions/
+      types.ts
+  components/        # Truly shared components
+  lib/               # Truly shared utilities
+```
+
+Each feature is self-contained. When you work on billing, everything you need is in `features/billing/`. When you delete a feature, you delete one folder.
+
+## The Hybrid Approach I Use
+
+For most Next.js projects, I use a combination:
+
+```
+src/
+  app/
+    (marketing)/
+      page.js
+      about/
+        page.js
+    (app)/
+      dashboard/
+        page.js
+        layout.js
+      settings/
+        page.js
+    api/
+      webhooks/
+        route.js
+    layout.js
+  components/
+    ui/              # Base UI primitives (Button, Input, Card)
+    layout/          # Header, Footer, Sidebar, Navigation
+    shared/          # Reusable composed components
+  features/
+    auth/
+    billing/
+    analytics/
+  lib/
+    db.ts
+    utils.ts
+    validations.ts
+  hooks/
+  config/
+    site.ts
+    navigation.ts
+```
+
+### Route Groups
+
+The `(marketing)` and `(app)` parenthesized folders are route groups — they organize routes without affecting the URL. Your marketing pages get one layout, your app pages get another, and the URL stays clean.
+
+### The `components/ui` Convention
+
+Base UI components — buttons, inputs, cards, modals — live in `components/ui/`. These are generic building blocks with no business logic. If you're using a component library like [Spell UI](https://spell.sh), installed components naturally land in this directory and follow the same pattern.
+
+Feature-specific components live inside their feature folder. The rule: if a component is used by more than one feature, it moves to `components/shared/`.
+
+## Configuration Patterns
+
+Centralize configuration instead of scattering magic values:
+
+```js
+// config/site.ts
+export const siteConfig = {
+  name: "My App",
+  description: "A description of my app",
+  url: "https://myapp.com",
+  links: {
+    github: "https://github.com/myapp",
+    docs: "https://docs.myapp.com",
+  },
+}
+```
+
+```js
+// config/navigation.ts
+export const mainNav = [
+  { title: "Features", href: "/features" },
+  { title: "Pricing", href: "/pricing" },
+  { title: "Docs", href: "/docs" },
+]
+
+export const dashboardNav = [
+  { title: "Overview", href: "/dashboard" },
+  { title: "Analytics", href: "/dashboard/analytics" },
+  { title: "Settings", href: "/dashboard/settings" },
+]
+```
+
+This makes it trivial to update navigation, reuse metadata, and keep things consistent.
+
+## Server vs. Client Component Boundaries
+
+Structure reinforces the server/client split. I keep a clear convention:
+
+- **Server components** are the default. Pages, layouts, and data-fetching components stay on the server.
+- **Client components** get a `"use client"` directive and are typically interactive leaf nodes — form inputs, modals, dropdown menus.
+- **Barrel exports** (`index.ts` files) can cause accidental client bundling. Be explicit about imports.
+
+A common pattern is wrapping a client component inside a server component that fetches its data:
+
+```js
+// features/dashboard/components/stats-section.js (server)
+import { getStats } from "../actions"
+import { StatsChart } from "./stats-chart" // client component
+
+export async function StatsSection() {
+  const stats = await getStats()
+  return <StatsChart data={stats} />
+}
+```
+
+## Naming Conventions
+
+Consistency matters more than which convention you pick. Here's what I use:
+
+- **Files:** kebab-case (`user-profile.tsx`, `use-auth.ts`)
+- **Components:** PascalCase (`UserProfile`, `StatsChart`)
+- **Utilities:** camelCase (`formatDate`, `calculateTotal`)
+- **Constants:** SCREAMING_SNAKE_CASE (`MAX_RETRY_COUNT`)
+
+## The Real Rule
+
+The best project structure is the one your team actually follows. Pick a pattern, document it in a `CONTRIBUTING.md`, and enforce it with linting rules. A mediocre structure followed consistently beats a perfect structure followed loosely.
+
+Start simple. Refactor when the pain is real, not when it's theoretical. Your future self will thank you for the discipline.

@@ -1,0 +1,138 @@
+---
+title: "Landing Page Call to Action: Best Practices That Convert"
+description: "Data-driven best practices for landing page CTAs. Covers copy, design, placement, color psychology, and A/B testing strategies that actually improve conversion rates."
+image: "/og?title=Landing+Page+Call+to+Action:+Best+Practices+That+Convert"
+tag: "Landing Pages"
+publishedOn: "2025-11-18"
+featured: false
+---
+
+Your call to action is where all the work you put into your landing page either pays off or doesn't. Every section — the hero, the features, the social proof — exists to build enough confidence for the visitor to click that button.
+
+Most CTAs underperform because of small, fixable mistakes in copy, design, or placement. Here's what the data says works.
+
+## CTA Copy That Converts
+
+The words on your button matter more than you think. Unbounce analyzed over 36,000 landing pages and found that CTA copy is one of the top three factors affecting conversion rate.
+
+**Lead with a verb.** "Get started free" outperforms "Free plan available." The verb creates momentum — it frames the action as something the visitor is doing, not something being offered.
+
+**Reduce perceived risk.** Adding qualifiers like "free," "no credit card," or "instant" directly addresses the visitor's hesitation:
+
+- "Start free trial" > "Sign up"
+- "Get started — no credit card required" > "Get started"
+- "Try it free for 14 days" > "Start trial"
+
+**Use first person when appropriate.** A/B tests from ContentVerve showed that changing "Start your free trial" to "Start my free trial" increased click-through rates by 90% in one case. First person creates ownership.
+
+**Be specific about the outcome.** "Deploy in 60 seconds" is more compelling than "Get started" because it sets a concrete expectation.
+
+## CTA Design Principles
+
+The button itself needs to pass the "squint test" — if you squint at the page, the CTA should still be the most visually prominent element.
+
+**Contrast is everything.** The CTA should be the highest-contrast element on the page. If your page has a dark background, use a bright button. If the page is light, use a dark or saturated button. The CTA should never blend into its surroundings.
+
+```css
+/* High-contrast CTA with visual weight */
+.cta-primary {
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cta-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+```
+
+**Size matters, but bigger isn't always better.** The CTA should be large enough to be immediately noticeable but not so large that it feels aggressive. A good rule: make it the largest button on the page, but keep it proportional to the surrounding text.
+
+**Whitespace around the CTA.** Give your button room to breathe. A CTA crammed between other elements gets lost. Generous padding above and below the button draws the eye naturally.
+
+## Color Psychology
+
+Color choice for CTAs has been debated endlessly. The truth is that no single color universally converts best. What matters is contrast relative to the rest of the page.
+
+That said, some general patterns from A/B test data:
+
+- **Orange and green** tend to perform well for sign-up actions because they feel approachable and low-risk
+- **Blue** performs well for enterprise and trust-heavy products because it signals reliability
+- **Red** can work for urgency-driven actions but can also signal "stop" or "error" depending on context
+- **White on dark backgrounds** is increasingly popular in SaaS and creates a clean, modern feel
+
+The most important principle: your CTA color should appear nowhere else on the page except in the CTA buttons. This creates what designers call "visual singularity" — the color becomes associated exclusively with action.
+
+## Placement Strategy
+
+A single CTA in the hero section isn't enough. Data consistently shows that multiple CTA placements increase total conversions without cannibalizing each other.
+
+**Primary placements:**
+
+1. **Hero section** — For visitors who arrive already convinced (from a referral, ad, or recommendation)
+2. **After features/social proof** — For visitors who needed more information before committing
+3. **Bottom of page** — For visitors who read everything and are now ready
+
+**The sticky CTA debate.** A persistent CTA in the navigation or a floating button can increase conversions, but it can also feel aggressive. Test this carefully. If your page is long (5+ scrolls), a sticky nav CTA is usually worth it. For shorter pages, it can feel pushy.
+
+```css
+/* Sticky CTA that appears after scrolling past the hero */
+.sticky-cta {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+.sticky-cta--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+```
+
+## Primary vs. Secondary CTAs
+
+Most landing pages need two types of CTAs:
+
+- **Primary**: The main conversion action ("Start free trial," "Sign up free")
+- **Secondary**: A lower-commitment alternative ("Watch demo," "View docs," "Talk to sales")
+
+The secondary CTA exists for visitors who are interested but not ready to commit. It keeps them engaged instead of losing them entirely.
+
+Design the secondary CTA to be clearly subordinate — outlined instead of filled, lower contrast, smaller or same size. Never make two CTAs compete visually.
+
+## A/B Testing Your CTA
+
+Testing CTA variations is one of the highest-leverage optimization activities because changes are cheap to implement and the impact is directly measurable.
+
+**What to test (in priority order):**
+
+1. **Copy** — The words on the button. Test outcome-oriented vs. action-oriented. Test with and without risk reducers.
+2. **Placement** — Try adding a CTA after each major section. Measure whether additional placements increase total conversions.
+3. **Color** — Test your current color against high-contrast alternatives. Run the test for at least 2 weeks to account for traffic variations.
+4. **Size and spacing** — Increase whitespace around the CTA. Make the button slightly larger. Small visual changes can yield surprising results.
+
+**What not to test:** Don't test two radically different page designs simultaneously and attribute the results to the CTA. Isolate variables.
+
+**Sample size matters.** You need at least 100 conversions per variation to reach statistical significance for most CTA tests. If your traffic is low, focus on copy tests first — they tend to have the largest effect size and reach significance faster.
+
+## Common CTA Mistakes
+
+**"Learn more" as a primary CTA.** This is a navigation link, not a call to action. It signals "more reading" rather than "take action."
+
+**Too many CTAs.** More than two CTA types (primary + secondary) creates decision paralysis. Every additional choice reduces the likelihood of any choice.
+
+**CTA that doesn't match the headline promise.** If your headline says "Deploy in seconds" but the CTA says "Contact sales," there's a disconnect that kills trust.
+
+**No CTA below the fold.** You're forcing engaged, interested visitors to scroll back to the top. That friction costs conversions.
+
+Your CTA is the bridge between interest and action. Make it visible, make it clear, and make it easy to click.

@@ -1,0 +1,200 @@
+---
+title: "How to Add Text Animations to Your React App"
+description: "Learn how to build fade-in, stagger, blur reveal, and typewriter text animations in React with practical code examples. Covers CSS and Motion-based approaches."
+image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=630&fit=crop"
+tag: "Animation"
+publishedOn: "2025-03-15"
+featured: false
+---
+
+Text animations are the highest-ROI visual improvement you can make to a landing page. A hero heading that fades in word-by-word instantly signals polish. Static text sitting there when the page loads signals "template."
+
+Here's how to implement the most common text animation patterns in [React](https://react.dev), from simple CSS to more advanced techniques.
+
+## 1. Basic Fade-In with CSS
+
+The simplest approach. No library needed.
+
+```css
+@keyframes text-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.text-fade-in {
+  animation: text-fade-in 0.6s ease-out forwards;
+}
+```
+
+Apply the class to any heading and you get a clean entrance. The `translateY` adds subtle upward movement that makes the fade feel directional rather than flat.
+
+For staggered delays on multiple elements, use CSS custom properties:
+
+```css
+.stagger-item {
+  animation: text-fade-in 0.6s ease-out forwards;
+  animation-delay: calc(var(--index) * 80ms);
+  opacity: 0;
+}
+```
+
+Then set the index inline on each element in your JSX.
+
+## 2. Word-by-Word Stagger
+
+Splitting text into individual words and animating each with a progressive delay creates a reading rhythm. This is the most popular text animation pattern on modern landing pages.
+
+The approach is straightforward: split the string by spaces, render each word as a span, and apply incremental animation delays.
+
+```js
+// Split text into words, apply delay to each
+const words = text.split(" ");
+const delayPerWord = 0.06; // seconds
+
+// Each word gets:
+// - opacity: 0 → 1
+// - translateY: 12px → 0
+// - delay: index * delayPerWord
+```
+
+The key parameters to tune:
+
+- **Delay between words:** 50-80ms feels natural. Below 40ms and it's too fast to notice. Above 120ms and it feels sluggish.
+- **Duration per word:** 300-500ms. Short enough to be snappy, long enough to be visible.
+- **Movement distance:** 8-16px of vertical travel. More than 20px starts feeling jumpy.
+
+## 3. Blur Reveal
+
+This effect transitions text from blurred and transparent to sharp and visible. It feels like the text is materializing or coming into focus.
+
+```css
+@keyframes blur-reveal {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+.blur-reveal {
+  animation: blur-reveal 0.8s ease-out forwards;
+}
+```
+
+Blur animations are more GPU-intensive than simple opacity transitions. On lower-end devices, animating `filter: blur()` on many elements simultaneously can cause frame drops. Apply this to headings and short text, not entire paragraphs.
+
+You can combine blur with word staggering for a premium effect: each word blurs in sequentially.
+
+## 4. Typewriter Effect
+
+The classic typewriter reveals characters one at a time. The trick is using `steps()` in CSS for the character-by-character reveal, and animating the blinking cursor separately.
+
+```css
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid currentColor;
+  width: 0;
+  animation:
+    typing 2s steps(30) forwards,
+    blink 0.7s step-end infinite;
+}
+
+@keyframes typing {
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+```
+
+The CSS-only approach has limitations: it requires fixed-width content and doesn't handle line wrapping. For dynamic content, a JavaScript approach that progressively reveals characters with `setTimeout` or `requestAnimationFrame` handles these cases better.
+
+## 5. Gradient / Shimmer Text
+
+A gradient that moves across text creates a shimmer or highlight effect. This works by setting the background to a moving linear gradient and clipping it to the text.
+
+```css
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    currentColor 0%,
+    #6366f1 45%,
+    #8b5cf6 55%,
+    currentColor 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: 100% center;
+  }
+  50% {
+    background-position: 0% center;
+  }
+}
+```
+
+This is purely a CSS effect — no JavaScript needed. It works best on headings and short phrases. On long paragraphs, it's distracting.
+
+## 6. Scroll-Triggered Text Reveal
+
+Animate text only when it scrolls into view using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver):
+
+```js
+// Basic IntersectionObserver setup
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  },
+  { threshold: 0.2 }
+);
+```
+
+Pair this with any of the CSS animations above by toggling a class that triggers the animation.
+
+## Pre-Built Solutions
+
+If you'd rather not build these from scratch, [Spell UI](https://spell.sh) ships several text animation components that handle the implementation details:
+
+- **BlurReveal** — text that transitions from blurred to focused, word by word
+- **WordsStagger** — configurable word-by-word entrance animations
+- **ShimmerText** — the gradient shimmer effect with customizable colors and speed
+
+Each is a single component you install via CLI and drop into your JSX. They handle the splitting, timing, and performance optimizations.
+
+## Performance Checklist
+
+Whichever approach you use, keep these rules in mind:
+
+1. **Animate `transform` and `opacity` over `top`/`left`** — they're GPU-composited and won't trigger layout recalculation
+2. **Use `filter: blur()` sparingly** — it's GPU-intensive; limit to 1-3 elements at a time
+3. **Trigger once, not repeatedly** — use `once: true` on intersection observers so animations don't replay on scroll
+4. **Keep durations under 1 second** — text animations should feel fast. Anything over 800ms feels like it's wasting the user's time
+5. **Test on mobile** — mobile GPUs are significantly weaker; what's smooth on your laptop may stutter on a phone
+
+Text animation is one of those details that separates generic pages from polished products. Start with a simple fade-in stagger on your hero text — it takes 10 minutes and the difference is immediate.

@@ -1,0 +1,140 @@
+---
+title: "15 Best React Animation Libraries Compared (2025)"
+description: "A practical comparison of the top React animation libraries — Motion (formerly Framer Motion), React Spring, GSAP, and more. Find the right tool for your project."
+image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=630&fit=crop"
+tag: "Animation"
+publishedOn: "2025-02-10"
+featured: true
+---
+
+Choosing an animation library for [React](https://react.dev) is harder than it should be. There are dozens of options, most of the comparison articles are outdated, and the "best" choice depends entirely on what you're building.
+
+I've used most of these in production. Here's an honest breakdown of 15 libraries, what they're actually good at, and where they fall short.
+
+## The Big Three
+
+### 1. Motion (formerly Framer Motion)
+
+The most popular React animation library for good reason. Declarative API, layout animations, gesture support, exit animations with `AnimatePresence`. If you're building a typical React app with route transitions and interactive components, [Motion](https://motion.dev) is the safe bet.
+
+**Best for:** General-purpose UI animations, page transitions, gesture-based interactions.
+
+**Tradeoff:** Bundle size. The full package is ~30KB gzipped. The team has been working on tree-shaking improvements, but it's still the heaviest option on this list.
+
+### 2. React Spring
+
+Physics-based animations that feel natural. React Spring uses spring physics instead of duration-based easing, which gives animations a more organic quality. The `useSpring`, `useTrail`, and `useTransition` hooks are well-designed.
+
+**Best for:** Fluid, natural-feeling animations. Data visualization transitions.
+
+**Tradeoff:** Steeper learning curve. The spring config system takes experimentation to dial in.
+
+### 3. [GSAP](https://gsap.com) (with React)
+
+The animation powerhouse. GSAP handles complex timelines, scroll-triggered sequences, and SVG morphing better than anything else. The `useGSAP` hook simplifies cleanup in React.
+
+**Best for:** Complex sequenced animations, scroll-driven narratives, SVG animation.
+
+**Tradeoff:** Licensing. GSAP is free for most use cases, but some plugins require a paid license for commercial use.
+
+## Lightweight Alternatives
+
+### 4. Motion One
+
+Motion One is now part of [Motion](https://motion.dev). Originally a standalone vanilla JavaScript animation library (~3KB) that used the [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API) under the hood, it has been merged into the main Motion library.
+
+**Best for:** Performance-critical apps where bundle size matters.
+
+### 5. AutoAnimate
+
+Drop-in animation for lists and layout changes. Add a single `ref` and your list items animate automatically when added, removed, or reordered.
+
+**Best for:** List transitions, minimal-effort animations.
+
+### 6. React Transition Group
+
+The low-level primitive. It doesn't animate anything itself — it manages enter/exit states so you can apply CSS transitions. Minimal overhead.
+
+**Best for:** Simple enter/exit CSS transitions.
+
+### 7. React Move
+
+Data-driven animations built on top of D3 interpolation. Built specifically for animating between data states.
+
+**Best for:** Charts, data visualization transitions.
+
+## CSS-First Approaches
+
+### 8. [Tailwind CSS](https://tailwindcss.com) + Animate
+
+Tailwind's built-in animation utilities (`animate-spin`, `animate-pulse`, `animate-bounce`) plus custom keyframes cover a surprising amount of ground.
+
+```css
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out forwards;
+}
+```
+
+**Best for:** Simple transitions, hover effects, loading states.
+
+### 9. CSS Spring Animations
+
+Native CSS now supports `linear()` easing, letting you replicate spring physics without JavaScript. Browser support is solid in 2025.
+
+**Best for:** Spring-like CSS transitions without a runtime library.
+
+## Scroll Animation Libraries
+
+### 10. Lenis
+
+Smooth scroll library that pairs well with any animation tool. Handles inertia scrolling and scroll-triggered effects.
+
+### 11. Locomotive Scroll
+
+Smooth scrolling with built-in parallax and scroll-triggered animations. Heavier than Lenis but more batteries-included.
+
+## Specialized Libraries
+
+### 12. [Three.js](https://threejs.org) / React Three Fiber
+
+3D animations and [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) effects in React. React Three Fiber gives you a declarative API over Three.js. Overkill for UI animation, essential for 3D.
+
+### 13. Lottie (lottie-react)
+
+Render After Effects animations as JSON. Great for complex illustrative animations that would be impractical to code by hand.
+
+### 14. Rive
+
+Real-time interactive animations created in the Rive editor. Smaller file sizes than Lottie, with built-in state machines for interactivity.
+
+### 15. Spell UI
+
+A different approach entirely. [Spell UI](https://spell.sh) is a React + Tailwind component library that ships pre-built animation components — text reveals, shimmer effects, tilt cards, animated backgrounds, marquees. Instead of writing animation code, you install a component via the CLI and customize it.
+
+**Best for:** Developers who want polished animation effects without building from scratch.
+
+## How to Choose
+
+Here's the decision framework I use:
+
+- **Simple hover/transition effects** → CSS + Tailwind
+- **Standard UI animations** → Motion
+- **Physics-based, fluid animations** → React Spring
+- **Complex timelines and scroll sequences** → GSAP
+- **Bundle size is critical** → Motion (lightweight imports)
+- **Pre-built animated components** → Spell UI
+- **3D / WebGL** → React Three Fiber
+- **Designer-created animations** → Lottie or Rive
+
+Don't overcomplicate it. Most projects need one library, maybe two. Start with the simplest tool that solves your problem and upgrade when you hit its limits.

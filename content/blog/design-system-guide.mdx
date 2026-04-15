@@ -1,0 +1,123 @@
+---
+title: "Building a Design System from Scratch: A Step-by-Step Guide"
+description: "A step-by-step guide to building a design system — from design tokens and components to documentation, governance, versioning, and adoption strategies."
+image: "/og?title=Building+a+Design+System+from+Scratch"
+tag: "Design"
+publishedOn: "2026-03-05"
+featured: false
+---
+
+Every team eventually reaches the point where copying components between projects stops working. Inconsistencies multiply, bug fixes don't propagate, and new developers spend their first week asking "which button is the right one?"
+
+That's when you need a design system. Not a UI kit — a system. Here's how to build one that people actually use.
+
+## Start With Tokens, Not Components
+
+Design tokens are the atomic values your entire system is built on. Colors, spacing, typography, border radii, shadows. Define these first and everything downstream inherits consistency.
+
+```css
+:root {
+  /* Color */
+  --color-primary-500: #3b82f6;
+  --color-gray-100: #f3f4f6;
+  --color-gray-900: #111827;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Typography */
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+```
+
+The key mistake teams make: defining tokens that are too granular or too abstract. `--color-blue-500` is useful. `--color-cta-primary-hover-bg` is overengineered. Find the middle ground.
+
+Structure your tokens in two layers. **Global tokens** define raw values (colors, sizes). **Semantic tokens** map those values to purposes (`--color-text-primary`, `--color-bg-surface`). Semantic tokens make theming possible — swap the mappings for dark mode, and every component adapts automatically.
+
+## Build Components in Layers
+
+Start with the components you use most, not the flashiest ones. For most teams, that means:
+
+1. **Button** — Primary, secondary, ghost, destructive variants. Multiple sizes.
+2. **Input** — Text, select, checkbox, radio. Error and disabled states.
+3. **Card** — Container with consistent padding, radius, and shadow.
+4. **Badge** — Status indicators and tags.
+5. **Modal / Dialog** — Overlay with focus trapping and escape handling.
+
+Build each component with these priorities:
+
+**Accessibility first.** Keyboard navigation, ARIA attributes, focus management, screen reader support. Retrofitting accessibility takes ten times longer than building it in.
+
+**Composable over configurable.** A `Card` component that accepts `Card.Header`, `Card.Body`, and `Card.Footer` children is more flexible than one with `header`, `body`, and `footer` props. Composition lets consumers arrange things you didn't anticipate.
+
+**Variants, not one-offs.** Every visual variation should be a named variant. If someone needs a button style that doesn't exist, add a variant — don't let them override styles inline.
+
+## Documentation That Gets Used
+
+The best component library is useless if people can't figure out how to use it. Good documentation has three layers:
+
+**Usage guidelines.** When to use this component. When not to. Which variant to pick for which scenario.
+
+**API reference.** Every prop, its type, its default value, and a description. Generate this from [TypeScript](https://www.typescriptlang.org) types when possible.
+
+**Live examples.** Interactive examples showing each variant, state, and combination. Storybook is the standard tool here, but tools like Ladle and Histoire are lighter alternatives.
+
+Write documentation as you build components, not after. The "we'll document it later" approach means it never happens.
+
+## Governance Without Bureaucracy
+
+A design system without governance drifts. Components get modified in consuming apps. New patterns get invented instead of contributed. Within a year you have a design system nobody trusts.
+
+Lightweight governance that works:
+
+**Contribution process.** A clear path for proposing new components or modifications. A GitHub issue template and a one-week review cycle is enough.
+
+**Office hours.** A weekly 30-minute slot where anyone can ask questions or propose changes. Lower friction than async reviews.
+
+**Ownership.** One to three people who own the system full-time or half-time. A design system without dedicated owners becomes a graveyard.
+
+**Adoption metrics.** Track which components are used, how often, and in which products. If a component has zero adoption after three months, remove it or figure out why.
+
+## Versioning and Releases
+
+Use semantic versioning. Breaking changes get a major bump. New components get a minor bump. Bug fixes get a patch.
+
+```js
+// package.json
+{
+  "name": "@company/design-system",
+  "version": "2.4.1"
+}
+// 2.x.x — Major: breaking API changes
+// x.4.x — Minor: new components or features
+// x.x.1 — Patch: bug fixes, style tweaks
+```
+
+Publish a changelog with every release. Not auto-generated commit logs — human-written summaries that explain what changed and what consumers need to do.
+
+For breaking changes, provide codemods when possible. A script that automatically renames a prop across a codebase saves every consuming team hours of manual migration.
+
+## When to Start
+
+The common advice is "don't build a design system until you need one." I'd refine that: don't build a design system until you have at least two products sharing components, or one product large enough that different teams are building the same patterns independently.
+
+Start with tokens and three to five components. Get those adopted. Then grow based on demand, not speculation. A small system that's used everywhere is worth more than a complete one that sits in a repo nobody touches.

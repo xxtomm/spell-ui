@@ -1,0 +1,175 @@
+---
+title: "SEO for React and Next.js: A Developer's Checklist"
+description: "A practical guide to SEO in React and Next.js — server rendering, metadata, structured data, sitemaps, and social cards. Everything you need for search visibility."
+image: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=1200&h=630&fit=crop"
+tag: "Performance"
+publishedOn: "2025-12-20"
+featured: false
+---
+
+[React](https://react.dev) apps have historically been bad for SEO. Client-side rendering means search engine crawlers see an empty `<div id="root">` until JavaScript executes. Google's crawler handles JavaScript better than it used to, but relying on that is gambling with your search rankings.
+
+[Next.js](https://nextjs.org) solves the rendering problem. But rendering is only part of SEO. Here's everything else you need to get right.
+
+## Server Rendering is the Foundation
+
+Next.js gives you three rendering strategies. For SEO, the choice matters:
+
+**Static Generation (SSG)** — HTML generated at build time. Fastest load, best for pages that don't change often (blog posts, marketing pages, documentation).
+
+**Server-Side Rendering (SSR)** — HTML generated on each request. Use this for pages with frequently changing content or personalized data.
+
+**React Server Components (RSC)** — The default in the App Router. Components render on the server with zero client-side JavaScript unless you explicitly add interactivity with `"use client"`.
+
+For most content-driven pages, static generation or server components are the right call. The key principle: your content should be in the HTML that the server sends, not injected by client-side JavaScript after load.
+
+## Metadata API
+
+The App Router's Metadata API gives you full control over `<head>` content. Define it in your `layout.js` or `page.js`:
+
+```js
+// app/blog/[slug]/page.js
+export async function generateMetadata({ params }) {
+  const post = await getPost(params.slug);
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.date,
+      images: [{ url: post.coverImage }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [post.coverImage],
+    },
+  };
+}
+```
+
+Every indexable page needs a unique, descriptive `title` and `description`. Duplicates across pages dilute your search presence.
+
+## Structured Data
+
+Structured data (JSON-LD) helps search engines understand your content and can trigger rich results — star ratings, FAQ dropdowns, breadcrumbs, article metadata.
+
+Add it as a script tag in your page component:
+
+```js
+// In your page component's return:
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.title,
+  datePublished: post.date,
+  author: {
+    "@type": "Person",
+    name: post.author,
+  },
+  description: post.excerpt,
+};
+
+// Render as:
+// <script type="application/ld+json"
+//   dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+// />
+```
+
+Use Google's [Rich Results Test](https://search.google.com/test/rich-results) to validate your structured data. Focus on the schemas that match your content: `Article`, `Product`, `FAQPage`, `HowTo`, `BreadcrumbList`.
+
+## Sitemaps
+
+A sitemap tells search engines which pages exist and how often they change. Next.js App Router supports dynamic sitemap generation:
+
+```js
+// app/sitemap.js
+export default async function sitemap() {
+  const posts = await getAllPosts();
+
+  const blogEntries = posts.map((post) => ({
+    url: "https://yoursite.com/blog/" + post.slug,
+    lastModified: post.updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [
+    { url: "https://yoursite.com", lastModified: new Date(), priority: 1 },
+    { url: "https://yoursite.com/about", lastModified: new Date(), priority: 0.5 },
+    ...blogEntries,
+  ];
+}
+```
+
+Submit your sitemap in Google Search Console. For large sites (10,000+ pages), use sitemap indexes to split into multiple files.
+
+## Robots.txt
+
+Control what crawlers can access:
+
+```js
+// app/robots.js
+export default function robots() {
+  return {
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/api/", "/admin/", "/_next/"],
+      },
+    ],
+    sitemap: "https://yoursite.com/sitemap.xml",
+  };
+}
+```
+
+Don't block CSS or JavaScript files — search engines need them to render your pages correctly.
+
+## Social Cards (Open Graph)
+
+When someone shares your link on Twitter, LinkedIn, or Slack, the card preview is pulled from Open Graph tags. A good preview image dramatically increases click-through rates.
+
+Generate dynamic OG images with Next.js:
+
+```js
+// app/og/route.js
+import { ImageResponse } from "next/og";
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const title = searchParams.get("title");
+
+  return new ImageResponse(
+    {
+      type: "div",
+      props: {
+        style: { fontSize: 48, background: "white", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 48 },
+        children: title,
+      },
+    },
+    { width: 1200, height: 630 }
+  );
+}
+```
+
+Test your cards with [opengraph.xyz](https://opengraph.xyz) or Twitter's card validator before shipping.
+
+## Technical Checklist
+
+- Serve all indexable content in the initial HTML (server render or static generate)
+- Unique `<title>` and `<meta description>` on every page
+- Implement Open Graph and Twitter Card tags
+- Add structured data for content types that support rich results
+- Generate a dynamic sitemap and submit to Search Console
+- Configure robots.txt to allow crawling of content pages
+- Use semantic HTML (`<article>`, `<nav>`, `<main>`, `<h1>`-`<h6>`)
+- Ensure all pages are accessible via internal links (orphan pages don't get indexed)
+- Set canonical URLs for pages accessible at multiple paths
+- Return proper HTTP status codes (404 for missing pages, 301 for redirects)
+
+SEO in Next.js is straightforward — it just requires covering each of these areas deliberately rather than assuming the framework handles it all.

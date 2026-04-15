@@ -1,0 +1,155 @@
+---
+title: "Web Animation Performance: A Guide to Smooth 60fps Motion"
+description: "How to build smooth 60fps animations on the web — GPU-composited properties, will-change, requestAnimationFrame, and techniques to avoid layout thrashing."
+image: "/og?title=Web+Animation+Performance:+Do's+and+Don'ts"
+tag: "Animation"
+publishedOn: "2025-10-12"
+featured: false
+---
+
+Smooth animation is 60 frames per second. That gives you 16.6 milliseconds per frame to do everything — run JavaScript, calculate styles, perform layout, paint pixels, and composite layers. Miss that budget and you get jank.
+
+Most animation jank comes from animating the wrong properties, triggering unnecessary layout recalculations, or fighting the browser's rendering pipeline instead of working with it.
+
+## The Rendering Pipeline
+
+Every frame, the browser runs through up to five steps:
+
+1. **JavaScript** — run handlers, update state
+2. **Style** — calculate which CSS rules apply
+3. **Layout** — compute size and position of every element
+4. **Paint** — fill in pixels (colors, images, text, shadows)
+5. **Composite** — combine painted layers in the correct order
+
+The fewer steps a frame triggers, the cheaper it is. This is the core principle of animation performance.
+
+## Animate Only Composite Properties
+
+Two CSS properties can be animated without triggering layout or paint: `transform` and `opacity`. The GPU handles these directly through compositing, which is fast.
+
+```css
+/* Good — GPU composited, skips layout and paint */
+.card-hover {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  opacity: 0.95;
+}
+
+/* Bad — triggers layout on every frame */
+.card-hover-slow {
+  transition: top 0.3s ease, width 0.3s ease;
+}
+.card-hover-slow:hover {
+  top: -4px;
+  width: 102%;
+}
+```
+
+Animating `width`, `height`, `top`, `left`, `margin`, or `padding` forces the browser to recalculate layout for that element and potentially every element around it. On a complex page, that single property change can take 10-20ms per frame — well over your 16.6ms budget.
+
+**Use `transform` instead of position properties.** `translateX()` replaces `left`, `translateY()` replaces `top`, `scale()` replaces width/height changes.
+
+## Use will-change Carefully
+
+The `will-change` property tells the browser to promote an element to its own compositor layer ahead of time, avoiding a repaint when the animation starts:
+
+```css
+.animated-element {
+  will-change: transform;
+}
+```
+
+It's worth understanding what `will-change` actually does under the hood. It's not a magic performance switch — it's a scheduling hint. It tells the browser to pre-promote an element to its own GPU compositing layer during idle time, so the promotion doesn't happen mid-animation and cause a visible stutter on the first frame. That first-frame hitch is the specific problem `will-change` solves.
+
+But don't add it everywhere. Each compositing layer consumes GPU memory. Overusing `will-change` creates dozens of unnecessary layers that bloat memory and can actually make performance worse. Only apply it to elements that will genuinely animate. Specify properties explicitly — `will-change: transform` not `will-change: all`. Modern browsers already optimize rendering well without it, so treat it as a targeted fix for measured jank, not a preventative measure. Use it only on elements you know will animate, and remove it after the animation completes if it's a one-time effect:
+
+```js
+element.addEventListener("transitionend", () => {
+  element.style.willChange = "auto";
+});
+```
+
+## requestAnimationFrame for JavaScript Animations
+
+If you're driving animations from JavaScript, always use `requestAnimationFrame`. It syncs your updates to the browser's refresh cycle:
+
+```js
+function animate(timestamp) {
+  // Calculate progress based on time, not frames
+  const progress = Math.min((timestamp - startTime) / duration, 1);
+
+  element.style.transform = "translateX(" + progress * 300 + "px)";
+
+  if (progress < 1) {
+    requestAnimationFrame(animate);
+  }
+}
+
+const startTime = performance.now();
+requestAnimationFrame(animate);
+```
+
+Never use `setInterval` or `setTimeout` for animations. They don't sync with the display refresh rate, they keep running in background tabs wasting CPU, and they drift over time.
+
+## Avoid Layout Thrashing
+
+Layout thrashing happens when you read a layout property and then immediately write a style, forcing the browser to recalculate layout synchronously:
+
+```js
+// Bad — forces layout recalculation on every iteration
+items.forEach((item) => {
+  const height = item.offsetHeight; // READ — triggers layout
+  item.style.height = height + 10 + "px"; // WRITE — invalidates layout
+});
+
+// Good — batch reads, then batch writes
+const heights = items.map((item) => item.offsetHeight); // All reads
+items.forEach((item, i) => {
+  item.style.height = heights[i] + 10 + "px"; // All writes
+});
+```
+
+In production, use `requestAnimationFrame` to defer writes to the next frame, or use a library like FastDOM that automatically batches reads and writes.
+
+## Timing and Easing
+
+Getting the duration and easing curve right matters as much as which properties you animate. A few principles from traditional animation carry over directly.
+
+Keep interaction durations under 300ms. Anything longer and the interface feels sluggish — users are waiting for the UI instead of the UI keeping up with them. Hover effects should be 150-200ms. Scroll reveals can stretch to 400ms because users aren't waiting on them to act.
+
+Match easing curves to direction. Use `ease-out` for elements entering the screen — they arrive quickly and decelerate into place, matching how physical objects slow down due to friction. Use `ease-in` for elements leaving — they start slow and accelerate away, giving the eye time to release. `ease-in-out` is for elements that move within the viewport, like repositioning items in a list.
+
+Define consistent timing values and reuse them across your app. Create a small set of duration tokens (fast, normal, slow) and easing curves (enter, exit, move) rather than picking values ad hoc for each animation. Consistency is what makes motion feel like a system rather than a collection of effects.
+
+## CSS Animations vs JavaScript
+
+For simple state transitions (hover effects, enter/exit animations, loading states), CSS animations and transitions are ideal. The browser can optimize them and run them off the main thread in many cases.
+
+JavaScript animations make sense when you need:
+
+- Dynamic values based on user input or scroll position
+- Complex sequencing with precise timing control
+- Physics-based motion (spring, decay)
+- Coordination between multiple elements
+
+## How Spell UI Handles This
+
+Every animated component in [Spell UI](https://spell.sh) — text reveals, tilt cards, shimmer effects — uses only `transform` and `opacity` animations, keeping everything on the GPU compositor layer.
+
+Where JavaScript-driven animation is necessary (scroll-triggered effects, gesture-based interactions), components use `requestAnimationFrame` and avoid layout reads during animation loops. The result: consistent 60fps even on mid-range mobile devices.
+
+## The Performance Checklist
+
+Before shipping any animation:
+
+- Animate only `transform` and `opacity` when possible
+- Use `will-change` sparingly and only on elements that will actually animate
+- Profile in Chrome DevTools Performance panel — watch for red frames and long "Layout" blocks
+- Test on a real mid-range phone, not just your development machine
+- Use `requestAnimationFrame` for all JavaScript-driven animations
+- Batch DOM reads and writes to prevent layout thrashing
+- Prefer CSS transitions for simple state changes
+
+The best-performing animation is one the user notices because it's smooth, not because it stutters.

@@ -1,0 +1,122 @@
+---
+title: "How to Build a SaaS Landing Page That Converts"
+description: "A practical, data-driven guide to building SaaS landing pages that actually convert visitors into users. Covers hero sections, social proof, pricing, and CTA placement."
+image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=630&fit=crop"
+tag: "Landing Pages"
+publishedOn: "2025-01-20"
+featured: true
+---
+
+Most SaaS landing pages fail not because the product is bad, but because the page doesn't communicate value fast enough. Visitors give you about 5 seconds before they decide to stay or bounce. In those 5 seconds, your page needs to answer one question: "What does this do for me?"
+
+Here's how to build a landing page that actually converts.
+
+## Start With a Clear Value Proposition
+
+Your hero headline is the single most important line of copy on the page. It should describe the outcome your user gets, not the features you built.
+
+Bad: "An AI-powered platform for workflow automation."
+Good: "Ship your weekly reports in 5 minutes, not 5 hours."
+
+The first tells me what the product is. The second tells me what it does for me. According to research from MarketingExperiments, outcome-oriented headlines outperform feature-oriented ones by 28% on average.
+
+Keep your subheadline to one sentence that adds context — who it's for and how it works at a high level.
+
+## Hero Section Structure
+
+The most effective SaaS hero sections follow a predictable pattern:
+
+1. **Headline** — Outcome-driven, under 12 words
+2. **Subheadline** — One sentence of supporting context
+3. **Primary CTA** — High-contrast button with action-oriented copy
+4. **Visual proof** — Screenshot, demo video, or product animation
+
+That visual proof element matters more than most founders think. Pages with a product screenshot or demo in the hero section convert 35% better than those with abstract illustrations. People want to see what they're signing up for.
+
+## Social Proof Placement
+
+Social proof should appear within the first viewport or immediately below it. The three most effective formats:
+
+- **Logo bars** — "Trusted by teams at [Stripe](https://stripe.com), [Vercel](https://vercel.com), [Linear](https://linear.app)" with logos
+- **Aggregate metrics** — "10,000+ teams" or "4.9/5 on G2"
+- **Short testimonial** — A single, specific quote from a recognizable name
+
+The key is specificity. "Loved by thousands" is weak. "Used by 12,847 engineering teams" is strong. Numbers with odd specificity feel more credible because they look measured, not made up.
+
+```css
+/* A clean logo bar with muted brand colors */
+.logo-bar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  opacity: 0.6;
+  filter: grayscale(100%);
+  transition: opacity 0.2s ease;
+}
+.logo-bar:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+```
+
+## Pricing: Remove Friction, Not Options
+
+The biggest conversion killer on pricing sections is cognitive overload. Three tiers is the standard for a reason — it gives users a clear "good, better, best" framework without paralysis.
+
+Tips that actually move the needle:
+
+- **Highlight the recommended plan** visually (border, badge, scale)
+- **Use monthly prices** but show annual savings as a toggle
+- **Anchor the value** — show what each plan saves in time or money
+- **Free tier or trial with no credit card** removes the biggest objection
+
+Research from Price Intelligently shows that SaaS pages with a highlighted "recommended" plan see 15-20% more clicks on that tier compared to pages where all plans look equal.
+
+## CTA Placement and Copy
+
+Your primary CTA should appear in at least three places: the hero, mid-page (after social proof or features), and the bottom of the page. Visitors who scroll to the bottom are highly engaged — don't make them scroll back up.
+
+CTA copy rules:
+
+- Lead with a verb: "Start building," "Get started free," "Try it now"
+- Include the value or remove the risk: "Start free trial — no credit card"
+- Avoid generic text like "Submit" or "Learn more" for primary actions
+
+A/B testing data from Unbounce shows that first-person phrasing ("Start my free trial") outperforms third-person ("Start your free trial") by 24% in most cases.
+
+## The Features Section
+
+Don't list features. Frame them as problems solved.
+
+Instead of a grid of icons with labels like "Real-time sync" and "Team collaboration," structure each feature as:
+
+1. The pain point
+2. How your product solves it
+3. A visual showing it in action
+
+Three to four feature blocks is the sweet spot. More than six and visitors start skimming without absorbing anything.
+
+## Page Speed and Technical Fundamentals
+
+None of the above matters if your page takes 4 seconds to load. Google's data shows that bounce rates increase by 32% when page load goes from 1 to 3 seconds.
+
+Checklist:
+
+- Serve images in WebP or AVIF format
+- Lazy-load anything below the fold
+- Use a CDN for static assets
+- Keep total page weight under 1.5MB
+- Target a [Lighthouse](https://developer.chrome.com/docs/lighthouse) performance score above 90
+
+## The Minimum Viable Landing Page
+
+If you're launching soon and need to prioritize, focus on these four elements in order:
+
+1. A clear, outcome-driven headline with a CTA
+2. A product screenshot or demo
+3. Three feature blocks framed as problems solved
+4. One form of social proof (even beta user quotes work)
+
+Everything else — pricing tables, comparison charts, FAQ sections — can come after launch when you have traffic to test against.
+
+The best landing page is the one that ships. Refine it with real data, not guesses.

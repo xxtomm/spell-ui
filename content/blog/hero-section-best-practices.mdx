@@ -1,0 +1,134 @@
+---
+title: "Hero Section Design: Best Practices and Examples"
+description: "Learn the layout patterns, typography hierarchy, and animation techniques that make hero sections effective. Practical tips for above-the-fold design that captures attention."
+image: "/og?title=Hero+Section+Design:+Best+Practices+and+Examples"
+tag: "Landing Pages"
+publishedOn: "2025-03-08"
+featured: false
+---
+
+The hero section is the most valuable real estate on your entire website. It's the first thing visitors see, and it sets the tone for everything that follows. Get it right and people scroll. Get it wrong and they bounce.
+
+After studying hundreds of high-performing landing pages, here are the patterns that consistently work.
+
+## Layout Patterns That Work
+
+Most effective hero sections fall into one of three layouts:
+
+**Centered single-column.** Headline, subtext, and CTA stacked vertically in the center of the page. This works best when your product is abstract or when the copy is strong enough to stand alone. Linear and Vercel use this pattern well.
+
+**Split layout (text + visual).** Copy on the left, product screenshot or illustration on the right. This is the most common SaaS hero pattern because it lets you show the product immediately. Notion and Slack have used variations of this effectively.
+
+**Full-bleed visual with overlay text.** A background image or video with text layered on top. Harder to execute well, but effective for products with strong visual identity. Works best for creative tools and design-forward brands.
+
+Pick the layout that matches your product's strengths. If your UI is your selling point, show it. If your value proposition is conceptual, lead with copy.
+
+## Typography Hierarchy
+
+Your hero needs exactly three levels of text:
+
+1. **Headline (H1)** — The main promise. Large, bold, high contrast. Typically 48-72px on desktop.
+2. **Subheadline** — Supporting context. Who it's for, how it works. 18-22px, lower contrast.
+3. **CTA label** — The action. Concise, verb-led.
+
+The most common mistake is making the subheadline too long. One to two sentences maximum. If you need more context, put it below the fold.
+
+```css
+/* Typographic hierarchy for hero sections */
+.hero-headline {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  max-width: 720px;
+}
+.hero-subheadline {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.6;
+  opacity: 0.7;
+  max-width: 540px;
+}
+```
+
+Notice the negative letter-spacing on the headline. Tight tracking at large sizes makes headings feel more intentional and modern. This is a small detail that separates polished pages from default-looking ones.
+
+## Above-the-Fold Optimization
+
+"Above the fold" still matters — not because people won't scroll, but because it determines whether they *want* to scroll.
+
+Everything above the fold should answer three questions:
+
+1. What is this? (headline)
+2. Why should I care? (subheadline)
+3. What do I do next? (CTA)
+
+Avoid cluttering the hero with navigation links, multiple CTAs, or long feature lists. The hero's job is singular: capture attention and create enough interest to keep reading.
+
+One thing that consistently underperforms is auto-playing video backgrounds. They increase page load time, compete with the headline for attention, and rarely communicate more than a static image would. If you want motion, use targeted animations instead.
+
+## Animation and Motion
+
+This is where most landing pages leave value on the table. A static hero section works, but an animated one *engages*.
+
+The most effective hero animations are:
+
+- **Text entrance** — Words fading up with a slight stagger or blur-to-focus reveal
+- **Product preview animation** — A short loop showing the product in action
+- **Background motion** — Subtle gradient shifts or particle effects that add atmosphere
+
+The key word is "subtle." The animation should support the content, not compete with it. A hero headline that takes 3 seconds to finish animating is testing the visitor's patience.
+
+Libraries like [Spell UI](https://spell.sh) offer pre-built text animation components -- staggered word reveals, shimmer effects -- that handle the timing and easing for you. They save hours of keyframe tweaking. But even simple CSS transitions can make a meaningful difference:
+
+```css
+/* Simple hero text entrance */
+.hero-text {
+  animation: heroEntrance 0.6s ease-out forwards;
+  opacity: 0;
+}
+@keyframes heroEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+```
+
+## Visual Proof in the Hero
+
+If your product has a UI, show it. A product screenshot or short demo in the hero section converts better than abstract illustrations in virtually every A/B test I've seen.
+
+Tips for hero visuals:
+
+- Use a real screenshot, not a mockup with fake data
+- Add a subtle shadow or border to ground the image
+- On mobile, move the visual below the CTA so the action isn't pushed off-screen
+- Consider a short looping video (5-10 seconds) if your product's value is hard to capture in a still image
+
+## Common Hero Section Mistakes
+
+**Too many CTAs.** One primary CTA and optionally one secondary (like "Watch demo"). More than that creates decision paralysis.
+
+**Generic stock photography.** Abstract images of people in meetings or hands typing on laptops communicate nothing about your product.
+
+**Missing mobile optimization.** A hero that looks great at 1440px but breaks at 375px is a conversion killer. Over 60% of web traffic is mobile.
+
+**Headline that describes the category, not the value.** "The all-in-one project management platform" tells me nothing about why I should choose *your* platform.
+
+## Start Simple, Then Polish
+
+If you're building a hero section today, start with:
+
+1. A centered headline under 10 words
+2. A one-sentence subheadline
+3. A single high-contrast CTA button
+4. A product screenshot or short demo
+
+Get the copy and structure right first. Then layer in animation, background effects, and visual polish. The best hero sections feel effortless, but they're always built iteratively.

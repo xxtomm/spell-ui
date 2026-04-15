@@ -1,0 +1,241 @@
+---
+title: "How to Build an Infinite Marquee Component in React"
+description: "Build a smooth, infinite-scrolling marquee component in React from scratch — with CSS animations, performance optimization, and accessibility considerations."
+image: "/og?title=How+to+Build+an+Infinite+Marquee+Component+in+React"
+tag: "Animation"
+publishedOn: "2026-03-10"
+featured: false
+---
+
+The infinite marquee — a continuous horizontal scroll of logos, testimonials, or text — is everywhere on modern landing pages. It signals social proof, adds visual motion, and fills space without demanding attention.
+
+Building one that actually works well is trickier than it looks. Here's how to build a production-quality marquee component in [React](https://react.dev).
+
+## The Technique
+
+The infinite scroll illusion works by duplicating the content and sliding both copies. When the first copy fully exits, it wraps around seamlessly because the second copy is in the exact same position the first one started.
+
+Here's the structure:
+
+```css
+/* Container clips the overflow */
+.marquee {
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Inner track holds two copies side by side */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: scroll-left 30s linear infinite;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+```
+
+The key insight: the track contains two identical copies of your content. The animation moves the track by exactly 50% (one full copy width), then resets. Because the second copy is identical, the reset is invisible.
+
+## Building the React Component
+
+Here's the component structure:
+
+```js
+// MarqueeProps:
+// - children: the content to scroll
+// - speed: animation duration in seconds (default 30)
+// - direction: "left" or "right"
+// - pauseOnHover: boolean
+
+// The component renders:
+// <div className="marquee"> (overflow: hidden)
+//   <div className="marquee-track"> (flex, animated)
+//     <div className="marquee-content">{children}</div>
+//     <div className="marquee-content" aria-hidden="true">
+//       {children}
+//     </div>
+//   </div>
+// </div>
+```
+
+The second copy of children gets `aria-hidden="true"` because it's purely decorative — screen readers should only read the content once.
+
+## The CSS
+
+```css
+.marquee {
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 2rem;
+}
+
+.marquee-track[data-direction="left"] {
+  animation: marquee-scroll-left var(--duration, 30s) linear infinite;
+}
+
+.marquee-track[data-direction="right"] {
+  animation: marquee-scroll-right var(--duration, 30s) linear infinite;
+}
+
+@keyframes marquee-scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Pause on hover */
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+```
+
+Using `--duration` as a CSS custom property lets you control speed from the React side by setting `style={{ '--duration': '20s' }}`.
+
+## Handling Variable Content Width
+
+The 50% translation assumes both copies are equal width, which they always will be since they're identical. But you need `width: max-content` on the track to prevent the flex container from constraining the children.
+
+If your content items have different sizes (e.g., logos of varying widths), wrap them in a flex container with consistent gap:
+
+```css
+.marquee-content {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  flex-shrink: 0;
+}
+
+.marquee-content img {
+  height: 32px;
+  width: auto;
+  flex-shrink: 0;
+}
+```
+
+The `flex-shrink: 0` is critical — without it, items will compress to fit the viewport.
+
+## Vertical Marquee
+
+The same technique works vertically. Change `flex-direction` to `column` and animate `translateY` instead:
+
+```css
+.marquee-vertical .marquee-track {
+  flex-direction: column;
+  animation: marquee-scroll-up var(--duration, 30s) linear infinite;
+}
+
+@keyframes marquee-scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+```
+
+## Performance
+
+CSS `transform: translateX()` is GPU-composited, so the animation itself is cheap. But there are a few things to watch:
+
+### Image Loading
+
+If your marquee contains images (logos, avatars), they should be fully loaded before the animation starts. Images popping in mid-scroll looks broken.
+
+Preload critical marquee images or use a loading state:
+
+```js
+// Wait for all images to load before showing the marquee
+// Use onLoad callbacks or the Image constructor to preload
+// Show a placeholder or static view until ready
+```
+
+### Will-Change
+
+Adding `will-change: transform` to the track tells the browser to composite it on its own GPU layer:
+
+```css
+.marquee-track {
+  will-change: transform;
+}
+```
+
+This prevents the animation from triggering repaints on surrounding elements.
+
+### Reduced Motion
+
+Respect user preferences:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+```
+
+Users who've enabled reduced motion in their OS settings should see static content instead of scrolling.
+
+## Accessibility
+
+Beyond `aria-hidden` on the duplicate:
+
+1. **Don't put critical information in a marquee** — users can't control the scroll speed
+2. **Pause on hover** — lets users read content at their own pace
+3. **Provide a pause button** — hover-to-pause doesn't work on touch devices. A visible pause control is more accessible
+4. **Keep the content readable** — text that moves too fast is worse than static text. Default to slow speeds (30s+ for a full cycle)
+
+## Edge Fade Effect
+
+Most production marquees have a fade-out at the edges so content doesn't appear to be abruptly clipped:
+
+```css
+.marquee {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
+```
+
+CSS `mask-image` with a gradient creates smooth transparency at both edges. This performs better than positioned gradient overlays because it adds no extra DOM elements.
+
+## The Shortcut
+
+If you want a marquee without building one, [Spell UI](https://spell.sh) has a `Marquee` component that covers duplication, direction, speed control, pause on hover, edge fading, reduced motion, and vertical mode. Install it via the CLI and drop it in.
+
+But the build-from-scratch approach is worth understanding. The infinite scroll illusion (duplicate + translate 50%) is a pattern that shows up in carousels, tickers, and other continuous-loop animations. Once you understand the mechanics, you can adapt it to any continuous scrolling effect.

@@ -1,0 +1,197 @@
+---
+title: "Building a Design System with Tailwind CSS"
+description: "A practical guide to creating a scalable design system with Tailwind CSS, covering design tokens, component patterns, theming, and documentation strategies."
+image: "/og?title=Building+a+Design+System+with+Tailwind+CSS"
+tag: "Tailwind CSS"
+publishedOn: "2025-12-12"
+featured: false
+---
+
+Design systems get talked about like they're only for large teams with dedicated design infrastructure. They're not. If you have more than a handful of components, you already need one — you just might not have formalized it yet.
+
+[Tailwind CSS](https://tailwindcss.com) is well-suited for design systems because it forces explicit decisions about spacing, color, and typography. The framework is the design token layer. Here's how to structure it properly.
+
+## Start with Design Tokens
+
+Design tokens are the atomic values that define your visual language: colors, spacing, font sizes, border radii, shadows. In Tailwind, your `tailwind.config.js` is your token file.
+
+```js
+// tailwind.config.js
+module.exports = {
+  theme: {
+    colors: {
+      transparent: "transparent",
+      current: "currentColor",
+      white: "#ffffff",
+      black: "#000000",
+      gray: {
+        50: "#fafafa",
+        100: "#f5f5f5",
+        200: "#e5e5e5",
+        300: "#d4d4d4",
+        400: "#a3a3a3",
+        500: "#737373",
+        600: "#525252",
+        700: "#404040",
+        800: "#262626",
+        900: "#171717",
+        950: "#0a0a0a",
+      },
+      primary: {
+        50: "#eff6ff",
+        100: "#dbeafe",
+        200: "#bfdbfe",
+        300: "#93c5fd",
+        400: "#60a5fa",
+        500: "#3b82f6",
+        600: "#2563eb",
+        700: "#1d4ed8",
+        800: "#1e40af",
+        900: "#1e3a5f",
+      },
+    },
+    spacing: {
+      0: "0",
+      1: "0.25rem",
+      2: "0.5rem",
+      3: "0.75rem",
+      4: "1rem",
+      5: "1.25rem",
+      6: "1.5rem",
+      8: "2rem",
+      10: "2.5rem",
+      12: "3rem",
+      16: "4rem",
+      20: "5rem",
+      24: "6rem",
+    },
+    borderRadius: {
+      none: "0",
+      sm: "0.25rem",
+      DEFAULT: "0.5rem",
+      md: "0.625rem",
+      lg: "0.75rem",
+      xl: "1rem",
+      full: "9999px",
+    },
+  },
+}
+```
+
+Notice I'm using `theme` (not `theme.extend`) for colors. This is intentional — in a design system, you want to lock down the palette. If a developer reaches for `text-teal-400` and it doesn't exist, that's the system working correctly. The constraint is the feature.
+
+## Semantic Color Layers
+
+Raw color scales are useful for developers, but semantic naming makes the system self-documenting. Map your scales to meaningful names:
+
+```css
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #e5e5e5;
+  --ring: #0a0a0a;
+}
+```
+
+These semantic tokens decouple your components from specific color values. When the brand palette changes, you update the tokens — not every component.
+
+## Component Patterns
+
+A common mistake is treating Tailwind components as raw utility strings. At scale, you need abstraction. Define consistent patterns for common components.
+
+For a button system, establish the variants upfront:
+
+```css
+/* Base button styles */
+/* inline-flex items-center justify-center rounded-md text-sm
+   font-medium transition-colors focus-visible:outline-none
+   focus-visible:ring-2 focus-visible:ring-ring
+   disabled:pointer-events-none disabled:opacity-50 */
+
+/* Variant: default */
+/* bg-primary text-primary-foreground hover:bg-primary/90 */
+
+/* Variant: outline */
+/* border border-border bg-background hover:bg-secondary */
+
+/* Variant: ghost */
+/* hover:bg-secondary hover:text-foreground */
+
+/* Size: sm — h-9 px-3 text-xs */
+/* Size: md — h-10 px-4 text-sm */
+/* Size: lg — h-11 px-6 text-base */
+```
+
+Document every variant. If a variant isn't documented, it's not part of the system.
+
+## Spacing and Layout Rules
+
+Establish spacing conventions early. Inconsistent spacing is the most common visual debt in growing codebases.
+
+```js
+// A simple spacing convention
+// Component internal padding: 4 (1rem) or 6 (1.5rem)
+// Between related elements: 2 (0.5rem) or 3 (0.75rem)
+// Between sections: 8 (2rem) or 12 (3rem)
+// Page-level gaps: 16 (4rem) or 24 (6rem)
+```
+
+Write these down. When a developer asks "how much space between a title and a description," the answer should be in the docs, not a judgment call.
+
+## Theming Strategy
+
+If you need multiple themes (light/dark, brand variants), CSS custom properties are the cleanest approach with Tailwind:
+
+```js
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+        primary: "var(--primary)",
+        secondary: "var(--secondary)",
+        muted: "var(--muted)",
+        border: "var(--border)",
+      },
+    },
+  },
+}
+```
+
+Then define each theme as a CSS class with the corresponding variable values. Switching themes is just swapping a class on the root element.
+
+This approach scales to any number of themes without multiplying your Tailwind classes. The component code stays the same — `bg-background text-foreground` — regardless of which theme is active.
+
+## Documentation Is Not Optional
+
+A design system without documentation is a folder of components. You need to document:
+
+- **Token values** — What colors, spacing, and typography scales exist
+- **Component API** — What variants, sizes, and props each component supports
+- **Usage guidelines** — When to use a ghost button vs. an outline button
+- **Composition patterns** — How to combine components for common layouts
+
+Storybook, custom docs sites, or even a well-organized markdown file in your repo will work. The format matters less than the habit of keeping it current.
+
+## Practical Advice
+
+A few lessons from building design systems in practice:
+
+1. **Start small.** Don't try to systematize everything at once. Begin with colors, typography, and your most-used components.
+2. **Constrain intentionally.** Remove default Tailwind values you don't use. A smaller API surface means more consistency.
+3. **Version your tokens.** When spacing scales or color values change, treat it like a breaking change. Components downstream depend on these values.
+4. **Lint for compliance.** Use ESLint plugins or custom rules to flag arbitrary values (`text-[#333]`) that bypass your token system.
+
+A design system isn't a project you finish. It's an ongoing practice of making consistent decisions and encoding them where your team can find them.

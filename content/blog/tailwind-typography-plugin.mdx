@@ -1,0 +1,170 @@
+---
+title: "A Guide to the Tailwind CSS Typography Plugin"
+description: "Learn how to use the Tailwind CSS Typography plugin to style markdown and CMS content with beautiful defaults, customization options, and dark mode support."
+image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200&h=630&fit=crop"
+tag: "Tailwind CSS"
+publishedOn: "2025-10-08"
+featured: false
+---
+
+If you've ever tried to style markdown or CMS-rendered content with [Tailwind CSS](https://tailwindcss.com), you've hit the problem: Tailwind's reset strips all default browser styles. Headings, paragraphs, lists, and blockquotes all render as unstyled text.
+
+The official Typography plugin (`@tailwindcss/typography`) solves this. It provides a set of `prose` classes that apply beautiful typographic defaults to any block of content you don't control.
+
+## Installation
+
+Install the plugin and add it to your Tailwind config:
+
+```js
+// Install
+// npm install -D @tailwindcss/typography
+
+// tailwind.config.js
+module.exports = {
+  plugins: [
+    require("@tailwindcss/typography"),
+  ],
+}
+```
+
+Now wrap any content block with the `prose` class:
+
+```css
+/* <article class="prose"> renders beautifully styled content */
+```
+
+That single class gives you sensible defaults for headings, paragraphs, lists, blockquotes, code blocks, tables, links, and horizontal rules.
+
+## Sizing Variants
+
+The plugin includes size modifiers that adjust the base font size and all related spacing proportionally:
+
+```css
+/* prose-sm  — 14px base, tighter spacing */
+/* prose     — 16px base (default) */
+/* prose-lg  — 18px base, wider spacing */
+/* prose-xl  — 20px base */
+/* prose-2xl — 24px base, generous spacing */
+```
+
+These are useful when the same content needs to render differently in different contexts — a blog post might use `prose-lg` while a documentation sidebar uses `prose-sm`.
+
+## Controlling Max Width
+
+By default, `prose` sets a `max-width` of `65ch` — a comfortable reading line length. If your layout already handles width constraints, you can remove this:
+
+```css
+/* prose max-w-none */
+```
+
+This is a common gotcha. People add `prose` and wonder why their content won't fill the container. The built-in max-width is the reason.
+
+## Customizing Colors
+
+The default prose styles use gray tones. You can change the color theme using Tailwind's color modifiers:
+
+```css
+/* prose prose-gray   — default gray tones */
+/* prose prose-slate  — cooler gray */
+/* prose prose-zinc   — neutral gray */
+/* prose prose-blue   — blue-tinted headings and links */
+/* prose prose-indigo — indigo-tinted accents */
+```
+
+These modifiers adjust heading colors, link colors, bold text weight, and other accents to match your chosen palette.
+
+## Dark Mode Support
+
+The Typography plugin works with Tailwind's dark mode out of the box. Prefix prose modifiers with `dark:` to swap color schemes:
+
+```css
+/* prose prose-gray dark:prose-invert */
+```
+
+The `prose-invert` class flips all typography colors for dark backgrounds. This is the simplest approach and works well in most cases.
+
+For more control, you can override individual elements in dark mode:
+
+```css
+/* Customize specific dark mode prose styles */
+.dark .prose {
+  --tw-prose-body: #d4d4d4;
+  --tw-prose-headings: #fafafa;
+  --tw-prose-links: #60a5fa;
+  --tw-prose-bold: #fafafa;
+  --tw-prose-code: #e5e5e5;
+  --tw-prose-quotes: #a3a3a3;
+  --tw-prose-quote-borders: #404040;
+}
+```
+
+The plugin exposes CSS custom properties for every color it uses, making targeted overrides straightforward.
+
+## Overriding Default Styles
+
+Sometimes the prose defaults don't match your design. You can override any element's styles in the Tailwind config:
+
+```js
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            a: {
+              color: "#2563eb",
+              textDecoration: "none",
+              fontWeight: "500",
+              "&:hover": {
+                textDecoration: "underline",
+              },
+            },
+            "code::before": {
+              content: '""',
+            },
+            "code::after": {
+              content: '""',
+            },
+            code: {
+              backgroundColor: "#f3f4f6",
+              padding: "0.25rem 0.375rem",
+              borderRadius: "0.25rem",
+              fontWeight: "400",
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+Two common overrides worth highlighting:
+
+1. **Removing backtick pseudo-elements from inline code.** The plugin wraps inline `code` with backtick characters by default. The `code::before` and `code::after` overrides above remove them.
+2. **Link decoration.** The default underlined links may clash with your design. Override the `a` styles as shown.
+
+## Using with Markdown Renderers
+
+If you're using MDX, Contentlayer, or any markdown renderer, the Typography plugin is essential. Your rendered markdown output won't have Tailwind utility classes — it's plain HTML. The `prose` class is what makes that output look good.
+
+A typical blog post layout looks like this:
+
+```js
+// Wrap your rendered content with prose
+// <article className="prose prose-lg dark:prose-invert max-w-none">
+//   {renderedContent}
+// </article>
+```
+
+## Common Pitfalls
+
+A few things that trip people up:
+
+- **Nested `prose` classes** can cause specificity issues. Avoid wrapping prose inside prose.
+- **Tailwind utilities inside prose** may get overridden by the plugin's styles. Use `not-prose` on child elements that should escape prose styling.
+- **Tables** are styled but not made responsive. Wrap tables in a `div` with `overflow-x-auto` for horizontal scrolling on mobile.
+- **Images** get auto margins and max-width. If you need different image layouts, wrap them in a `not-prose` container.
+
+The Typography plugin handles the 90% case for content styling. For the remaining 10%, the config overrides and `not-prose` escape hatch give you full control. It's one of those plugins that probably belongs in every Tailwind project that renders user or editorial content.

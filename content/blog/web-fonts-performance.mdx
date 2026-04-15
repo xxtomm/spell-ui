@@ -1,0 +1,195 @@
+---
+title: "Web Fonts and Performance: Loading Strategies That Work"
+description: "Practical strategies for loading web fonts without hurting performance — font-display, preloading, subsetting, variable fonts, and Next.js font optimization."
+image: "/og?title=Web+Fonts+and+Performance:+Loading+Strategies+That+Work"
+tag: "Performance"
+publishedOn: "2026-04-14"
+featured: false
+---
+
+A few font files can add 200-500KB to your page weight and block text rendering for several seconds on slow connections. The irony: fonts are supposed to make your site look better, but slow fonts make it look broken.
+
+Here's how to load fonts fast without compromising your typography.
+
+## The Core Problem
+
+When a browser encounters text styled with a web font, it has a decision to make: show the text in a fallback font immediately, or hide it until the custom font downloads. The default behavior in most browsers is to hide text for up to 3 seconds. That's 3 seconds of invisible content.
+
+This is called FOIT — Flash of Invisible Text. The fix is straightforward.
+
+## font-display
+
+The `font-display` descriptor controls what happens while a font is loading:
+
+```css
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-var.woff2") format("woff2");
+  font-display: swap;
+}
+```
+
+The options:
+
+- **`swap`** — Shows fallback text immediately, swaps to the custom font when it loads. Best for body text. Causes a brief flash of unstyled text (FOUT), but text is always visible.
+- **`optional`** — Uses the custom font only if it's already cached. If it needs to download, the fallback font is used for the entire page load. Best for non-critical fonts where consistency matters less than speed.
+- **`fallback`** — A middle ground. Gives the font a short window (~100ms) to load. If it misses that window, the fallback is used for the rest of that page load (but the font is cached for future visits).
+
+For most sites, use `swap` for your primary font and `optional` for decorative or secondary fonts.
+
+## Preloading Critical Fonts
+
+Font files are typically discovered late. The browser has to download HTML, parse CSS, find the `@font-face` rule, then start downloading the font. Preloading skips ahead in that chain:
+
+```html
+<link
+  rel="preload"
+  href="/fonts/inter-var.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+```
+
+The `crossorigin` attribute is required even for same-origin fonts — this is a quirk of the font loading spec. Omitting it causes the font to be fetched twice.
+
+Only preload 1-2 fonts. Preloading too many competes for bandwidth with other critical resources and can actually slow down your page.
+
+## Self-Hosting vs Google Fonts
+
+Google Fonts is convenient but introduces a performance penalty:
+
+1. DNS lookup for `fonts.googleapis.com`
+2. CSS download from Google
+3. DNS lookup for `fonts.gstatic.com`
+4. Font file download from Google
+
+That's two extra DNS lookups and a blocking CSS request before your fonts even start downloading.
+
+Self-hosting eliminates these round trips. Download the font files, serve them from your own domain, and you remove the external dependency entirely:
+
+```bash
+# Download Google Fonts for self-hosting
+npx @nicolo-ribaudo/google-fonts-helper download -f Inter -s latin -w 400,500,600,700 -o ./public/fonts
+```
+
+If you must use Google Fonts, at minimum preconnect to their domains:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+```
+
+## Variable Fonts
+
+A traditional font setup might include separate files for regular, medium, semibold, and bold — four files, potentially 200-400KB total. A variable font combines all weights (and sometimes widths and other axes) into a single file.
+
+Inter Variable, for example, is roughly 100KB for all weights from thin to black. That's less than two traditional weight-specific files.
+
+```css
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+h1 {
+  font-weight: 650; /* Any value in the 100-900 range */
+}
+```
+
+Variable fonts also let you use any weight value, not just the predefined 100/200/300 steps. `font-weight: 550` or `font-weight: 650` are perfectly valid, giving you more precise typographic control.
+
+## Subsetting
+
+Most fonts include glyphs for dozens of languages and scripts you'll never use. Subsetting strips out the characters you don't need:
+
+```bash
+# Using pyftsubset (from fonttools)
+pip install fonttools brotli
+pyftsubset InterVariable.woff2 \
+  --output-file=inter-latin.woff2 \
+  --flavor=woff2 \
+  --unicodes="U+0000-007F,U+00A0-00FF,U+2000-206F"
+```
+
+A Latin-only subset of Inter drops from ~100KB to ~30KB. If your site is English-only, there's no reason to ship Cyrillic, Greek, or Vietnamese glyphs.
+
+Google Fonts subsets automatically by script (the `&subset=latin` parameter). When self-hosting, you need to do this yourself.
+
+## [Next.js](https://nextjs.org) Font Optimization
+
+Next.js has a built-in font module that handles most of these optimizations automatically:
+
+```js
+// app/layout.js
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+// In your layout:
+// <html className={inter.variable}>
+```
+
+What `next/font` does under the hood:
+
+- Downloads the font at build time and self-hosts it (no external requests)
+- Generates optimized `@font-face` declarations
+- Applies `font-display: swap` (or your chosen value)
+- Injects a CSS variable you can use in Tailwind or your stylesheets
+
+For local fonts:
+
+```js
+import localFont from "next/font/local";
+
+const myFont = localFont({
+  src: "./fonts/MyFont-Variable.woff2",
+  display: "swap",
+  variable: "--font-my",
+});
+```
+
+## Reducing Layout Shift from Font Loading
+
+When a fallback font swaps to a custom font, text reflows because the fonts have different metrics (character width, line height, letter spacing). This causes CLS.
+
+The `size-adjust`, `ascent-override`, and `descent-override` CSS properties let you tune the fallback font to match your custom font's metrics, minimizing reflow:
+
+```css
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 107%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+body {
+  font-family: "Inter", "Inter Fallback", sans-serif;
+}
+```
+
+Next.js `next/font` calculates and applies these overrides automatically, which is one of the strongest reasons to use it.
+
+## The Checklist
+
+- Use `font-display: swap` for primary fonts, `optional` for decorative fonts
+- Preload your most critical font file (one, maybe two)
+- Self-host fonts instead of loading from Google Fonts
+- Use variable fonts to consolidate multiple weight files
+- Subset to only the character ranges you need
+- Use `next/font` if you're on Next.js
+- Apply fallback font metric overrides to minimize CLS
+
+These techniques are well-supported, well-documented, and take an afternoon to implement. There's no reason to ship a site where text is invisible for 3 seconds in 2026.

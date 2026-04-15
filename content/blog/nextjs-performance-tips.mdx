@@ -1,0 +1,275 @@
+---
+title: "10 Next.js Performance Tips for Production Apps"
+description: "Practical Next.js performance optimizations — image handling, font loading, code splitting, caching strategies, ISR, streaming, and bundle analysis techniques."
+image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=630&fit=crop"
+tag: "Next.js"
+publishedOn: "2026-04-08"
+featured: false
+---
+
+Performance comes from dozens of small decisions during development, not a last-minute audit. [Next.js](https://nextjs.org) handles a lot of optimization automatically, but a default Next.js app and a properly tuned one differ substantially.
+
+Here are 10 things I've seen make the biggest difference in production.
+
+## 1. Use the Image Component Properly
+
+`next/image` optimizes images automatically — format conversion, resizing, lazy loading. But it only works if you use it correctly.
+
+```js
+import Image from "next/image"
+
+// Good: explicit dimensions, priority for above-the-fold
+<Image
+  src="/hero.jpg"
+  alt="Hero image"
+  width={1200}
+  height={630}
+  priority
+/>
+
+// Good: fill mode for responsive containers
+<div className="relative aspect-video">
+  <Image
+    src="/feature.jpg"
+    alt="Feature screenshot"
+    fill
+    sizes="(max-width: 768px) 100vw, 50vw"
+    className="object-cover"
+  />
+</div>
+```
+
+Key mistakes to avoid:
+- Missing `sizes` prop on responsive images (defeats optimization)
+- Not using `priority` on LCP images (causes layout shift)
+- Using `fill` without a sized container (image collapses)
+
+## 2. Optimize Font Loading
+
+`next/font` preloads fonts and eliminates layout shift by using `size-adjust`. Self-hosting fonts also avoids external network requests to Google Fonts.
+
+```js
+import { Inter } from "next/font/google"
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+})
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={inter.className}>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+For custom fonts, use `next/font/local`:
+
+```js
+import localFont from "next/font/local"
+
+const myFont = localFont({
+  src: "./fonts/MyFont.woff2",
+  display: "swap",
+})
+```
+
+## 3. Code Split Aggressively with Dynamic Imports
+
+Not every component needs to be in the initial bundle. Heavy components — charts, editors, maps, animation libraries — should load on demand:
+
+```js
+import dynamic from "next/dynamic"
+
+const Chart = dynamic(() => import("@/components/chart"), {
+  loading: () => <div className="h-64 animate-pulse bg-muted rounded" />,
+  ssr: false,
+})
+
+const RichTextEditor = dynamic(
+  () => import("@/components/rich-text-editor"),
+  { ssr: false }
+)
+```
+
+We take this approach with [Spell UI](https://spell.sh) components too — heavier animation components that depend on WebGL or complex motion libraries lazy-load by default so they don't block your initial page render. The component loads when the user scrolls to it, not when the page first loads.
+
+## 4. Use Server Components
+
+Server Components send zero JavaScript to the client. Every component that doesn't need interactivity should stay on the server.
+
+A common anti-pattern is wrapping entire pages in `"use client"` because one small piece needs state. Instead, push client boundaries to the smallest possible leaf:
+
+```js
+// page.js (server component)
+import { ProductList } from "./product-list"
+import { AddToCartButton } from "./add-to-cart-button" // "use client"
+
+export default async function ProductPage() {
+  const products = await getProducts()
+
+  return (
+    <div>
+      <ProductList products={products} />
+      <AddToCartButton />
+    </div>
+  )
+}
+```
+
+`ProductList` renders on the server — no JavaScript sent. Only `AddToCartButton` ships client-side code.
+
+## 5. Implement Caching Strategically
+
+Next.js caches at multiple levels. Understanding what's cached and for how long prevents stale data and unnecessary revalidation.
+
+```js
+// Cache for 1 hour, revalidate in background
+fetch("https://api.example.com/data", {
+  next: { revalidate: 3600 },
+})
+
+// Never cache (dynamic data)
+fetch("https://api.example.com/realtime", {
+  cache: "no-store",
+})
+```
+
+For database queries or non-fetch data, use the `unstable_cache` function:
+
+```js
+import { unstable_cache } from "next/cache"
+
+const getCachedProducts = unstable_cache(
+  async () => db.product.findMany(),
+  ["products"],
+  { revalidate: 3600 }
+)
+```
+
+## 6. Use ISR for Content-Heavy Pages
+
+Incremental Static Regeneration (ISR) gives you the speed of static pages with the freshness of server rendering. Set `revalidate` in your page or layout:
+
+```js
+// app/blog/[slug]/page.js
+export const revalidate = 3600 // revalidate every hour
+
+export default async function BlogPost({ params }) {
+  const post = await getPost(params.slug)
+  return <article>{/* render post */}</article>
+}
+```
+
+Combine with `generateStaticParams` to pre-render known pages at build time:
+
+```js
+export async function generateStaticParams() {
+  const posts = await getAllPosts()
+  return posts.map(post => ({ slug: post.slug }))
+}
+```
+
+## 7. Stream Long-Running Pages
+
+React Suspense boundaries let you stream parts of a page as they become ready, instead of waiting for everything:
+
+```js
+import { Suspense } from "react"
+
+export default function DashboardPage() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <Suspense fallback={<div>Loading stats...</div>}>
+        <SlowStatsComponent />
+      </Suspense>
+      <Suspense fallback={<div>Loading activity...</div>}>
+        <SlowActivityFeed />
+      </Suspense>
+    </div>
+  )
+}
+```
+
+The page shell and heading render instantly. Each Suspense boundary resolves independently as its data arrives. The user sees progressive content instead of a blank screen.
+
+## 8. Analyze Your Bundle
+
+You can't optimize what you can't measure. Use `@next/bundle-analyzer` to see what's actually in your client bundles:
+
+```bash
+npm install @next/bundle-analyzer
+```
+
+```js
+// next.config.js
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+})
+
+module.exports = withBundleAnalyzer({
+  // your config
+})
+```
+
+```bash
+ANALYZE=true npm run build
+```
+
+This opens a treemap visualization of your bundles. Look for:
+- Libraries you imported but barely use
+- Duplicate dependencies across chunks
+- Large packages that could be dynamically imported
+
+## 9. Optimize Third-Party Scripts
+
+Third-party scripts (analytics, chat widgets, ad tags) are the most common source of performance regressions. Use the `Script` component with the right loading strategy:
+
+```js
+import Script from "next/script"
+
+// Load after page is interactive
+<Script src="https://analytics.example.com/script.js" strategy="afterInteractive" />
+
+// Load when browser is idle
+<Script src="https://chat-widget.example.com/widget.js" strategy="lazyOnload" />
+
+// Inline script that runs before page hydration
+<Script id="theme-detector" strategy="beforeInteractive">
+  {`document.documentElement.classList.toggle('dark', localStorage.theme === 'dark')`}
+</Script>
+```
+
+`lazyOnload` is your best friend for anything non-essential. Chat widgets, social embeds, tracking pixels — none of these need to block your page.
+
+## 10. Set Proper Cache Headers
+
+For static assets, configure long cache lifetimes in your `next.config.js` headers:
+
+```js
+// next.config.js
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: "/fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ]
+  },
+}
+```
+
+Next.js already sets good cache headers for `_next/static` assets (they're content-hashed), but custom static files in `public/` need manual configuration.
+
+## The Optimization Mindset
+
+Ship less JavaScript, load things when they're needed, cache aggressively, and measure regularly. These ten tips cover most performance wins in a Next.js app.

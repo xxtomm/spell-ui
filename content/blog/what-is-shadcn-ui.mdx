@@ -1,0 +1,79 @@
+---
+title: "What Is shadcn/ui? A Guide for Modern Developers"
+description: "Understand shadcn/ui's copy-paste component philosophy, how it differs from traditional npm packages, and why it's changing how developers build React UIs."
+image: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=1200&h=630&fit=crop"
+tag: "React"
+publishedOn: "2025-04-05"
+featured: false
+---
+
+## A New Kind of Component Library
+
+If you have been building [React](https://react.dev) applications in the past couple of years, you have almost certainly encountered [shadcn/ui](https://ui.shadcn.com). It has become one of the most popular approaches to building user interfaces in the React ecosystem, yet it defies the traditional definition of a component library. Understanding what shadcn/ui actually is, and what it is not, will help you decide if it belongs in your workflow.
+
+## The Core Philosophy: Copy and Paste, Not Install
+
+Traditional component libraries like [Material UI](https://mui.com) or [Chakra UI](https://chakra-ui.com) ship as npm packages. You install them, import components, and style them through the library's theming API. Your code depends on their code at runtime.
+
+shadcn/ui takes a fundamentally different approach. It is not an npm package. It is a collection of component source code that you copy directly into your project. When you run the CLI to add a component, the actual source files land in your codebase. You own them. You can read every line, modify anything, and never worry about upstream breaking changes.
+
+```bash
+npx shadcn@latest add button
+```
+
+This command does not add a dependency to your `package.json`. It copies a `button.tsx` file into your project's component directory.
+
+## How It Works Under the Hood
+
+shadcn/ui components are built on top of a few key technologies:
+
+- **[Radix UI](https://www.radix-ui.com)** for accessible, unstyled primitive components (dialogs, popovers, dropdowns)
+- **[Tailwind CSS](https://tailwindcss.com)** for styling with utility classes
+- **Class Variance Authority (CVA)** for managing component variants
+- **tailwind-merge** for intelligently merging class names
+
+The result is a component that is fully accessible out of the box, styled with Tailwind, and completely yours to customize.
+
+## The Advantages
+
+**Full ownership.** You are never stuck waiting for a library maintainer to fix a bug or add a feature. The code is yours.
+
+**No version lock-in.** There is no `"shadcn-ui": "^2.0.0"` in your dependencies. No breaking upgrade migrations.
+
+**Tailwind-native.** If your project already uses Tailwind CSS, shadcn/ui components feel native. No fighting between a library's theme system and your utility classes.
+
+**Lightweight.** You only include the components you actually use. No tree-shaking concerns.
+
+**Excellent defaults.** The components ship with thoughtful design, proper accessibility, and keyboard navigation built in.
+
+## The Trade-Offs
+
+**No automatic updates.** When the upstream source improves a component, you do not get those improvements automatically. You have to manually pull changes.
+
+**Requires Tailwind CSS.** If your project uses CSS Modules, styled-components, or another styling approach, shadcn/ui is not a natural fit.
+
+**Initial learning curve.** Understanding the CVA pattern and how variants work takes some time if you have not used them before.
+
+**More files in your repo.** Each component adds source files to your project. In large applications, this can add up.
+
+## The Growing Ecosystem
+
+The copy-paste philosophy that shadcn/ui popularized has inspired a growing ecosystem of compatible libraries. [Spell UI](https://spell.sh) follows the same approach, focusing on animation-rich, interactive components that complement shadcn/ui's foundational primitives. Because both use the same architecture (Tailwind CSS, the same CLI pattern, and similar file conventions), they work together without friction.
+
+## When to Use shadcn/ui
+
+shadcn/ui is a strong choice when:
+
+- You are building a new project with Tailwind CSS and want polished, accessible components fast
+- You value owning your UI code and being able to customize every detail
+- You want a consistent design system without being locked into a specific package version
+
+It is less ideal when:
+
+- Your team needs strict design governance where components should not be modified
+- You are not using Tailwind CSS
+- You prefer a fully managed, auto-updating component library
+
+## The Bigger Picture
+
+shadcn/ui represents a shift in how we think about shared code. Not everything needs to be an npm package. Sometimes the best abstraction is readable source code that lives in your project, fully under your control. Even if you don't adopt shadcn/ui directly, the ideas behind it are worth understanding.

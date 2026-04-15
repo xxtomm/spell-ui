@@ -1,0 +1,117 @@
+---
+title: "Tailwind CSS vs Bootstrap: Which Should You Choose?"
+description: "An honest comparison of Tailwind CSS and Bootstrap covering philosophy, bundle size, customization, learning curve, ecosystem, and when to pick each one."
+image: "/og?title=Tailwind+CSS+vs+Bootstrap:+Which+Should+You+Choose?"
+tag: "Tailwind CSS"
+publishedOn: "2025-04-12"
+featured: false
+---
+
+This is the most common question I hear from developers choosing a CSS framework in 2025. Both [Tailwind CSS](https://tailwindcss.com) and Bootstrap are excellent tools, but they solve the same problem in fundamentally different ways. The right choice depends on your project, your team, and how much control you want over the final output.
+
+Let me break it down honestly.
+
+## The Core Difference
+
+**Bootstrap** gives you pre-built components. You get buttons, navbars, modals, and cards out of the box. You add a class like `btn btn-primary` and you have a styled button immediately.
+
+**Tailwind** gives you utility classes. You compose your design by combining low-level classes like `px-4 py-2 bg-blue-600 text-white rounded-lg`. There's no pre-built button — you build it yourself.
+
+This distinction shapes everything else.
+
+## Design Flexibility
+
+Bootstrap sites tend to look like Bootstrap sites. The default design language is strong, and overriding it requires fighting the framework's opinions. You can customize the Sass variables, but the component structure is fixed.
+
+Tailwind has no default look. Every design decision is yours. This means more work upfront, but total freedom in the output. Two Tailwind projects can look completely different because the framework imposes no visual opinion.
+
+```css
+/* Bootstrap: override the framework's opinion */
+.btn-primary {
+  background-color: #1e40af;
+  border-color: #1e40af;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.5rem;
+}
+
+/* Tailwind: compose from scratch — no overrides needed */
+/* bg-blue-800 rounded-xl px-6 py-2.5 text-white */
+```
+
+If you need a unique brand identity, Tailwind gives you less friction. If you need something that looks professional with minimal effort, Bootstrap is faster to start.
+
+## Bundle Size
+
+Tailwind's production build uses PurgeCSS (now built into the framework) to strip unused classes. A typical production bundle is **5-15 KB** gzipped.
+
+Bootstrap's full CSS file is around **25 KB** gzipped. If you only import the components you use (via Sass), you can get it lower, but tree-shaking CSS is harder than you'd expect. JavaScript components (dropdowns, modals, tooltips) add another **15-20 KB** with Popper.js.
+
+For performance-sensitive projects, Tailwind has a clear advantage here.
+
+## Learning Curve
+
+Bootstrap is easier to learn initially. The documentation reads like a component catalog: find what you need, copy the markup, done. A junior developer can be productive within hours.
+
+Tailwind has a steeper initial curve. You need to internalize the utility class naming conventions, understand the spacing scale, and get comfortable reading dense class strings. But once you've built that muscle memory — usually within a week of daily use — most developers report being faster with Tailwind than they were with Bootstrap.
+
+```css
+/* Tailwind's class strings can look intimidating at first */
+/* flex items-center gap-3 rounded-lg border border-gray-200 px-4 py-3
+   text-sm font-medium text-gray-700 shadow-sm transition-colors
+   hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 */
+```
+
+The tradeoff: Bootstrap is faster to start, Tailwind is faster to master.
+
+## JavaScript and Interactivity
+
+Bootstrap bundles JavaScript for its interactive components — dropdowns, modals, carousels, tooltips, and accordions. This is convenient if you're working with plain HTML or server-rendered templates.
+
+Tailwind is CSS-only. For interactive behavior, you pair it with a headless UI library (like [Headless UI](https://headlessui.com) or [Radix UI](https://www.radix-ui.com)) or your framework's state management. In [React](https://react.dev), Vue, or Svelte projects, this is usually preferable because you want framework-native behavior, not jQuery-era DOM manipulation.
+
+## Customization and Theming
+
+Tailwind's `tailwind.config.js` is where customization shines. You can extend the color palette, spacing scale, font stack, breakpoints, and animations in a single file. The design system is yours to define.
+
+```js
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: "#eff6ff",
+          500: "#3b82f6",
+          900: "#1e3a5f",
+        },
+      },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+      },
+    },
+  },
+}
+```
+
+Bootstrap customization runs through Sass variables. It's capable but more rigid -- you're modifying the framework's opinions rather than defining your own from scratch.
+
+## When to Choose Bootstrap
+
+- You need a working prototype fast and design originality isn't critical
+- Your team includes designers or developers who aren't comfortable with utility-first CSS
+- You're building an internal tool or admin dashboard where "looks like Bootstrap" is acceptable
+- You're working with server-rendered HTML (Rails, Django, Laravel) and want built-in JS components
+
+## When to Choose Tailwind
+
+- You care about a unique visual identity and want full design control
+- You're using a component-based framework (React, Vue, Svelte, etc.)
+- Performance and bundle size matter to your project
+- Your team is comfortable investing a few days in the learning curve for long-term speed
+- You want a design system that grows with your product
+
+## The Bottom Line
+
+There's no universally correct answer. Bootstrap optimizes for speed-to-first-result. Tailwind optimizes for long-term flexibility and performance. Most developers who try both end up preferring Tailwind for custom products and Bootstrap for rapid prototyping.
+
+Pick the one that matches how you want to work, not the one that's trending on Twitter.

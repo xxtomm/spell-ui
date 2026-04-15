@@ -1,0 +1,120 @@
+---
+title: "How to Get a Perfect Lighthouse Score: A Practical Guide"
+description: "A step-by-step guide to achieving a 100/100 Lighthouse score across Performance, Accessibility, Best Practices, and SEO. Practical fixes for every audit."
+image: "/og?title=How+to+Get+a+Perfect+Lighthouse+Score"
+tag: "Performance"
+publishedOn: "2026-02-28"
+featured: false
+---
+
+A perfect [Lighthouse](https://developer.chrome.com/docs/lighthouse) score — 100 across Performance, Accessibility, Best Practices, and SEO — is achievable on most sites. It's not a vanity metric either. Each category maps to real problems that affect real users.
+
+Here's how to hit 100 in each category, with the specific fixes that matter most.
+
+## Running Lighthouse Properly
+
+Before optimizing, make sure you're measuring correctly.
+
+```bash
+# CLI gives more consistent results than DevTools
+npx lighthouse https://yoursite.com --output html --output-path report.html
+
+# Run multiple times — scores vary by 5-10 points between runs
+npx lighthouse https://yoursite.com --output json | jq '.categories.performance.score'
+```
+
+Use an incognito window with no extensions if testing in Chrome DevTools. Extensions inject scripts that tank your performance score. Also test on a throttled connection — Lighthouse simulates a mid-tier phone on 4G, so your score on a MacBook Pro won't match.
+
+## Performance (100)
+
+This is the hardest category. The key metrics are LCP, TBT (Total Blocking Time, the lab equivalent of INP), CLS, FCP, and Speed Index.
+
+**Eliminate render-blocking resources.** Inline critical CSS, defer non-critical stylesheets, and add `defer` to script tags:
+
+```html
+<link rel="preload" href="/styles/critical.css" as="style" />
+<link rel="stylesheet" href="/styles/non-critical.css" media="print" onload="this.media='all'" />
+<script src="/app.js" defer></script>
+```
+
+**Optimize your LCP element.** Identify what Lighthouse flags as the LCP element (usually a hero image or heading). If it's an image, preload it and serve it in WebP/AVIF. If it's text, ensure fonts load fast with `font-display: swap`.
+
+**Reduce JavaScript execution time.** This is the most common reason for TBT failures. The fixes: code split aggressively, remove unused dependencies, defer third-party scripts, and avoid long synchronous operations.
+
+**Fix CLS.** Set explicit dimensions on images and videos. Reserve space for ad slots and dynamic content. Avoid injecting content above existing content.
+
+**Compress and cache everything.** Enable Brotli compression. Set immutable cache headers on hashed static assets.
+
+## Accessibility (100)
+
+Lighthouse tests a subset of WCAG 2.1 AA requirements. Passing doesn't mean your site is fully accessible, but failing means it definitely isn't.
+
+**Color contrast.** Every text element needs a contrast ratio of at least 4.5:1 (3:1 for large text). Check with:
+
+```bash
+# Using axe-core for automated accessibility testing
+npx @axe-core/cli https://yoursite.com
+```
+
+**Missing alt text.** Every `<img>` needs an `alt` attribute. Decorative images get `alt=""`. Informative images get descriptive text.
+
+**Form labels.** Every input needs a programmatically associated label — either a `<label>` element with a matching `for` attribute or an `aria-label`.
+
+**Heading hierarchy.** Use one `<h1>` per page. Don't skip levels (no jumping from `<h1>` to `<h3>`).
+
+**Link text.** "Click here" and "Read more" are failures. Links should describe their destination: "View the pricing page" or "Read the migration guide."
+
+**ARIA attributes.** If you use ARIA, use it correctly. `aria-hidden="true"` on focusable elements is a common mistake. Interactive elements need accessible names.
+
+**Keyboard navigation.** Every interactive element must be focusable and operable with a keyboard. Custom components need appropriate `role`, `tabindex`, and keyboard event handlers.
+
+## Best Practices (100)
+
+This category catches security issues and web platform misuse.
+
+**Use HTTPS.** Every resource — scripts, images, fonts, API calls — must load over HTTPS. Mixed content (HTTP resources on an HTTPS page) is both a security risk and a Lighthouse failure.
+
+**Avoid deprecated APIs.** `document.write()`, `Application Cache`, and synchronous XHR in event handlers will fail this audit.
+
+**No browser errors.** Open the console and fix any JavaScript errors. Lighthouse checks for logged errors.
+
+**CSP and security headers.** While not all are required for a perfect score, setting `Content-Security-Policy`, `X-Content-Type-Options`, and `Referrer-Policy` headers improves your score and your security posture.
+
+**Use passive event listeners.** Touch and wheel event listeners should use `{ passive: true }` to avoid blocking scrolling:
+
+```js
+document.addEventListener("touchstart", onTouch, { passive: true });
+```
+
+## SEO (100)
+
+The SEO audit checks technical fundamentals, not content quality.
+
+**Required meta tags.** Every page needs a `<title>` and `<meta name="description">`. Both should be unique across your site.
+
+```html
+<title>Page Title — Site Name</title>
+<meta name="description" content="A concise description under 160 characters." />
+```
+
+**Crawlable links.** Use proper `<a href="...">` tags, not JavaScript click handlers for navigation. Crawlers follow `<a>` tags.
+
+**Valid robots.txt.** Ensure it's accessible at `/robots.txt` and doesn't accidentally block important pages.
+
+**Document has a valid `hreflang`.** If you serve multiple languages, implement `hreflang` tags correctly.
+
+**Legible font sizes.** Body text should be at least 16px on mobile. Lighthouse flags text smaller than 12px.
+
+## Maintaining the Score
+
+A perfect score today can degrade tomorrow. Set up automated monitoring:
+
+```bash
+# Lighthouse CI in your CI/CD pipeline
+npm install -g @lhci/cli
+lhci autorun --config=lighthouserc.json
+```
+
+Configure it to fail your build if scores drop below your threshold. Catching regressions in CI is far cheaper than debugging them in production.
+
+The goal is not the number itself — it's building the habit of shipping fast, accessible, well-built pages by default.

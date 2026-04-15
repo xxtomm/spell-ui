@@ -1,0 +1,181 @@
+---
+title: "Understanding React Server Components: A Mental Model"
+description: "A clear mental model for React Server Components: when to use server vs client components, data fetching patterns, streaming, and practical migration strategies."
+image: "/og?title=Understanding+React+Server+Components"
+tag: "React"
+publishedOn: "2026-02-15"
+featured: false
+---
+
+## A New Mental Model
+
+[React](https://react.dev) Server Components (RSC) change where your components run, how data flows through your application, and what gets sent to the browser. Understanding the mental model behind RSC matters more than memorizing the API.
+
+## Server Components vs Client Components
+
+In the RSC model, components fall into two categories:
+
+**Server Components** run exclusively on the server. They can directly access databases, read files, call internal APIs, and use secrets. Their JavaScript is never sent to the browser. They cannot use state, effects, or browser APIs.
+
+**Client Components** run in the browser (and also on the server for the initial HTML render). They can use `useState`, `useEffect`, event handlers, and browser APIs. They are marked with the `"use client"` directive at the top of the file.
+
+```js
+// This is a Server Component by default (no directive)
+async function UserProfile({ userId }) {
+  const user = await db.users.findById(userId)
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.bio}</p>
+      <FollowButton userId={userId} />
+    </div>
+  )
+}
+```
+
+```js
+// This is a Client Component
+"use client"
+
+import { useState } from "react"
+
+function FollowButton({ userId }) {
+  const [following, setFollowing] = useState(false)
+
+  async function handleFollow() {
+    await fetch(`/api/follow/${userId}`, { method: "POST" })
+    setFollowing(true)
+  }
+
+  return (
+    <button onClick={handleFollow}>
+      {following ? "Following" : "Follow"}
+    </button>
+  )
+}
+```
+
+The key insight: Server Components handle data and layout. Client Components handle interactivity. Most of your application's UI is probably static or data-driven, which means most of it can be a Server Component.
+
+## The Boundary Rule
+
+A Server Component can render a Client Component, but a Client Component cannot import a Server Component. This is the most important rule to internalize.
+
+However, a Client Component can accept Server Components as `children` or other props:
+
+```js
+"use client"
+
+function Sidebar({ children }) {
+  const [isOpen, setIsOpen] = useState(true)
+
+  return (
+    <aside style={{ display: isOpen ? "block" : "none" }}>
+      <button onClick={() => setIsOpen(!isOpen)}>Toggle</button>
+      {children}
+    </aside>
+  )
+}
+```
+
+```js
+// In a Server Component
+<Sidebar>
+  <ServerRenderedNavigation />
+</Sidebar>
+```
+
+This pattern lets you wrap server-rendered content in client-side interactivity without pushing everything to the client.
+
+## Data Fetching Patterns
+
+RSC eliminates the need for most client-side data fetching. Instead of `useEffect` plus a loading state, you fetch data directly in the component:
+
+```js
+async function ProductPage({ params }) {
+  const product = await getProduct(params.id)
+  const reviews = await getReviews(params.id)
+
+  return (
+    <div>
+      <ProductDetails product={product} />
+      <ReviewList reviews={reviews} />
+    </div>
+  )
+}
+```
+
+For parallel data fetching, use `Promise.all`:
+
+```js
+async function Dashboard() {
+  const [stats, recentOrders, notifications] = await Promise.all([
+    getStats(),
+    getRecentOrders(),
+    getNotifications(),
+  ])
+
+  return (
+    <div>
+      <StatsGrid stats={stats} />
+      <OrderTable orders={recentOrders} />
+      <NotificationList notifications={notifications} />
+    </div>
+  )
+}
+```
+
+No loading spinners, no waterfall requests, no client-side caching to manage. The data is available when the component renders.
+
+## Streaming with Suspense
+
+What about slow data? Streaming lets you send parts of the page as they become ready, rather than waiting for everything:
+
+```js
+import { Suspense } from "react"
+
+async function ProductPage({ params }) {
+  const product = await getProduct(params.id)
+
+  return (
+    <div>
+      <ProductDetails product={product} />
+      <Suspense fallback={<ReviewsSkeleton />}>
+        <Reviews productId={params.id} />
+      </Suspense>
+    </div>
+  )
+}
+
+async function Reviews({ productId }) {
+  const reviews = await getReviews(productId) // slow query
+  return <ReviewList reviews={reviews} />
+}
+```
+
+The product details render immediately. The reviews section shows a skeleton and streams in when the data arrives. The user sees a fast initial load, and the slow data fills in progressively.
+
+## When to Use "use client"
+
+Add the `"use client"` directive when your component needs:
+
+- State (`useState`, `useReducer`)
+- Effects (`useEffect`, `useLayoutEffect`)
+- Event handlers (`onClick`, `onChange`)
+- Browser APIs (`window`, `document`, `localStorage`)
+- Custom hooks that use any of the above
+- Third-party libraries that use any of the above
+
+If a component only receives props and renders JSX, it should stay as a Server Component.
+
+## Practical Migration Strategy
+
+You do not need to rewrite your application. Start from the leaves of your component tree and work inward:
+
+1. Identify components that are purely presentational with no state or effects. These are already Server Components by default.
+2. Add `"use client"` to components that use hooks or event handlers.
+3. Move data fetching from `useEffect` in Client Components to direct fetches in Server Components above them.
+4. Wrap slow data sources in `Suspense` boundaries.
+
+Server Components are not a replacement for everything you know about React. They are a new tool for a specific class of problems: getting data from the server to the UI with less JavaScript, less latency, and less complexity.

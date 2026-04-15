@@ -1,0 +1,164 @@
+---
+title: "React Performance Optimization: A Practical Guide"
+description: "Learn practical React performance optimization techniques: React.memo, useMemo, useCallback, virtualization, code splitting, and lazy loading with real examples."
+image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop"
+tag: "React"
+publishedOn: "2025-12-18"
+featured: false
+---
+
+## Measure Before You Optimize
+
+The single most important performance advice: do not optimize blindly. [React](https://react.dev) is fast by default. Most perceived performance problems come from a handful of specific patterns, and fixing the wrong thing wastes time while the real bottleneck persists.
+
+Start with React DevTools Profiler. Record an interaction, identify which components re-render and how long they take. If a re-render takes under 16ms, it is not your problem. Focus your effort where the profiler shows real cost.
+
+## React.memo: Preventing Unnecessary Re-Renders
+
+When a parent component re-renders, all of its children re-render by default, even if their props have not changed. `React.memo` wraps a component to skip re-rendering when props are shallowly equal.
+
+```js
+import { memo } from "react"
+
+const ExpensiveList = memo(function ExpensiveList({ items, onSelect }) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id} onClick={() => onSelect(item.id)}>
+          {item.name}
+        </li>
+      ))}
+    </ul>
+  )
+})
+```
+
+Use `memo` when a component renders often with the same props, is expensive to render (large lists, complex calculations), or sits below a parent that updates frequently for unrelated reasons.
+
+Do not wrap every component in `memo`. The shallow comparison itself has a cost, and for cheap components, re-rendering is faster than comparing.
+
+## useMemo: Caching Expensive Computations
+
+`useMemo` caches the result of a computation between re-renders. It is useful for derived data that is expensive to calculate.
+
+```js
+import { useMemo } from "react"
+
+function Dashboard({ transactions }) {
+  const summary = useMemo(() => {
+    return {
+      total: transactions.reduce((sum, t) => sum + t.amount, 0),
+      average: transactions.reduce((sum, t) => sum + t.amount, 0) / transactions.length,
+      categories: [...new Set(transactions.map((t) => t.category))],
+    }
+  }, [transactions])
+
+  return <SummaryCard data={summary} />
+}
+```
+
+The computation only re-runs when `transactions` changes. Without `useMemo`, it would run on every render, even if only an unrelated piece of state changed.
+
+## useCallback: Stable Function References
+
+Every time a component renders, inline functions are recreated. This is usually fine, but it breaks `memo` optimizations on child components because the function reference changes.
+
+```js
+import { useCallback } from "react"
+
+function SearchPage() {
+  const [query, setQuery] = useState("")
+  const [filters, setFilters] = useState({})
+
+  const handleSearch = useCallback((searchQuery) => {
+    fetchResults(searchQuery, filters)
+  }, [filters])
+
+  return (
+    <div>
+      <SearchInput onChange={setQuery} />
+      <MemoizedResults onSearch={handleSearch} />
+    </div>
+  )
+}
+```
+
+`useCallback` ensures `handleSearch` keeps the same reference as long as `filters` has not changed, which means `MemoizedResults` can skip re-rendering.
+
+## Virtualization for Long Lists
+
+Rendering thousands of DOM nodes is one of the few things that genuinely makes React slow. Virtualization renders only the items currently visible in the viewport.
+
+```js
+import { useVirtualizer } from "@tanstack/react-virtual"
+
+function VirtualList({ items }) {
+  const parentRef = useRef(null)
+
+  const virtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 50,
+  })
+
+  return (
+    <div ref={parentRef} style={{ height: "400px", overflow: "auto" }}>
+      <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+        {virtualizer.getVirtualItems().map((virtualItem) => (
+          <div
+            key={virtualItem.key}
+            style={{
+              position: "absolute",
+              top: 0,
+              transform: `translateY(${virtualItem.start}px)`,
+              height: virtualItem.size,
+            }}
+          >
+            {items[virtualItem.index].name}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+A list of 10,000 items now renders only 10-20 DOM nodes at any time. The performance difference is dramatic.
+
+## Code Splitting and Lazy Loading
+
+Not every component needs to be in the initial bundle. `React.lazy` and `Suspense` let you load components on demand.
+
+```js
+import { lazy, Suspense } from "react"
+
+const SettingsPanel = lazy(() => import("./SettingsPanel"))
+
+function App() {
+  const [showSettings, setShowSettings] = useState(false)
+
+  return (
+    <div>
+      <button onClick={() => setShowSettings(true)}>Settings</button>
+      {showSettings && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <SettingsPanel />
+        </Suspense>
+      )}
+    </div>
+  )
+}
+```
+
+The `SettingsPanel` code is only downloaded when the user clicks the button. For large applications, this can reduce the initial bundle by 30-50%.
+
+## Quick Wins
+
+A few patterns that yield immediate improvement with minimal effort:
+
+- **Move state down.** If only one section of the page needs a piece of state, move that state into the section component. The rest of the page stops re-rendering.
+- **Avoid object literals in JSX.** `style={{ color: "red" }}` creates a new object every render. Extract it to a constant or use a CSS class.
+- **Use keys correctly.** Never use array index as a key for lists that can be reordered. Incorrect keys cause unnecessary DOM mutations.
+- **Debounce rapid updates.** Typing in a search field should not trigger a re-render on every keystroke. Debounce the state update.
+
+Performance optimization in React is not about applying every technique everywhere. It is about understanding your specific bottlenecks and applying the right tool to each one.

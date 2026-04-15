@@ -1,0 +1,154 @@
+---
+title: "Tailwind CSS Dark Mode: A Complete Setup Guide"
+description: "Learn how to implement dark mode in Tailwind CSS using the class strategy, theme toggles, and color tokens for a polished user experience. Covers both strategies."
+image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=1200&h=630&fit=crop"
+tag: "Tailwind CSS"
+publishedOn: "2025-02-05"
+featured: false
+---
+
+Dark mode has gone from a nice-to-have to an expectation. Users want it, and [Tailwind CSS](https://tailwindcss.com) makes it straightforward to implement. But there are a few decisions to make early on that will save you from refactoring later.
+
+This guide walks through the two strategies Tailwind offers, how to wire up a theme toggle, and how to structure your color tokens so dark mode doesn't become a maintenance headache.
+
+## Two Strategies: `media` vs `class`
+
+Tailwind supports two approaches for dark mode out of the box.
+
+### The `media` Strategy
+
+This is the default. Tailwind uses the `prefers-color-scheme` CSS media query to detect the user's operating system preference.
+
+```css
+/* This is what Tailwind generates under the hood */
+@media (prefers-color-scheme: dark) {
+  .dark\:bg-gray-900 {
+    background-color: #111827;
+  }
+}
+```
+
+Pros: zero JavaScript required. Cons: the user can't override it within your app.
+
+### The `class` Strategy
+
+This is what you want for most production apps. It applies dark styles when a `dark` class is present on a parent element (usually `<html>`).
+
+In your `tailwind.config.js`:
+
+```js
+module.exports = {
+  darkMode: "class",
+  // ...
+}
+```
+
+Now `dark:` variants only activate when the `dark` class exists on an ancestor element. This gives you full control over toggling.
+
+## Building a Theme Toggle
+
+With the `class` strategy, you need JavaScript to add or remove the `dark` class. Here's a minimal implementation:
+
+```js
+// Check for saved preference or fall back to system preference
+function getTheme() {
+  if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+    return localStorage.getItem("theme");
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+// Apply the theme
+function setTheme(theme) {
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+  localStorage.setItem("theme", theme);
+}
+
+// Initialize on page load
+setTheme(getTheme());
+```
+
+The key detail here is reading from `localStorage` first. Without persistence, users would have to toggle dark mode on every visit.
+
+### Preventing the Flash
+
+If you load your theme toggle script in the body, users will see a brief flash of the wrong theme on page load. The fix is to inline a small script in the `<head>` before any content renders:
+
+```js
+// Place this inline in <head> — not in a bundled JS file
+(function () {
+  var theme = localStorage.getItem("theme");
+  if (
+    theme === "dark" ||
+    (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+  ) {
+    document.documentElement.classList.add("dark");
+  }
+})();
+```
+
+This runs synchronously before the browser paints, eliminating the flash entirely.
+
+## Structuring Color Tokens
+
+The biggest dark mode mistake I see is scattering one-off color values throughout your markup. Instead, define semantic color tokens using CSS custom properties:
+
+```css
+:root {
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-muted: #737373;
+  --color-border: #e5e5e5;
+  --color-card: #f5f5f5;
+  --color-primary: #2563eb;
+}
+
+.dark {
+  --color-background: #0a0a0a;
+  --color-foreground: #fafafa;
+  --color-muted: #a3a3a3;
+  --color-border: #262626;
+  --color-card: #171717;
+  --color-primary: #3b82f6;
+}
+```
+
+Then reference these in your Tailwind config:
+
+```js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        background: "var(--color-background)",
+        foreground: "var(--color-foreground)",
+        muted: "var(--color-muted)",
+        border: "var(--color-border)",
+        card: "var(--color-card)",
+        primary: "var(--color-primary)",
+      },
+    },
+  },
+}
+```
+
+Now you write `bg-background text-foreground` once, and it works in both themes. No `dark:` prefix needed on every element. You only use `dark:` for the occasional edge case where light and dark layouts genuinely differ.
+
+This is the approach I use at [Spell UI](https://spell.sh) for theming components, and it scales cleanly across dozens of components without the markup becoming unreadable.
+
+## Quick Checklist
+
+Before shipping dark mode, run through these:
+
+- **Contrast ratios** — Test text against backgrounds in both modes. WCAG AA requires at least 4.5:1 for body text.
+- **Images and shadows** — Shadows that look natural on white can look harsh on dark backgrounds. Reduce opacity or switch to border-based separation.
+- **Form inputs** — Browser-default inputs often look broken in dark mode. Style them explicitly.
+- **Third-party embeds** — iframes, code embeds, and widgets may not respect your theme. Wrap them with appropriate backgrounds.
+
+Dark mode done well is invisible. Users shouldn't notice the implementation — they should just feel comfortable reading your content at midnight.

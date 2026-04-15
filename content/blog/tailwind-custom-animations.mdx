@@ -1,0 +1,173 @@
+---
+title: "How to Build Custom Animations with Tailwind CSS"
+description: "Learn how to extend Tailwind CSS with custom keyframes, animation utilities, and transition timing functions for polished UI animations. Includes reusable snippets."
+image: "/og?title=How+to+Build+Custom+Animations+with+Tailwind+CSS"
+tag: "Tailwind CSS"
+publishedOn: "2025-08-15"
+featured: false
+---
+
+[Tailwind CSS](https://tailwindcss.com) ships with a handful of built-in animations — `animate-spin`, `animate-pulse`, `animate-ping`, and `animate-bounce`. They cover the basics, but real-world projects need more. Fade-ins, slide-ups, scale effects, shimmer loaders — these require custom keyframes.
+
+The good news: extending Tailwind's animation system is clean and well-supported. Here's how to do it properly.
+
+## Adding Custom Keyframes
+
+Everything starts in `tailwind.config.js`. You define keyframes under `theme.extend.keyframes` and then reference them in `theme.extend.animation`.
+
+```js
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      keyframes: {
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "slide-up": {
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "scale-in": {
+          "0%": { opacity: "0", transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+      },
+      animation: {
+        "fade-in": "fade-in 0.5s ease-out",
+        "slide-up": "slide-up 0.5s ease-out",
+        "scale-in": "scale-in 0.3s ease-out",
+      },
+    },
+  },
+}
+```
+
+Now you can use `animate-fade-in`, `animate-slide-up`, and `animate-scale-in` anywhere in your markup — just like the built-in utilities.
+
+## Controlling Duration and Delay
+
+Tailwind v3.3+ includes `duration-*` and `delay-*` utilities that work with the `animation` property. This means you can override the hardcoded duration from your config:
+
+```css
+/* These utilities let you adjust timing without config changes */
+/* animate-slide-up duration-700 delay-150 */
+```
+
+If you need more granular control, you can define multiple animation variants in your config:
+
+```js
+animation: {
+  "slide-up-fast": "slide-up 0.2s ease-out",
+  "slide-up-slow": "slide-up 0.8s ease-out",
+}
+```
+
+I prefer defining a single base animation and using `duration-*` and `delay-*` utilities for variations — it keeps the config lighter.
+
+## Custom Timing Functions
+
+The default easing options (`ease-in`, `ease-out`, `ease-in-out`) work for most cases. But for animations that feel more natural, custom cubic beziers are worth the effort.
+
+```js
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      transitionTimingFunction: {
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "in-out-back": "cubic-bezier(0.68, -0.6, 0.32, 1.6)",
+        spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      },
+    },
+  },
+}
+```
+
+The `out-expo` curve is my go-to for entrance animations — it starts fast and decelerates smoothly. The `spring` curve adds a subtle overshoot that makes elements feel like they have physical weight.
+
+Use them with Tailwind's transition utilities:
+
+```css
+/* transition-all duration-500 ease-out-expo */
+```
+
+## Building a Shimmer Loading Effect
+
+Skeleton loaders with a shimmer effect are a common pattern. Here's how to build one entirely in Tailwind config:
+
+```js
+keyframes: {
+  shimmer: {
+    "0%": { backgroundPosition: "-200% 0" },
+    "100%": { backgroundPosition: "200% 0" },
+  },
+},
+animation: {
+  shimmer: "shimmer 1.5s ease-in-out infinite",
+}
+```
+
+Then pair it with a gradient background:
+
+```css
+/* animate-shimmer bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200
+   bg-[length:200%_100%] rounded-lg h-4 */
+```
+
+This creates a smooth, looping shimmer that looks polished and requires zero JavaScript.
+
+## Staggered Entrance Animations
+
+For lists or grids where items should animate in sequentially, combine `animate-slide-up` with `animation-delay` via inline styles or CSS variables:
+
+```css
+/* Apply to each child with increasing delay */
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 75ms; }
+.stagger-item:nth-child(3) { animation-delay: 150ms; }
+.stagger-item:nth-child(4) { animation-delay: 225ms; }
+```
+
+Alternatively, you can use Tailwind's arbitrary value syntax inline:
+
+```css
+/* animate-slide-up [animation-delay:150ms] fill-mode-backwards */
+```
+
+The `fill-mode-backwards` (or `animation-fill-mode: backwards` via a custom utility) ensures elements stay invisible until their delay expires.
+
+## Adding `animation-fill-mode` Utilities
+
+Tailwind doesn't include `animation-fill-mode` by default, but you can add it with a simple plugin:
+
+```js
+// tailwind.config.js
+const plugin = require("tailwindcss/plugin");
+
+module.exports = {
+  plugins: [
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        ".fill-mode-forwards": { "animation-fill-mode": "forwards" },
+        ".fill-mode-backwards": { "animation-fill-mode": "backwards" },
+        ".fill-mode-both": { "animation-fill-mode": "both" },
+        ".fill-mode-none": { "animation-fill-mode": "none" },
+      });
+    }),
+  ],
+}
+```
+
+This is one of those small additions that makes Tailwind's animation system significantly more usable.
+
+## Performance Notes
+
+A few rules to keep your animations smooth:
+
+- **Stick to `transform` and `opacity`.** These properties are composited on the GPU and won't trigger layout recalculations.
+- **Avoid animating `width`, `height`, `top`, or `left`.** These cause reflows and will drop frames on lower-end devices.
+- **Use `will-change` sparingly.** Adding `will-change-transform` to an element about to animate can help, but applying it to everything wastes GPU memory.
+
+Custom animations are one of the fastest ways to make a Tailwind project feel polished. A few well-placed entrance transitions and hover effects go a long way — and they cost almost nothing in bundle size.

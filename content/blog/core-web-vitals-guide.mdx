@@ -1,0 +1,137 @@
+---
+title: "Core Web Vitals Guide: What Developers Need to Know"
+description: "A developer-focused guide to Core Web Vitals — what LCP, INP, and CLS actually measure, how to diagnose problems, and practical fixes that move the numbers."
+image: "/og?title=Core+Web+Vitals:+What+Developers+Need+to+Know"
+tag: "Performance"
+publishedOn: "2025-05-28"
+featured: false
+---
+
+Core Web Vitals are Google's metrics for measuring real-world user experience. They affect search ranking, but more importantly, they measure things users actually feel — slow loads, unresponsive clicks, and janky layout shifts.
+
+Here's what each metric means, how to measure it, and how to fix it when it's bad.
+
+## The Three Metrics
+
+### Largest Contentful Paint (LCP)
+
+**What it measures:** How long it takes for the largest visible element (usually a hero image or heading) to render.
+
+**Target:** Under 2.5 seconds.
+
+LCP is your perceived load speed. Users don't care when `DOMContentLoaded` fires — they care when they can see the main content.
+
+### Interaction to Next Paint (INP)
+
+**What it measures:** The responsiveness of your page to user input. INP replaced FID (First Input Delay) in March 2024. Unlike FID, which only measured the first interaction, INP tracks all interactions throughout the page lifecycle and reports the worst one.
+
+**Target:** Under 200 milliseconds.
+
+If clicking a button takes 400ms to produce a visual response, your INP will reflect that. Every slow click, tap, or keypress counts.
+
+### Cumulative Layout Shift (CLS)
+
+**What it measures:** How much the page layout moves around unexpectedly during loading.
+
+**Target:** Under 0.1.
+
+You've experienced bad CLS — you're about to tap a link and an ad loads above it, pushing everything down. CLS quantifies that frustration.
+
+## How to Measure
+
+**Lab data** (synthetic testing):
+
+```bash
+# Lighthouse from the command line
+npx lighthouse https://yoursite.com --output html --output-path ./report.html
+
+# Chrome DevTools
+# Open DevTools > Performance > check "Web Vitals" > reload and record
+```
+
+**Field data** (real users):
+
+- [PageSpeed Insights](https://pagespeed.web.dev) shows both lab and field data from the Chrome User Experience Report
+- The `web-vitals` library captures real metrics from your production users:
+
+```js
+import { onLCP, onINP, onCLS } from "web-vitals";
+
+onLCP(console.log);
+onINP(console.log);
+onCLS(console.log);
+```
+
+Field data is what Google uses for ranking. Lab data helps you debug, but field data is the score that counts.
+
+## Fixing LCP
+
+Bad LCP almost always comes from one of four causes:
+
+**1. Slow server response.** If your TTFB (Time to First Byte) is over 600ms, fix that first. Use a CDN, enable caching, or move to edge rendering.
+
+**2. Render-blocking resources.** CSS and synchronous JavaScript in the `<head>` block rendering. Inline critical CSS, defer non-critical stylesheets, and add `async` or `defer` to scripts.
+
+**3. Slow LCP resource loading.** If your LCP element is an image, preload it:
+
+```html
+<link rel="preload" as="image" href="/hero.webp" />
+```
+
+**4. Client-side rendering delay.** SPAs that fetch data after hydration push LCP late. Server-render your above-the-fold content.
+
+## Fixing INP
+
+INP problems come from long tasks blocking the main thread.
+
+**Break up long tasks.** Any JavaScript that runs for more than 50ms blocks input. Use `requestAnimationFrame` or `scheduler.yield()` to break work into smaller chunks:
+
+```js
+async function processItems(items) {
+  for (const item of items) {
+    processItem(item);
+    // Yield to let the browser handle pending interactions
+    await scheduler.yield();
+  }
+}
+```
+
+**Reduce JavaScript.** Audit your bundle. Remove unused dependencies, code-split aggressively, and defer non-critical scripts.
+
+**Avoid layout thrashing.** Reading layout properties (offsetHeight, getBoundingClientRect) then immediately writing styles forces synchronous layout. Batch your reads and writes.
+
+## Fixing CLS
+
+**Set explicit dimensions on images and videos.** This is the most common CLS source. Always include `width` and `height` attributes or use CSS `aspect-ratio`:
+
+```css
+.video-container {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
+```
+
+**Reserve space for dynamic content.** Ads, embeds, and lazy-loaded components should have a fixed container height or a `min-height` before they load.
+
+**Avoid inserting content above existing content.** Banners, cookie notices, and notifications should overlay or push from the top of the document, not inject mid-page.
+
+**Use CSS `contain` for off-screen elements.** This tells the browser that layout changes inside a container won't affect the rest of the page:
+
+```css
+.card {
+  contain: layout style;
+}
+```
+
+## A Debugging Workflow
+
+When a Core Web Vital is failing:
+
+1. Check field data in PageSpeed Insights to confirm the problem
+2. Run [Lighthouse](https://developer.chrome.com/docs/lighthouse) to reproduce in the lab
+3. Open Chrome DevTools Performance panel and record a page load
+4. For LCP — look at the "Timings" lane for the LCP marker and trace back to what delayed it
+5. For INP — click around the page during recording and look for long tasks near interactions
+6. For CLS — enable the "Layout Shift Regions" rendering option to see exactly what moved
+
+Fix the biggest problem first. Core Web Vitals follow the 75th percentile, so improving your worst pages has the most impact on the overall score.

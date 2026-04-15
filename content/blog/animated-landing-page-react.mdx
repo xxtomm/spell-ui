@@ -1,0 +1,188 @@
+---
+title: "How to Create an Animated Landing Page with React"
+description: "A practical guide to adding entrance animations, scroll-triggered reveals, and micro-interactions to your React landing page. Covers CSS, Motion, and component libraries."
+image: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=1200&h=630&fit=crop"
+tag: "Landing Pages"
+publishedOn: "2025-09-30"
+featured: false
+---
+
+A static landing page works. An animated one converts better. Research from Hubspot shows that pages with purposeful animation see up to 20% more engagement than static equivalents. But the keyword is "purposeful" — animation that distracts or delays hurts more than it helps.
+
+Here's a practical guide to adding motion to your React landing page, from simple CSS transitions to scroll-triggered reveals.
+
+## Start With Entrance Animations
+
+The hero section is the first thing visitors see, so it's the highest-impact place to add animation. A simple fade-up entrance on the headline, subtext, and CTA creates a sense of craftsmanship that static text doesn't have.
+
+The simplest approach uses pure CSS with animation delays:
+
+```css
+.hero-element {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.6s ease-out forwards;
+}
+.hero-headline {
+  animation-delay: 0s;
+}
+.hero-subtext {
+  animation-delay: 0.15s;
+}
+.hero-cta {
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+```
+
+This takes 5 minutes to implement and immediately makes the hero feel more polished. The staggered delays create rhythm — the eye follows the content in the order you intended.
+
+## Scroll-Triggered Reveals
+
+Elements below the fold should animate in as the user scrolls to them. This transforms a wall of content into a guided experience.
+
+The browser-native way to handle this is with [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver). Here's a reusable hook:
+
+```js
+function useInView(ref, options = {}) {
+  const [isInView, setIsInView] = React.useState(false);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.1, ...options }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return isInView;
+}
+```
+
+Pair this with CSS transitions for a lightweight reveal effect:
+
+```css
+.reveal-element {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.reveal-element.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+```
+
+The `once: true` behavior (observing only the first intersection) is important. Elements that animate in and out as you scroll back and forth feel jittery and unintentional.
+
+## Staggered List Animations
+
+Feature grids, testimonial cards, and logo bars all benefit from staggered reveals — where each item animates in slightly after the previous one.
+
+The trick is applying an incremental `transition-delay` to each child:
+
+```css
+.stagger-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+.stagger-item.visible:nth-child(1) { transition-delay: 0s; }
+.stagger-item.visible:nth-child(2) { transition-delay: 0.08s; }
+.stagger-item.visible:nth-child(3) { transition-delay: 0.16s; }
+.stagger-item.visible:nth-child(4) { transition-delay: 0.24s; }
+```
+
+For dynamic lists, set the delay via inline styles with a multiplier based on the index. Keep individual delays short — 60-100ms between items. Longer gaps make the sequence feel sluggish.
+
+## Micro-Interactions
+
+Beyond entrance animations, small interactive details make the page feel alive:
+
+**Button hover effects.** Go beyond a simple color swap. A subtle scale change, shadow shift, or border animation adds depth:
+
+```css
+.cta-button {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.cta-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+```
+
+**Card hover states.** Feature cards that respond to hover with a subtle tilt, glow, or border effect invite interaction:
+
+```css
+.feature-card {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  border: 1px solid transparent;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+```
+
+**Copy feedback.** When users click a copy button (for install commands, code snippets), swap the icon to a checkmark with a brief animation. This closes the feedback loop.
+
+## Using Component Libraries
+
+Building all animations from scratch is educational but time-consuming. Several libraries can accelerate the process:
+
+**[Motion](https://motion.dev)** is the most popular React animation library. It provides declarative animation props, gesture handling, and layout animations. It's full-featured but adds bundle size -- roughly 30-40KB gzipped.
+
+**[Spell UI](https://spell.sh)** offers pre-built animated components for landing pages -- text animations, card effects, gradient backgrounds. The components are copy-paste friendly and built on [Tailwind CSS](https://tailwindcss.com), so they integrate directly into your project without adding a dependency.
+
+**CSS-only approaches** work well for simpler animations and keep your bundle lean. The examples in this article are all CSS-based and performant by default.
+
+Choose based on your needs. If you want a few polished entrance animations, CSS is sufficient. If you need gesture-based interactions, scroll-linked animations, or complex sequences, reach for a library.
+
+## Performance Guidelines
+
+Animation that causes jank destroys the polish it's supposed to create. Follow these rules:
+
+1. **Only animate `transform` and `opacity`** — these properties are GPU-composited and won't trigger layout recalculations
+2. **Avoid animating `width`, `height`, `margin`, or `padding`** — these trigger expensive reflows
+3. **Use `will-change` sparingly** — only on elements about to animate, and remove it after
+4. **Test on real devices** — your development machine lies about performance
+5. **Reduce motion for accessibility** — respect `prefers-reduced-motion`
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+## Putting It Together
+
+A well-animated React landing page typically has:
+
+- Hero text and CTA with staggered entrance animations (CSS)
+- Scroll-triggered reveals on feature sections (IntersectionObserver + CSS)
+- Hover micro-interactions on buttons and cards (CSS transitions)
+- One standout animation that showcases the product (library-assisted)
+
+Start with the hero entrance. If that's the only animation you add, it still makes a noticeable difference. Layer in scroll reveals and hover states as time allows.
+
+The goal isn't to make everything move. It's to make the right things move at the right time.

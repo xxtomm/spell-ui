@@ -1,0 +1,187 @@
+---
+title: "Adding WebGL Backgrounds to Your React App"
+description: "Learn how to add immersive WebGL backgrounds to React apps using Three.js, React Three Fiber, and shaders, plus plug-and-play alternatives for common effects."
+image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&h=630&fit=crop"
+tag: "Animation"
+publishedOn: "2026-01-18"
+featured: false
+---
+
+[WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) backgrounds are what separate a "nice landing page" from one that makes people pause and look around. That animated gradient that feels alive, those light rays that shift with the cursor, the organic noise patterns that breathe — they're all WebGL under the hood.
+
+The barrier to entry is steep if you've never worked with shaders. Here's a practical introduction to adding WebGL backgrounds in React, from basic Three.js setup to writing your first fragment shader.
+
+## The Stack
+
+For WebGL in React, you'll typically use:
+
+- **[Three.js](https://threejs.org)** — the core 3D library
+- **React Three Fiber** — a React renderer for Three.js
+- **@react-three/drei** — helper components and abstractions
+
+Install them:
+
+```bash
+npm install three @react-three/fiber @react-three/drei
+```
+
+## Basic Setup: A Full-Screen Shader Background
+
+The simplest WebGL background is a full-screen quad (plane) with a custom shader material. Here's the structure:
+
+```js
+// 1. Create a Canvas that fills the background
+// 2. Place a Plane geometry that covers the viewport
+// 3. Apply a ShaderMaterial with custom vertex/fragment shaders
+// 4. Pass uniforms (time, resolution, mouse) to the shader
+```
+
+The Canvas component from React Three Fiber replaces the standard Three.js boilerplate:
+
+```js
+// Canvas setup
+// - Position fixed behind content
+// - gl={{ antialias: false }} for performance
+// - dpr={[1, 1.5]} limits pixel ratio on retina screens
+// - camera={{ position: [0, 0, 1] }} for 2D effects
+```
+
+## Writing a Fragment Shader
+
+Fragment shaders run on every pixel of your geometry. For a background, they determine the color at each pixel based on math — typically involving time, position, and noise functions.
+
+Here's a minimal animated gradient shader:
+
+```js
+// Vertex shader (pass-through for 2D backgrounds)
+const vertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = vec4(position, 1.0);
+  }
+`;
+
+// Fragment shader (the visual output)
+const fragmentShader = `
+  uniform float u_time;
+  uniform vec2 u_resolution;
+  varying vec2 vUv;
+
+  void main() {
+    vec2 uv = vUv;
+
+    // Animated color channels
+    float r = 0.5 + 0.5 * sin(u_time * 0.3 + uv.x * 3.0);
+    float g = 0.5 + 0.5 * sin(u_time * 0.5 + uv.y * 3.0);
+    float b = 0.5 + 0.5 * sin(u_time * 0.7 + uv.x * uv.y * 3.0);
+
+    gl_FragColor = vec4(r * 0.3, g * 0.2, b * 0.5, 1.0);
+  }
+`;
+```
+
+This creates smoothly shifting colors based on position and time. The `u_time` uniform increments each frame, driving the animation.
+
+### Updating Uniforms
+
+Pass `u_time` from your React component using a `useFrame` hook:
+
+```js
+// Inside your shader mesh component:
+// useFrame updates every frame
+// ref.current.uniforms.u_time.value = clock.getElapsedTime()
+```
+
+## Adding Noise
+
+The secret to organic-looking backgrounds is noise functions. Simplex noise or Perlin noise create natural, flowing patterns.
+
+Add a noise function to your fragment shader:
+
+```js
+// Simplex noise is too long to include inline,
+// but the usage is straightforward:
+
+// float n = snoise(vec3(uv * 2.0, u_time * 0.2));
+// This gives you a value between -1 and 1
+// that flows smoothly across space and time
+
+// Use it to distort colors, create patterns,
+// or modulate other effects
+```
+
+You can find well-tested GLSL noise implementations by searching for "Ashima simplex noise GLSL" — it's the standard implementation used across thousands of projects.
+
+## Mouse Interaction
+
+Making the background respond to cursor position adds a layer of interactivity:
+
+```js
+// Track mouse position normalized to 0-1 range
+// Pass as uniform: u_mouse (vec2)
+//
+// In the shader, use distance from mouse
+// to create spotlight or distortion effects:
+//
+// float dist = distance(uv, u_mouse);
+// float spotlight = smoothstep(0.4, 0.0, dist);
+```
+
+The `smoothstep` function creates a smooth falloff from the cursor position, perfect for spotlight or ripple effects.
+
+## Performance Considerations
+
+WebGL backgrounds can tank performance if you're not careful:
+
+1. **Limit pixel ratio** — rendering at 2x or 3x DPR is expensive. Cap at 1.5 with `dpr={[1, 1.5]}` on Canvas
+2. **Reduce shader complexity** — each additional math operation runs on every pixel, every frame. On a 1920x1080 display, that's 2 million pixels at 60fps
+3. **Use `powerPreference: "low-power"`** — helps on laptops and mobile by selecting the integrated GPU
+4. **Lazy load the canvas** — don't block initial page render with shader compilation. Load Three.js asynchronously
+5. **Provide a CSS fallback** — for browsers without WebGL or devices where performance is poor, fall back to a CSS gradient
+
+```css
+/* CSS fallback when WebGL isn't available */
+.bg-fallback {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+}
+```
+
+## Common Background Patterns
+
+### Animated Gradient Mesh
+
+Multiple overlapping radial gradients that move independently create a fluid color mesh. Each gradient center follows a Lissajous curve (sine/cosine at different frequencies).
+
+### Particle Field
+
+Hundreds of small points drifting slowly, connected by lines when they're within a certain distance. This is a classic "plexus" effect.
+
+### Noise Distortion
+
+A noise field that distorts the UV coordinates before sampling a gradient. Creates an organic, watery feel.
+
+### Light Rays / God Rays
+
+Volumetric light beams emanating from a point, typically using radial blur in the fragment shader.
+
+## The Easy Route
+
+Building custom WebGL backgrounds from scratch is rewarding but time-intensive. If you want the visual impact without the shader learning curve, there are pre-built options.
+
+[Spell UI](https://spell.sh) includes two WebGL-powered background components:
+
+- **AnimatedGradient** — a shader-based gradient mesh with smooth color transitions. Drop it behind your content for an organic, shifting background
+- **LightRays** — volumetric light effects that respond to page position
+
+Both are React components you install via the CLI. No Three.js setup, no shader writing. They include performance tuning, fallbacks, and responsive behavior.
+
+## Going Further
+
+If you want to learn shader programming properly, these resources are excellent:
+
+- **The Book of Shaders** (thebookofshaders.com) — the best introduction to fragment shaders
+- **Shadertoy** (shadertoy.com) — a community of shader experiments you can study and modify
+- **Three.js Journey** (threejs-journey.com) — a full course covering Three.js and React Three Fiber
+
+WebGL backgrounds make a product feel premium. Build them from scratch or use a pre-built component -- either way, the visual impact pays off.

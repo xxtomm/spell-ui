@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# content-collections
+/.content-collections/
+
 # production
 /build
 
@@ -31,6 +34,9 @@ yarn-error.log*
 .pnpm-debug.log*
 
 .cursor
+.claude
+.agents
+skills-lock.json
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -47,3 +53,4 @@ db/local/
 
 # local-only pages
 /app/banner/
+

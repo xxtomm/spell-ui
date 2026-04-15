@@ -1,0 +1,153 @@
+---
+title: "How to Improve Your Website's Loading Speed"
+description: "Actionable techniques for faster websites — bundle analysis, code splitting, font loading, caching strategies, and more. Practical advice you can apply today."
+image: "https://images.unsplash.com/photo-1534078362425-387ae9668c17?w=1200&h=630&fit=crop"
+tag: "Performance"
+publishedOn: "2025-08-05"
+featured: false
+---
+
+A slow website costs you users. 53% of mobile visitors abandon a page that takes more than 3 seconds to load. Most performance problems have straightforward fixes.
+
+Here's a practical playbook for making your site faster.
+
+## Start with Bundle Analysis
+
+Before optimizing anything, measure what you're shipping. You can't fix what you can't see.
+
+```bash
+# Next.js — built-in analyzer
+ANALYZE=true npm run build
+
+# Webpack — bundle analyzer plugin
+npx webpack-bundle-analyzer stats.json
+
+# Vite
+npx vite-bundle-visualizer
+```
+
+Look for three things:
+
+1. **Large dependencies you don't need.** A full lodash import when you use two functions. Moment.js when you could use `Intl.DateTimeFormat`. A markdown parser pulled in for one tooltip.
+2. **Duplicate dependencies.** Multiple versions of the same library loaded by different packages.
+3. **Code that should be lazy loaded.** Heavy components (editors, charts, maps) loaded eagerly on every page.
+
+## Code Splitting
+
+Ship only the code the current page needs. Modern bundlers make this straightforward.
+
+**Route-based splitting** is the highest-impact pattern. Each page loads only its own code:
+
+```js
+// Next.js does this automatically per-page
+
+// For React Router, use lazy routes:
+import { lazy } from "react";
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Settings = lazy(() => import("./pages/Settings"));
+```
+
+**Component-level splitting** targets heavy features:
+
+```js
+const CodeEditor = lazy(() => import("./components/CodeEditor"));
+
+// Wrap with Suspense
+// <Suspense fallback={<EditorSkeleton />}>
+//   <CodeEditor />
+// </Suspense>
+```
+
+The key insight: don't split everything. Splitting adds a network request. Only split components that are large (50KB+), conditionally rendered, or below the fold.
+
+## Optimize Fonts
+
+Web fonts are a common performance bottleneck. A single font family with multiple weights can add 200-400KB.
+
+**Use `font-display: swap`.** This shows fallback text immediately while the custom font loads, preventing invisible text (FOIT):
+
+```css
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-var.woff2") format("woff2");
+  font-display: swap;
+}
+```
+
+**Preload your primary font.** This tells the browser to start downloading the font immediately:
+
+```html
+<link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+```
+
+**Use variable fonts.** One variable font file replaces multiple weight-specific files. Inter Variable (~100KB) replaces what would be 400-600KB of individual weight files.
+
+**Subset your fonts.** If you only need Latin characters, strip everything else. Tools like `glyphhanger` or `pyftsubset` can cut font files by 60-80%.
+
+```bash
+# Subset to Latin characters only
+pyftsubset Inter.woff2 --unicodes="U+0000-00FF" --flavor=woff2 --output-file=inter-latin.woff2
+```
+
+## Caching Strategy
+
+Effective caching eliminates redundant downloads entirely.
+
+**Static assets (JS, CSS, fonts, images):** Use content-hashed filenames and long cache lifetimes. Since the filename changes when the content changes, you can cache aggressively.
+
+```
+Cache-Control: public, max-age=31536000, immutable
+```
+
+**HTML pages:** Cache briefly or not at all, so users always get the latest version that references the current hashed assets.
+
+```
+Cache-Control: public, max-age=0, must-revalidate
+```
+
+**API responses:** Cache based on how often the data changes. Use `stale-while-revalidate` to show cached data while fetching fresh data in the background:
+
+```
+Cache-Control: public, max-age=60, stale-while-revalidate=300
+```
+
+## Reduce JavaScript Execution
+
+Downloading JavaScript is only half the problem. Parsing and executing it blocks the main thread.
+
+**Defer third-party scripts.** Analytics, chat widgets, and social embeds should never block page load:
+
+```html
+<script src="https://analytics.example.com/script.js" defer></script>
+```
+
+**Remove unused JavaScript.** Chrome DevTools Coverage tool (Ctrl+Shift+P > "Show Coverage") reveals how much of each script is actually executed. If large portions go unused, you have a splitting opportunity.
+
+**Avoid hydration waterfalls.** In SSR frameworks, components that fetch data after hydration create sequential network requests. Use server-side data fetching (Next.js Server Components, loader functions) to parallelize data loading.
+
+## Compress Everything
+
+Enable compression on your server. Brotli compresses 15-20% better than gzip for text assets:
+
+```bash
+# Verify compression is working
+curl -I -H "Accept-Encoding: br,gzip" https://yoursite.com | grep content-encoding
+# Should show: content-encoding: br
+```
+
+Most hosting platforms (Vercel, Netlify, Cloudflare) enable Brotli by default. If you're self-hosting, configure it in your server or reverse proxy.
+
+## The Priority List
+
+If you're short on time, work through this list in order:
+
+1. Analyze your bundle and remove unnecessary dependencies
+2. Enable route-based code splitting
+3. Optimize and preload fonts
+4. Set correct cache headers on all assets
+5. Defer third-party scripts
+6. Enable Brotli compression
+7. Lazy load heavy components and below-the-fold images
+
+Each step compounds. A site that implements all of these typically loads 2-4x faster than the same site without them.

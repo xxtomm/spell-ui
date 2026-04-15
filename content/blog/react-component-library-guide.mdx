@@ -1,0 +1,203 @@
+---
+title: "How to Build a React Component Library from Scratch"
+description: "A step-by-step guide to building a React component library with TypeScript, bundling with tsup, testing with Vitest, and publishing to npm. Includes project setup."
+image: "https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=1200&h=630&fit=crop"
+tag: "React"
+publishedOn: "2025-10-30"
+featured: false
+---
+
+## Why Build Your Own Library
+
+There comes a point where shared components stop living in a `shared/` folder and need to become a proper library. The fundamentals are the same for internal design systems and open-source projects: a clean project structure, [TypeScript](https://www.typescriptlang.org) types, a reliable build step, tests, and a publishing pipeline.
+
+## Project Setup
+
+Start with a minimal folder structure:
+
+```bash
+my-component-library/
+  src/
+    components/
+      Button/
+        Button.tsx
+        Button.test.tsx
+        index.ts
+    index.ts
+  package.json
+  tsconfig.json
+  tsup.config.ts
+```
+
+Initialize the project and install core dependencies:
+
+```bash
+npm init -y
+npm install react react-dom --save-peer
+npm install typescript tsup vitest @testing-library/react --save-dev
+```
+
+Setting React as a peer dependency is critical. Your library should use the consumer's React instance, not bundle its own.
+
+## TypeScript Configuration
+
+Your `tsconfig.json` should target modern JavaScript and generate declaration files:
+
+```js
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "declarationDir": "dist",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["**/*.test.tsx", "**/*.test.ts"]
+}
+```
+
+Strict mode is non-negotiable for a library. Your consumers rely on your types being accurate.
+
+## Bundling with tsup
+
+tsup is the simplest way to bundle a modern component library. It handles ESM, CJS, and declaration files in a single config:
+
+```js
+// tsup.config.ts
+import { defineConfig } from "tsup"
+
+export default defineConfig({
+  entry: ["src/index.ts"],
+  format: ["cjs", "esm"],
+  dts: true,
+  splitting: true,
+  sourcemap: true,
+  clean: true,
+  external: ["react", "react-dom"],
+})
+```
+
+The `external` field ensures React is not bundled into your library. The `dts` flag generates TypeScript declaration files automatically.
+
+Add build and dev scripts to your `package.json`:
+
+```js
+// package.json (partial)
+{
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  }
+}
+```
+
+## Writing Your First Component
+
+Keep components simple and well-typed:
+
+```js
+// src/components/Button/Button.tsx
+import { forwardRef } from "react"
+
+const Button = forwardRef(function Button(props, ref) {
+  const { variant = "primary", size = "md", className = "", children, ...rest } = props
+
+  const baseStyles = "inline-flex items-center justify-center rounded-md font-medium"
+
+  const variants = {
+    primary: "bg-blue-600 text-white hover:bg-blue-700",
+    secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300",
+    ghost: "bg-transparent hover:bg-gray-100",
+  }
+
+  const sizes = {
+    sm: "h-8 px-3 text-sm",
+    md: "h-10 px-4 text-sm",
+    lg: "h-12 px-6 text-base",
+  }
+
+  const classes = [baseStyles, variants[variant], sizes[size], className]
+    .filter(Boolean)
+    .join(" ")
+
+  return <button ref={ref} className={classes} {...rest}>{children}</button>
+})
+
+export { Button }
+```
+
+Always use `forwardRef`. Library consumers frequently need to attach refs for positioning, focus management, and animation libraries. Omitting it is a common mistake that forces breaking changes later.
+
+## Testing
+
+Use Vitest with Testing Library for component tests:
+
+```js
+// src/components/Button/Button.test.tsx
+import { render, screen } from "@testing-library/react"
+import { describe, it, expect } from "vitest"
+import { Button } from "./Button"
+
+describe("Button", () => {
+  it("renders children", () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByText("Click me")).toBeDefined()
+  })
+
+  it("applies variant classes", () => {
+    render(<Button variant="secondary">Test</Button>)
+    const button = screen.getByText("Test")
+    expect(button.className).toContain("bg-gray-200")
+  })
+
+  it("forwards refs", () => {
+    let buttonRef = null
+    render(<Button ref={(el) => { buttonRef = el }}>Ref test</Button>)
+    expect(buttonRef).toBeInstanceOf(HTMLButtonElement)
+  })
+})
+```
+
+## The Barrel Export
+
+Your root `src/index.ts` should re-export everything consumers need:
+
+```js
+export { Button } from "./components/Button"
+```
+
+Avoid default exports in libraries. Named exports produce better autocomplete, clearer import statements, and simpler tree-shaking.
+
+## Publishing to npm
+
+Before your first publish, verify your package:
+
+```bash
+npm run build
+npm pack --dry-run
+```
+
+The `npm pack --dry-run` command shows exactly which files will be included. Verify that only `dist/` and `package.json` are present. No `src/`, no test files, no config files.
+
+When everything looks right:
+
+```bash
+npm publish --access public
+```
+
+## What Comes Next
+
+Once the foundation is solid, you can layer on additional concerns: a Storybook for visual documentation, Changesets for version management, a CI pipeline that publishes on merge to main, and CSS extraction if you want to ship styles separately.
+
+The key is starting simple. A well-structured library with one excellent component is worth more than a sprawling collection of poorly tested ones.

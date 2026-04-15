@@ -1,0 +1,178 @@
+---
+title: "Build a Dropdown Menu in React from Scratch"
+description: "A complete guide to building an accessible dropdown menu in React with click-outside detection, keyboard navigation, focus management, and smooth animations."
+image: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=1200&h=630&fit=crop"
+tag: "Components"
+publishedOn: "2025-07-05"
+featured: false
+---
+
+Dropdown menus are deceptively complex. The visible part is just a button and a list. But underneath, you need click-outside detection, keyboard navigation, focus management, and exit animations. Here's how to build one that covers all the edge cases.
+
+## Basic Toggle
+
+Start with the simplest possible version: a button that toggles a list.
+
+```js
+function Dropdown() {
+  const [isOpen, setIsOpen] = React.useState(false)
+
+  return (
+    <div className="relative inline-block text-left">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="inline-flex items-center gap-2 rounded-md bg-card border border-border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+      >
+        Options
+        <ChevronDownIcon className="h-4 w-4" />
+      </button>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-48 rounded-md border border-border bg-popover shadow-lg">
+          <div className="py-1" role="menu">
+            <button role="menuitem" className="block w-full px-4 py-2 text-left text-sm hover:bg-muted">Edit</button>
+            <button role="menuitem" className="block w-full px-4 py-2 text-left text-sm hover:bg-muted">Duplicate</button>
+            <button role="menuitem" className="block w-full px-4 py-2 text-left text-sm hover:bg-muted text-red-500">Delete</button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+The `relative` on the wrapper and `absolute` on the panel positions the dropdown correctly. This works, but it doesn't close when you click outside.
+
+## Click-Outside Detection
+
+The standard approach is to listen for clicks on the document and check if the click target is inside the dropdown.
+
+```js
+const dropdownRef = React.useRef(null)
+
+React.useEffect(() => {
+  function handleClickOutside(event) {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false)
+    }
+  }
+
+  if (isOpen) {
+    document.addEventListener("mousedown", handleClickOutside)
+  }
+  return () => document.removeEventListener("mousedown", handleClickOutside)
+}, [isOpen])
+```
+
+Attach `dropdownRef` to the outer wrapper `<div>`. Using `mousedown` instead of `click` closes the menu slightly earlier, which feels more responsive.
+
+## Keyboard Navigation
+
+An accessible dropdown responds to Arrow keys, Enter, Escape, and Tab.
+
+```js
+function handleKeyDown(event) {
+  if (!isOpen) {
+    if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      setIsOpen(true)
+      // Focus the first menu item after opening
+      requestAnimationFrame(() => {
+        const firstItem = dropdownRef.current?.querySelector("[role='menuitem']")
+        firstItem?.focus()
+      })
+    }
+    return
+  }
+
+  const items = Array.from(dropdownRef.current?.querySelectorAll("[role='menuitem']") || [])
+  const currentIndex = items.indexOf(document.activeElement)
+
+  switch (event.key) {
+    case "ArrowDown":
+      event.preventDefault()
+      items[(currentIndex + 1) % items.length]?.focus()
+      break
+    case "ArrowUp":
+      event.preventDefault()
+      items[(currentIndex - 1 + items.length) % items.length]?.focus()
+      break
+    case "Escape":
+      setIsOpen(false)
+      // Return focus to the trigger button
+      triggerRef.current?.focus()
+      break
+    case "Tab":
+      setIsOpen(false)
+      break
+  }
+}
+```
+
+The modular arithmetic in the ArrowDown/ArrowUp handlers creates a circular navigation pattern. When the user arrows past the last item, focus wraps to the first.
+
+## Smooth Enter and Exit Animations
+
+A common mistake is only animating the enter transition. Without an exit animation, the dropdown just vanishes. You need to delay the unmount until the animation completes.
+
+One approach is a two-phase state: one boolean for whether the dropdown is mounted, another for whether it's visible.
+
+```js
+const [mounted, setMounted] = React.useState(false)
+const [visible, setVisible] = React.useState(false)
+
+function open() {
+  setMounted(true)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => setVisible(true))
+  })
+}
+
+function close() {
+  setVisible(false)
+  setTimeout(() => setMounted(false), 150) // Match the CSS transition duration
+}
+```
+
+The double `requestAnimationFrame` trick ensures the browser has painted the element in its initial state before the transition class is applied. Apply classes based on `visible`:
+
+```css
+/* Base state */
+.dropdown-panel {
+  opacity: 0;
+  transform: scale(0.95) translateY(-4px);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+/* Visible state */
+.dropdown-panel.is-visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+```
+
+## Positioning Edge Cases
+
+The dropdown can overflow the viewport if the trigger is near the edge of the screen. For simple cases, check the trigger's position and flip the dropdown accordingly:
+
+```js
+const rect = triggerRef.current?.getBoundingClientRect()
+const spaceBelow = window.innerHeight - (rect?.bottom || 0)
+const shouldFlip = spaceBelow < 200
+
+// Apply: shouldFlip ? "bottom-full mb-2" : "top-full mt-2"
+```
+
+For more complex positioning (nested menus, scrollable containers), consider using a library like Floating UI, which handles all the geometry for you.
+
+## Accessibility Checklist
+
+- The trigger button needs `aria-haspopup="true"` and `aria-expanded`.
+- The menu container should have `role="menu"`.
+- Each item should have `role="menuitem"`.
+- Arrow keys move focus between items.
+- Escape closes the menu and returns focus to the trigger.
+- Clicking outside closes the menu.
+
+These aren't optional. Screen readers depend on these roles and behaviors to communicate the dropdown's purpose and state. Get them right from the start and you won't have to retrofit accessibility later.

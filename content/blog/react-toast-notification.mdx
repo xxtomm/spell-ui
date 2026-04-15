@@ -1,0 +1,198 @@
+---
+title: "Building a Toast Notification System in React from Scratch"
+description: "Learn how to build a toast notification system in React with queue management, auto-dismiss timers, enter/exit animations, stacking logic, and accessibility."
+image: "https://images.unsplash.com/photo-1596558450268-9c27524ba856?w=1200&h=630&fit=crop"
+tag: "Components"
+publishedOn: "2025-11-25"
+featured: false
+---
+
+Toast notifications seem like a small feature until you realize they need queue management, auto-dismiss timers, enter and exit animations, stacking logic, and accessibility support. Here's how to build a toast system that handles all of those concerns cleanly.
+
+## The Toast Context
+
+Toasts can be triggered from anywhere in your app. A React context with a provider at the root is the cleanest way to expose a `toast()` function globally.
+
+```js
+const ToastContext = React.createContext(null)
+
+function useToast() {
+  const context = React.useContext(ToastContext)
+  if (!context) throw new Error("useToast must be used within a ToastProvider")
+  return context
+}
+
+function ToastProvider({ children }) {
+  const [toasts, setToasts] = React.useState([])
+
+  const toast = React.useCallback((message, options = {}) => {
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2)
+    const newToast = {
+      id,
+      message,
+      type: options.type || "default",
+      duration: options.duration || 4000,
+    }
+    setToasts(prev => [...prev, newToast])
+    return id
+  }, [])
+
+  const dismiss = React.useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
+  return (
+    <ToastContext.Provider value={{ toast, dismiss }}>
+      {children}
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
+    </ToastContext.Provider>
+  )
+}
+```
+
+Generating IDs with `Date.now()` plus a random suffix is simple and collision-resistant enough for client-side toast management.
+
+## The Toast Container
+
+The container positions toasts in a fixed corner of the viewport and stacks them vertically.
+
+```js
+function ToastContainer({ toasts, onDismiss }) {
+  return (
+    <div
+      className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 w-full max-w-sm"
+      aria-live="polite"
+      aria-label="Notifications"
+    >
+      {toasts.map(toast => (
+        <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
+      ))}
+    </div>
+  )
+}
+```
+
+The `aria-live="polite"` attribute tells screen readers to announce new toasts without interrupting whatever the user is currently doing. This is the single most important accessibility attribute for a toast system.
+
+## Individual Toast with Auto-Dismiss
+
+Each toast manages its own dismiss timer. When the timer expires, the toast removes itself.
+
+```js
+function ToastItem({ toast, onDismiss }) {
+  const [isExiting, setIsExiting] = React.useState(false)
+
+  const handleDismiss = React.useCallback(() => {
+    setIsExiting(true)
+    setTimeout(() => onDismiss(toast.id), 200)
+  }, [toast.id, onDismiss])
+
+  React.useEffect(() => {
+    if (toast.duration === Infinity) return
+    const timer = setTimeout(handleDismiss, toast.duration)
+    return () => clearTimeout(timer)
+  }, [toast.duration, handleDismiss])
+
+  const typeStyles = {
+    default: "bg-card border-border",
+    success: "bg-card border-green-500/30",
+    error: "bg-card border-red-500/30",
+  }
+
+  return (
+    <div
+      role="status"
+      className={`rounded-lg border px-4 py-3 shadow-lg text-sm transition-all duration-200 ${typeStyles[toast.type]} ${
+        isExiting ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span>{toast.message}</span>
+        <button
+          onClick={handleDismiss}
+          className="shrink-0 text-muted-foreground hover:text-foreground"
+          aria-label="Dismiss notification"
+        >
+          <XIcon className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  )
+}
+```
+
+The `isExiting` state enables exit animations. When the dismiss timer fires, the toast first transitions to its exit state (`opacity-0 translate-x-4`), then after the animation completes (200ms), it's actually removed from the list.
+
+## Pause on Hover
+
+A nice touch: pause the auto-dismiss timer when the user hovers over a toast. This prevents notifications from disappearing while the user is reading them.
+
+```js
+const [isPaused, setIsPaused] = React.useState(false)
+const timerRef = React.useRef(null)
+const remainingRef = React.useRef(toast.duration)
+const startTimeRef = React.useRef(Date.now())
+
+React.useEffect(() => {
+  if (isPaused || toast.duration === Infinity) return
+
+  startTimeRef.current = Date.now()
+  timerRef.current = setTimeout(handleDismiss, remainingRef.current)
+
+  return () => {
+    clearTimeout(timerRef.current)
+    remainingRef.current -= Date.now() - startTimeRef.current
+  }
+}, [isPaused, handleDismiss, toast.duration])
+```
+
+Then add `onMouseEnter={() => setIsPaused(true)}` and `onMouseLeave={() => setIsPaused(false)}` to the toast wrapper. The remaining time is tracked so the timer resumes from where it left off instead of restarting.
+
+## Queue Management
+
+If your app fires many toasts in quick succession, the screen fills up. Limit the visible count and queue the rest:
+
+```js
+const MAX_VISIBLE = 3
+
+function ToastContainer({ toasts, onDismiss }) {
+  const visibleToasts = toasts.slice(-MAX_VISIBLE)
+
+  return (
+    <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 w-full max-w-sm" aria-live="polite">
+      {visibleToasts.map(toast => (
+        <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
+      ))}
+    </div>
+  )
+}
+```
+
+Taking the last `MAX_VISIBLE` items means older toasts are hidden but newer ones are always visible. As toasts are dismissed, queued ones appear automatically.
+
+## Using the System
+
+With everything wired up, triggering a toast from any component is clean:
+
+```js
+function SaveButton() {
+  const { toast } = useToast()
+
+  async function handleSave() {
+    try {
+      await saveData()
+      toast("Changes saved successfully", { type: "success" })
+    } catch {
+      toast("Failed to save changes", { type: "error", duration: 6000 })
+    }
+  }
+
+  return <button onClick={handleSave}>Save</button>
+}
+```
+
+Error toasts get a longer duration (6 seconds instead of the default 4) because error messages usually require more reading time.
+
+## Putting It Together
+
+A toast system composes small, independent behaviors: context for global access, a fixed container for positioning, per-toast timers for auto-dismiss, a two-phase exit for animations, hover detection for pausing, and queue slicing for overflow. Each piece is simple. The value is in combining them into a system that handles real-world usage without surprising the user.

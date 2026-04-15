@@ -1,0 +1,186 @@
+---
+title: "How to Build a Carousel Component in React"
+description: "A practical guide to building a carousel component in React with touch and swipe support, autoplay, pagination dots, navigation arrows, and responsive breakpoints."
+image: "/og?title=How+to+Build+a+Carousel+Component+in+React"
+tag: "Components"
+publishedOn: "2026-01-30"
+featured: false
+---
+
+Carousels have a complicated reputation. Some developers avoid them entirely, but they remain one of the best solutions for logo rows, testimonials, and image galleries where horizontal scrolling makes more sense than vertical stacking. The key is building one that works well on every device and doesn't fight the user.
+
+## The Core Concept
+
+A carousel is a horizontally overflowing container where only one "window" of content is visible at a time. The container translates left or right to bring different slides into view.
+
+```js
+function Carousel({ items }) {
+  const [currentIndex, setCurrentIndex] = React.useState(0)
+
+  function goTo(index) {
+    const clamped = Math.max(0, Math.min(index, items.length - 1))
+    setCurrentIndex(clamped)
+  }
+
+  return (
+    <div className="relative overflow-hidden">
+      <div
+        className="flex transition-transform duration-500 ease-out"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {items.map((item, i) => (
+          <div key={i} className="w-full shrink-0">{item}</div>
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+Each slide has `w-full shrink-0` so it takes the full container width and doesn't compress. The `flex` container holds all slides in a row, and `translateX` shifts the visible window.
+
+## Navigation Arrows
+
+Arrows should sit at the vertical center of the carousel and stay out of the way of the content.
+
+```js
+<button
+  onClick={() => goTo(currentIndex - 1)}
+  disabled={currentIndex === 0}
+  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm p-2 border border-border shadow-sm hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+  aria-label="Previous slide"
+>
+  <ChevronLeftIcon className="h-5 w-5" />
+</button>
+
+<button
+  onClick={() => goTo(currentIndex + 1)}
+  disabled={currentIndex === items.length - 1}
+  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm p-2 border border-border shadow-sm hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+  aria-label="Next slide"
+>
+  <ChevronRightIcon className="h-5 w-5" />
+</button>
+```
+
+Disabling the arrows at the boundaries prevents users from scrolling past the first or last slide. If you want infinite looping, use modular arithmetic in `goTo` instead of clamping.
+
+## Pagination Dots
+
+Dots give users a sense of position and let them jump directly to a specific slide.
+
+```js
+<div className="flex justify-center gap-2 mt-4">
+  {items.map((_, i) => (
+    <button
+      key={i}
+      onClick={() => goTo(i)}
+      className={`h-2 rounded-full transition-all duration-300 ${
+        i === currentIndex ? "w-6 bg-primary" : "w-2 bg-muted-foreground/30"
+      }`}
+      aria-label={`Go to slide ${i + 1}`}
+    />
+  ))}
+</div>
+```
+
+The active dot stretches wider with `w-6` while inactive dots stay as small circles. This is a subtle but effective indicator of the current position.
+
+## Touch and Swipe Support
+
+Without touch support, the carousel is unusable on mobile. Track touch start and end positions to detect swipe direction.
+
+```js
+const touchStartX = React.useRef(0)
+const touchEndX = React.useRef(0)
+
+function handleTouchStart(e) {
+  touchStartX.current = e.changedTouches[0].screenX
+}
+
+function handleTouchEnd(e) {
+  touchEndX.current = e.changedTouches[0].screenX
+  const diff = touchStartX.current - touchEndX.current
+  const threshold = 50
+
+  if (Math.abs(diff) > threshold) {
+    if (diff > 0) {
+      goTo(currentIndex + 1) // Swipe left = next
+    } else {
+      goTo(currentIndex - 1) // Swipe right = previous
+    }
+  }
+}
+```
+
+Attach `onTouchStart={handleTouchStart}` and `onTouchEnd={handleTouchEnd}` to the carousel wrapper. The 50px threshold prevents accidental swipes from triggering navigation.
+
+## Autoplay
+
+Autoplay is straightforward with `setInterval`, but it needs to pause when the user interacts with the carousel or hovers over it.
+
+```js
+const [isPaused, setIsPaused] = React.useState(false)
+
+React.useEffect(() => {
+  if (isPaused) return
+
+  const interval = setInterval(() => {
+    setCurrentIndex(prev => {
+      if (prev >= items.length - 1) return 0
+      return prev + 1
+    })
+  }, 5000)
+
+  return () => clearInterval(interval)
+}, [isPaused, items.length])
+```
+
+Add `onMouseEnter={() => setIsPaused(true)}` and `onMouseLeave={() => setIsPaused(false)}` to the wrapper. Also pause on touch start and resume on touch end.
+
+## Responsive Breakpoints
+
+Sometimes you want to show multiple slides at once on larger screens. Adjust the slide width based on a breakpoint:
+
+```js
+const [slidesPerView, setSlidesPerView] = React.useState(1)
+
+React.useEffect(() => {
+  function handleResize() {
+    if (window.innerWidth >= 1024) setSlidesPerView(3)
+    else if (window.innerWidth >= 640) setSlidesPerView(2)
+    else setSlidesPerView(1)
+  }
+
+  handleResize()
+  window.addEventListener("resize", handleResize)
+  return () => window.removeEventListener("resize", handleResize)
+}, [])
+```
+
+Then adjust the slide width and max index accordingly:
+
+```js
+// Slide width: instead of w-full, use a dynamic style
+<div style={{ width: `${100 / slidesPerView}%` }} className="shrink-0 px-2">
+  {item}
+</div>
+
+// Max index calculation
+const maxIndex = Math.max(0, items.length - slidesPerView)
+```
+
+## A Note on Logo Carousels
+
+One of the most common carousel use cases is a scrolling row of partner or client logos. At [Spell UI](https://spell.sh), the `LogosCarousel` component handles this pattern with continuous scroll animation, automatic item duplication for gapless looping, and pause-on-hover built in. If you're building a logo strip specifically, a dedicated component is faster to ship than adapting a general-purpose carousel.
+
+## Accessibility
+
+A few things to keep in mind:
+
+- Use `aria-label` on all navigation buttons.
+- Add `aria-roledescription="carousel"` to the wrapper and `aria-roledescription="slide"` to each slide.
+- Include `aria-label="Slide 1 of 5"` on each slide for context.
+- Autoplay should respect `prefers-reduced-motion`. Check with `window.matchMedia("(prefers-reduced-motion: reduce)")` and disable autoplay if it matches.
+
+Carousels don't have to be a usability problem. With keyboard support, touch handling, and proper ARIA attributes, they can be a clean, effective way to present horizontal content without overwhelming the page.

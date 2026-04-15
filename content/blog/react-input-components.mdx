@@ -1,0 +1,189 @@
+---
+title: "Modern Input Components in React and Tailwind CSS"
+description: "Build polished input components in React and Tailwind CSS with floating labels, password visibility toggles, validation states, focus effects, and error handling."
+image: "/og?title=Modern+Input+Components+in+React+and+Tailwind+CSS"
+tag: "Components"
+publishedOn: "2026-04-10"
+featured: false
+---
+
+Default HTML inputs are functional but bland. A few well-chosen enhancements -- floating labels, password toggles, validation feedback, and focus effects -- make forms easier to use without adding complexity. Here's how to build each pattern in [React](https://react.dev) with [Tailwind CSS](https://tailwindcss.com).
+
+## The Base Input
+
+Start with a styled wrapper that every variant can build on.
+
+```js
+function Input({ label, id, type = "text", error, ...props }) {
+  return (
+    <div className="space-y-1.5">
+      {label && (
+        <label htmlFor={id} className="block text-sm font-medium text-foreground">
+          {label}
+        </label>
+      )}
+      <input
+        id={id}
+        type={type}
+        className={`w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary ${
+          error ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" : "border-border"
+        }`}
+        {...props}
+      />
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  )
+}
+```
+
+The `focus:ring-2 focus:ring-primary/20` creates a subtle glow around the input on focus. The `/20` opacity keeps it from being overwhelming.
+
+## Floating Labels
+
+Floating labels sit inside the input and move up when the input is focused or has a value. This saves vertical space and looks clean.
+
+The trick is using CSS peer selectors. The input comes first in the DOM, and the label is positioned on top of it.
+
+```js
+function FloatingInput({ label, id, type = "text", ...props }) {
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type={type}
+        placeholder=" "
+        className="peer w-full rounded-md border border-border bg-transparent px-3 pb-2 pt-5 text-sm outline-none transition-colors focus:ring-2 focus:ring-primary/20 focus:border-primary"
+        {...props}
+      />
+      <label
+        htmlFor={id}
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground transition-all duration-200 peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs"
+      >
+        {label}
+      </label>
+    </div>
+  )
+}
+```
+
+The `placeholder=" "` (a single space) is essential. The `:placeholder-shown` selector only works when the placeholder is visible, meaning the input is empty. With an empty string, the placeholder is technically never "shown." A space character makes the selector work correctly.
+
+The label transitions from centered (`top-1/2 -translate-y-1/2`) to the top of the input (`top-2 translate-y-0 text-xs`) when the input is focused or has a value.
+
+## Password Visibility Toggle
+
+Password inputs should let users see what they've typed. Toggle between `type="password"` and `type="text"`.
+
+```js
+function PasswordInput({ label, id, ...props }) {
+  const [visible, setVisible] = React.useState(false)
+
+  return (
+    <div className="space-y-1.5">
+      {label && (
+        <label htmlFor={id} className="block text-sm font-medium text-foreground">
+          {label}
+        </label>
+      )}
+      <div className="relative">
+        <input
+          id={id}
+          type={visible ? "text" : "password"}
+          className="w-full rounded-md border border-border bg-transparent px-3 py-2 pr-10 text-sm outline-none transition-colors focus:ring-2 focus:ring-primary/20 focus:border-primary"
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={() => setVisible(!visible)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-1 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label={visible ? "Hide password" : "Show password"}
+        >
+          {visible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+        </button>
+      </div>
+    </div>
+  )
+}
+```
+
+The `type="button"` on the toggle prevents it from submitting the form. The `pr-10` on the input adds right padding so text doesn't run under the icon.
+
+## Validation States
+
+Inputs should communicate their validation state visually. Beyond the red border for errors, consider adding icons and styling for success states.
+
+```js
+function ValidatedInput({ label, id, error, success, ...props }) {
+  let borderClass = "border-border"
+  let ringClass = "focus:ring-primary/20 focus:border-primary"
+
+  if (error) {
+    borderClass = "border-red-500"
+    ringClass = "focus:ring-red-500/20 focus:border-red-500"
+  } else if (success) {
+    borderClass = "border-green-500"
+    ringClass = "focus:ring-green-500/20 focus:border-green-500"
+  }
+
+  return (
+    <div className="space-y-1.5">
+      {label && <label htmlFor={id} className="block text-sm font-medium">{label}</label>}
+      <div className="relative">
+        <input
+          id={id}
+          className={`w-full rounded-md border bg-transparent px-3 py-2 pr-10 text-sm outline-none transition-colors ${borderClass} ${ringClass}`}
+          aria-invalid={error ? "true" : undefined}
+          aria-describedby={error ? `${id}-error` : undefined}
+          {...props}
+        />
+        {error && <AlertCircleIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-500" />}
+        {success && !error && <CheckCircleIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-500" />}
+      </div>
+      {error && <p id={`${id}-error`} className="text-xs text-red-500">{error}</p>}
+    </div>
+  )
+}
+```
+
+The `aria-invalid` and `aria-describedby` attributes connect the input to its error message for screen readers. Without these, users relying on assistive technology won't know why their form submission failed.
+
+## Focus Effects
+
+A subtle focus animation can make the input feel more interactive. Here's a bottom-border highlight effect:
+
+```css
+.input-highlight {
+  position: relative;
+}
+
+.input-highlight::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-primary);
+  transition: width 200ms ease, left 200ms ease;
+}
+
+.input-highlight:focus-within::after {
+  width: 100%;
+  left: 0;
+}
+```
+
+The highlight starts at the center (left: 50%, width: 0) and expands outward to the edges on focus. This creates a drawing effect that's subtle but noticeable.
+
+## Spell UI's Input Components
+
+[Spell UI](https://spell.sh) includes two input components worth mentioning. `LabelInput` implements the floating label pattern with smooth transitions and built-in validation styling. `ExplodingInput` fires particles outward from the border on focus, adding a visible micro-interaction. Both components are built with Tailwind CSS and work with standard React form patterns like controlled components and `react-hook-form`.
+
+## Tips for Production
+
+- Always associate labels with inputs using `htmlFor` and `id`. Clicking the label should focus the input.
+- Use `autocomplete` attributes. They help password managers and browsers fill forms correctly.
+- Don't rely only on color to indicate validation state. The icon and text message together ensure the state is communicated even to users who can't perceive color differences.
+- Test with keyboard-only navigation. Tab order, focus rings, and toggle buttons should all work without a mouse.
+
+Good input components stay out of the way. They guide the user through the form, show feedback at the right moments, and otherwise remain invisible.

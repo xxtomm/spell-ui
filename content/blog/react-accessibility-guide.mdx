@@ -1,0 +1,196 @@
+---
+title: "Building Accessible React Components: A Practical Guide"
+description: "A practical guide to building accessible React components: ARIA attributes, keyboard navigation, focus management, screen reader testing, and automated testing with axe."
+image: "/og?title=Building+Accessible+React+Components"
+tag: "React"
+publishedOn: "2026-04-05"
+featured: false
+---
+
+## Accessibility Is Not Optional
+
+Accessibility is not a feature you add at the end. It is a quality of well-built software. One in four adults in the United States has a disability, and globally the numbers are similar. When your components are inaccessible, you are excluding a significant portion of your users.
+
+The good news: most accessibility work is straightforward. It comes down to using the right HTML elements, managing focus correctly, and testing with the right tools.
+
+## Start with Semantic HTML
+
+The majority of accessibility problems are solved by using the correct HTML element. A `button` that is built from a `div` requires manual keyboard handling, ARIA roles, and focus management. A real `button` element gets all of that for free.
+
+```js
+// Bad: requires manual accessibility work
+<div className="btn" onClick={handleClick}>Submit</div>
+
+// Good: accessible by default
+<button className="btn" onClick={handleClick}>Submit</button>
+```
+
+This applies broadly. Use `a` for navigation, `input` for form fields, `nav` for navigation regions, `main` for primary content, `h1` through `h6` for headings in order. Semantic HTML is not old-fashioned; it is the foundation of accessibility.
+
+## ARIA: When HTML Is Not Enough
+
+ARIA attributes bridge the gap between custom UI patterns and assistive technologies. There are three categories to understand:
+
+**Roles** define what an element is. Use them when you are building a custom widget that has no native HTML equivalent:
+
+```js
+<div role="tablist">
+  <button role="tab" aria-selected={activeTab === 0}>Overview</button>
+  <button role="tab" aria-selected={activeTab === 1}>Details</button>
+</div>
+<div role="tabpanel">
+  {activeTab === 0 ? <Overview /> : <Details />}
+</div>
+```
+
+**States and properties** communicate the current condition of an element:
+
+```js
+<button
+  aria-expanded={isMenuOpen}
+  aria-controls="dropdown-menu"
+  aria-haspopup="true"
+>
+  Menu
+</button>
+<ul id="dropdown-menu" role="menu" hidden={!isMenuOpen}>
+  <li role="menuitem">Profile</li>
+  <li role="menuitem">Settings</li>
+  <li role="menuitem">Sign out</li>
+</ul>
+```
+
+**Labels** provide accessible names for elements that lack visible text:
+
+```js
+<button aria-label="Close dialog">
+  <svg>...</svg>
+</button>
+
+<input aria-label="Search products" placeholder="Search..." />
+```
+
+The first rule of ARIA: do not use ARIA if native HTML can do the job. ARIA adds accessibility semantics, but it does not add behavior. An element with `role="button"` still needs manual keyboard and click handling.
+
+## Keyboard Navigation
+
+Every interactive element must be operable with a keyboard. This means:
+
+- **Tab** moves focus to the next interactive element
+- **Shift+Tab** moves focus backward
+- **Enter** or **Space** activates buttons
+- **Arrow keys** navigate within composite widgets (tabs, menus, radio groups)
+- **Escape** closes modals, dropdowns, and popovers
+
+For custom components, implement keyboard handlers explicitly:
+
+```js
+function TabList({ tabs, activeTab, onSelect }) {
+  function handleKeyDown(e) {
+    const tabCount = tabs.length
+    let newIndex = activeTab
+
+    if (e.key === "ArrowRight") {
+      newIndex = (activeTab + 1) % tabCount
+    } else if (e.key === "ArrowLeft") {
+      newIndex = (activeTab - 1 + tabCount) % tabCount
+    } else if (e.key === "Home") {
+      newIndex = 0
+    } else if (e.key === "End") {
+      newIndex = tabCount - 1
+    } else {
+      return
+    }
+
+    e.preventDefault()
+    onSelect(newIndex)
+  }
+
+  return (
+    <div role="tablist" onKeyDown={handleKeyDown}>
+      {tabs.map((tab, index) => (
+        <button
+          key={tab.id}
+          role="tab"
+          tabIndex={index === activeTab ? 0 : -1}
+          aria-selected={index === activeTab}
+          onClick={() => onSelect(index)}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+```
+
+Notice the `tabIndex` pattern: only the active tab is in the tab order (`tabIndex={0}`). The rest use `tabIndex={-1}`, making them focusable programmatically but not part of the normal tab sequence. This is the "roving tabindex" pattern.
+
+## Focus Management
+
+When UI changes in response to user action, focus must follow. Two common scenarios:
+
+**Modals.** When a modal opens, move focus to the first focusable element inside it. When it closes, return focus to the element that triggered it. Trap focus inside the modal so Tab does not escape to the content behind it.
+
+```js
+function Dialog({ isOpen, onClose, children }) {
+  const dialogRef = useRef(null)
+  const previousFocusRef = useRef(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement
+      dialogRef.current?.focus()
+    } else if (previousFocusRef.current) {
+      previousFocusRef.current.focus()
+    }
+  }, [isOpen])
+
+  if (!isOpen) return null
+
+  return (
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      tabIndex={-1}
+      onKeyDown={(e) => e.key === "Escape" && onClose()}
+    >
+      {children}
+    </div>
+  )
+}
+```
+
+**Dynamic content.** When a user deletes an item from a list, focus should move to the next item or to a logical fallback, not disappear into the void.
+
+## Testing with axe
+
+Automated testing catches roughly 30-40% of accessibility issues, which covers the most common problems. The `axe-core` library integrates with your existing test setup:
+
+```js
+import { render } from "@testing-library/react"
+import { axe, toHaveNoViolations } from "jest-axe"
+
+expect.extend(toHaveNoViolations)
+
+test("form has no accessibility violations", async () => {
+  const { container } = render(<LoginForm />)
+  const results = await axe(container)
+  expect(results).toHaveNoViolations()
+})
+```
+
+For manual testing, install the axe browser extension and run it on your pages during development. Also test with a screen reader: VoiceOver on macOS (free), NVDA on Windows (free), and JAWS (paid) are the most common.
+
+## A Practical Checklist
+
+For every component you build, verify these five things:
+
+1. Can you reach and operate it using only the keyboard?
+2. Does it have a visible focus indicator?
+3. Does it have an accessible name (visible label or `aria-label`)?
+4. Does it communicate state changes to screen readers?
+5. Does it pass automated axe checks?
+
+Accessibility is not about perfection. It is about consistent effort. Each accessible component you build makes the web better for everyone.

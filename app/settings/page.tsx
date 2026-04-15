@@ -55,6 +55,7 @@ export default function SettingsPage() {
       })
       .catch(() => {});
   }, [session?.user]);
+  
 
   const originalName = session?.user?.name ?? "";
 

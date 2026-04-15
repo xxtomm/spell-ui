@@ -1,0 +1,220 @@
+---
+title: "Authentication in Next.js: A Practical Approach"
+description: "How to implement authentication in Next.js with Auth.js (NextAuth), middleware-based route protection, session management, and security best practices."
+image: "/og?title=Authentication+in+Next.js:+A+Practical+Approach"
+tag: "Next.js"
+publishedOn: "2025-10-15"
+featured: false
+---
+
+Authentication is the feature every app needs and nobody enjoys building. [Next.js](https://nextjs.org) doesn't ship with auth built in, but [Auth.js](https://authjs.dev) (formerly NextAuth.js) fills that gap well. Here's how to set it up properly with the App Router, protect routes with middleware, and handle sessions on both the server and client.
+
+## Setting Up Auth.js
+
+Install the package:
+
+```bash
+npm install next-auth@beta
+```
+
+Create your auth configuration:
+
+```js
+// lib/auth.js
+import NextAuth from "next-auth"
+import GitHub from "next-auth/providers/github"
+import Google from "next-auth/providers/google"
+import Credentials from "next-auth/providers/credentials"
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  providers: [
+    GitHub({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
+    Google({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+    }),
+  ],
+  pages: {
+    signIn: "/login",
+  },
+})
+```
+
+Set up the API route handler:
+
+```js
+// app/api/auth/[...nextauth]/route.js
+import { handlers } from "@/lib/auth"
+export const { GET, POST } = handlers
+```
+
+Auth.js handles OAuth flows, CSRF protection, token rotation, and session management. You bring the provider credentials.
+
+## Environment Variables
+
+Add these to your `.env.local`:
+
+```bash
+AUTH_SECRET=your-random-secret-here
+GITHUB_ID=your-github-oauth-app-id
+GITHUB_SECRET=your-github-oauth-app-secret
+```
+
+Generate `AUTH_SECRET` with:
+
+```bash
+npx auth secret
+```
+
+## Getting the Session
+
+### Server Components
+
+On the server, call the `auth()` function directly:
+
+```js
+// app/dashboard/page.js
+import { auth } from "@/lib/auth"
+import { redirect } from "next/navigation"
+
+export default async function DashboardPage() {
+  const session = await auth()
+
+  if (!session) {
+    redirect("/login")
+  }
+
+  return <h1>Welcome, {session.user.name}</h1>
+}
+```
+
+No hooks, no context providers, no loading states. Server Components make this clean.
+
+### Client Components
+
+For client components, use the `SessionProvider` and the `useSession` hook:
+
+```js
+// app/layout.js
+import { SessionProvider } from "next-auth/react"
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <SessionProvider>{children}</SessionProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+```js
+// components/user-menu.js
+"use client"
+
+import { useSession, signIn, signOut } from "next-auth/react"
+
+export function UserMenu() {
+  const { data: session, status } = useSession()
+
+  if (status === "loading") return <div>Loading...</div>
+
+  if (!session) {
+    return <button onClick={() => signIn()}>Sign in</button>
+  }
+
+  return (
+    <div>
+      <span>{session.user.email}</span>
+      <button onClick={() => signOut()}>Sign out</button>
+    </div>
+  )
+}
+```
+
+## Middleware-Based Route Protection
+
+Checking auth in every page component works but breaks down as your app grows. Middleware runs before the request reaches your page, making it the right place for route-level protection:
+
+```js
+// middleware.js
+import { auth } from "@/lib/auth"
+
+export default auth((req) => {
+  const isLoggedIn = !!req.auth
+  const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard")
+  const isOnLogin = req.nextUrl.pathname === "/login"
+
+  if (isOnDashboard && !isLoggedIn) {
+    return Response.redirect(new URL("/login", req.nextUrl))
+  }
+
+  if (isOnLogin && isLoggedIn) {
+    return Response.redirect(new URL("/dashboard", req.nextUrl))
+  }
+})
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/login"],
+}
+```
+
+The `matcher` config limits middleware to specific paths. Exclude static assets and API routes that don't need auth.
+
+## Database Sessions vs. JWT
+
+Auth.js supports two session strategies:
+
+**JWT (default):** Sessions are stored in an encrypted cookie. No database needed. Good for simple apps. The downside: you can't revoke sessions server-side.
+
+**Database:** Sessions are stored in your database. Requires a database adapter (Prisma, [Drizzle](https://orm.drizzle.team), etc.). Lets you list active sessions, revoke access, and track login history.
+
+```js
+// lib/auth.js
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prisma } from "./db"
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
+  session: { strategy: "database" },
+  // ...providers
+})
+```
+
+For production apps handling sensitive data, use database sessions.
+
+## Role-Based Access
+
+Extend the session with custom fields by using the `callbacks` option:
+
+```js
+callbacks: {
+  async session({ session, user }) {
+    session.user.role = user.role
+    return session
+  },
+}
+```
+
+Then check roles in your middleware or components:
+
+```js
+const session = await auth()
+if (session?.user?.role !== "admin") {
+  redirect("/unauthorized")
+}
+```
+
+## Best Practices
+
+1. **Always use HTTPS in production.** Auth cookies over HTTP are vulnerable to interception.
+2. **Set `AUTH_SECRET` to a strong random value.** This encrypts your JWT tokens.
+3. **Use middleware for route protection,** not individual page checks.
+4. **Keep session data minimal.** Don't store large objects in the JWT.
+5. **Handle the loading state.** Users will see a flash of unauthenticated content if you don't.
+
+Getting auth right early saves you from painful refactors later. Auth.js with the App Router covers OAuth, credentials, sessions, and middleware — everything most apps need.

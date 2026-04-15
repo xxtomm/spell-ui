@@ -1,0 +1,186 @@
+---
+title: "Lazy Loading in React: A Complete Guide to Code Splitting"
+description: "Everything you need to know about lazy loading in React — React.lazy, Suspense, route-based and component-level code splitting, and Intersection Observer patterns."
+image: "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=1200&h=630&fit=crop"
+tag: "Performance"
+publishedOn: "2026-03-25"
+featured: false
+---
+
+Lazy loading means deferring the download and execution of code until it's actually needed. In a [React](https://react.dev) application, this translates directly to faster initial page loads — your user downloads only the code for what they can see, not the entire application.
+
+Here's how to implement it effectively.
+
+## React.lazy and Suspense
+
+`React.lazy` lets you define a component that loads its code on demand. It works with dynamic `import()`, which tells your bundler to split that module into a separate chunk:
+
+```js
+import { lazy, Suspense } from "react";
+
+const HeavyChart = lazy(() => import("./components/HeavyChart"));
+
+function Dashboard() {
+  return (
+    <Suspense fallback={<div>Loading chart...</div>}>
+      <HeavyChart data={chartData} />
+    </Suspense>
+  );
+}
+```
+
+When `Dashboard` renders, React downloads the `HeavyChart` chunk in the background. Until it loads, the `Suspense` fallback is shown.
+
+A few things to know:
+
+- `React.lazy` only works with default exports. If your component uses named exports, create an intermediate module that re-exports it as default.
+- The `Suspense` boundary can wrap multiple lazy components. One fallback handles all of them.
+- If the lazy component fails to load (network error), it will throw. Wrap with an Error Boundary to handle failures gracefully.
+
+## Route-Based Code Splitting
+
+The highest-impact place to split code is at the route level. Each page becomes its own chunk, so navigating to `/settings` doesn't require downloading the code for `/dashboard`.
+
+With React Router:
+
+```js
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+const Home = lazy(() => import("./pages/Home"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Settings = lazy(() => import("./pages/Settings"));
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<PageSkeleton />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+}
+```
+
+[Next.js](https://nextjs.org) handles this automatically. Every file in the `app/` or `pages/` directory is its own chunk — no configuration needed.
+
+## Component-Level Code Splitting
+
+Below routes, split heavy individual components that aren't immediately visible:
+
+**Modal dialogs.** A settings modal with a rich form doesn't need to load until the user opens it:
+
+```js
+const SettingsModal = lazy(() => import("./SettingsModal"));
+
+function Header() {
+  const [showSettings, setShowSettings] = useState(false);
+
+  return (
+    <div>
+      <button onClick={() => setShowSettings(true)}>Settings</button>
+      {showSettings && (
+        <Suspense fallback={<ModalSkeleton />}>
+          <SettingsModal onClose={() => setShowSettings(false)} />
+        </Suspense>
+      )}
+    </div>
+  );
+}
+```
+
+**Rich text editors, code editors, and chart libraries.** These can add 100-500KB to your bundle. Split them out.
+
+**Below-the-fold content.** Anything the user needs to scroll to see is a candidate.
+
+## Intersection Observer Pattern
+
+For components that should load when they scroll into view, combine `React.lazy` with [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver):
+
+```js
+import { useRef, useState, useEffect, lazy, Suspense } from "react";
+
+function LazySection({ importFn, fallback, ...props }) {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const Component = lazy(importFn);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" } // Start loading 200px before it's visible
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref}>
+      {isVisible ? (
+        <Suspense fallback={fallback}>
+          <Component {...props} />
+        </Suspense>
+      ) : (
+        fallback
+      )}
+    </div>
+  );
+}
+```
+
+The `rootMargin: "200px"` setting starts loading the component 200px before it enters the viewport, so it's often ready by the time the user scrolls to it.
+
+## Preloading Lazy Components
+
+The downside of lazy loading is that the user waits for a download on interaction. You can mitigate this by preloading components you expect the user will need:
+
+```js
+// Preload on hover — user is likely about to click
+const SettingsPage = lazy(() => import("./pages/Settings"));
+
+function NavLink() {
+  const preload = () => import("./pages/Settings");
+
+  return (
+    <a href="/settings" onMouseEnter={preload} onFocus={preload}>
+      Settings
+    </a>
+  );
+}
+```
+
+This triggers the download when the user hovers over the link. By the time they click, the chunk is often cached and ready.
+
+## When Not to Lazy Load
+
+Lazy loading adds complexity and a network waterfall. Don't use it for:
+
+- **Above-the-fold components.** The user sees these immediately — loading them lazily adds delay to the initial render.
+- **Small components.** If a component is under 10KB, the overhead of a separate network request may outweigh the savings.
+- **Critical path components.** Navigation, headers, and footers that appear on every page should be in the main bundle.
+
+## Measuring the Impact
+
+Verify that code splitting actually helps:
+
+```bash
+# Check bundle sizes before and after
+npx next build  # Next.js shows chunk sizes in build output
+
+# Or use webpack-bundle-analyzer
+npx webpack-bundle-analyzer stats.json
+```
+
+Look at the main chunk size. If it dropped significantly and page-specific chunks are now loading on demand, your splitting strategy is working. If your main chunk is still large, you have more splitting opportunities — or dependencies in shared code that are pulling in heavy modules.
+
+Start with route-based splitting, then target heavy components, and preload anything the user is likely to need next.

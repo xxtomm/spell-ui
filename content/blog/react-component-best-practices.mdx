@@ -1,0 +1,129 @@
+---
+title: "React Component Best Practices for Clean Code"
+description: "Learn practical React component patterns for cleaner, more maintainable code. Covers composition, prop drilling solutions, custom hooks, and separation of concerns."
+image: "/og?title=React+Component+Best+Practices+for+Clean+Code"
+tag: "React"
+publishedOn: "2025-01-28"
+featured: false
+---
+
+## Why Component Architecture Matters
+
+A well-structured [React](https://react.dev) codebase is the difference between a project that scales gracefully and one that collapses under its own weight. After years of building React applications, I keep coming back to a handful of patterns that consistently produce clean, maintainable code.
+
+## Composition Over Configuration
+
+The most common mistake I see in React codebases is components that accept dozens of props to handle every possible variation. Instead, lean on composition.
+
+Rather than building a monolithic `Card` component with `hasHeader`, `hasFooter`, `headerIcon`, and `footerAction` props, build composable pieces:
+
+```js
+// Good: composable, flexible
+function Card({ children, className }) {
+  return <div className={className}>{children}</div>
+}
+
+function CardHeader({ children }) {
+  return <div className="border-b p-4 font-semibold">{children}</div>
+}
+
+function CardBody({ children }) {
+  return <div className="p-4">{children}</div>
+}
+
+// Usage: the consumer decides what goes where
+<Card>
+  <CardHeader>Settings</CardHeader>
+  <CardBody>Your content here</CardBody>
+</Card>
+```
+
+This pattern gives the consumer full control without the component author needing to anticipate every use case.
+
+## Solving Prop Drilling
+
+Passing props through five layers of components is a code smell. There are three practical solutions, each suited to different situations.
+
+**Context for global concerns.** Authentication state, theme, locale, and similar cross-cutting data belong in context. But keep contexts small and focused; a single `AppContext` holding everything will cause unnecessary re-renders.
+
+**Component composition.** Often you can restructure your tree so that the component needing the data receives it directly. Move the data-consuming component up and pass it down as `children`:
+
+```js
+function Dashboard({ user }) {
+  return (
+    <Layout>
+      <Sidebar>
+        <UserProfile user={user} />
+      </Sidebar>
+    </Layout>
+  )
+}
+```
+
+Now `Layout` and `Sidebar` never need to know about `user`.
+
+**Custom hooks for shared logic.** When multiple components need the same data-fetching or state logic, extract it into a hook rather than threading props.
+
+## Custom Hooks for Separation of Concerns
+
+A component should ideally do one thing: render UI based on its inputs. Business logic, data fetching, and side effects should live in hooks.
+
+```js
+function useUserSettings(userId) {
+  const [settings, setSettings] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchSettings(userId).then((data) => {
+      setSettings(data)
+      setLoading(false)
+    })
+  }, [userId])
+
+  const updateSetting = (key, value) => {
+    setSettings((prev) => ({ ...prev, [key]: value }))
+    saveSettings(userId, { [key]: value })
+  }
+
+  return { settings, loading, updateSetting }
+}
+```
+
+The component becomes a thin rendering layer:
+
+```js
+function SettingsPanel({ userId }) {
+  const { settings, loading, updateSetting } = useUserSettings(userId)
+
+  if (loading) return <Spinner />
+
+  return (
+    <form>
+      <label>
+        Theme
+        <select
+          value={settings.theme}
+          onChange={(e) => updateSetting("theme", e.target.value)}
+        >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </form>
+  )
+}
+```
+
+## Keep Components Small and Focused
+
+If a component file exceeds 200 lines, it is almost certainly doing too much. Break it apart. A `CheckoutPage` should delegate to `OrderSummary`, `PaymentForm`, and `ShippingAddress`, each with its own hook if needed.
+
+## Name Props from the Consumer's Perspective
+
+Props should describe what the consumer cares about, not the internal implementation. Use `onSelect` instead of `handleItemClick`. Use `isOpen` instead of `modalVisibilityState`. Clear naming makes components self-documenting.
+
+## The Single Responsibility Test
+
+For every component, ask: "Can I describe what this does in one sentence without using the word 'and'?" If the answer is no, split it. This simple heuristic catches the majority of bloated components before they become a problem.
+
+Clean React code is not about clever abstractions. It is about making the next developer (including future you) able to read, change, and extend your code with confidence.

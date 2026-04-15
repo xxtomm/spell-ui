@@ -1,0 +1,187 @@
+---
+title: "Tailwind CSS Button Styles: A Practical Guide"
+description: "Build a complete button system with Tailwind CSS covering variants, sizes, disabled and loading states, icon buttons, and button groups with practical code examples."
+image: "https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=1200&h=630&fit=crop"
+tag: "Tailwind CSS"
+publishedOn: "2026-02-08"
+featured: false
+---
+
+Buttons are the most interactive element on any page, and they're usually the first component developers build when starting a project. Getting them right with [Tailwind CSS](https://tailwindcss.com) means thinking through variants, sizes, states, and edge cases upfront.
+
+Here's how to build a complete button system using nothing but Tailwind utility classes.
+
+## Base Styles
+
+Every button variant shares a foundation. Define these once and build on top of them:
+
+```css
+/* Base button */
+/* inline-flex items-center justify-center gap-2 rounded-lg
+   text-sm font-medium whitespace-nowrap
+   transition-colors duration-150
+   focus-visible:outline-none focus-visible:ring-2
+   focus-visible:ring-offset-2 focus-visible:ring-blue-500
+   disabled:opacity-50 disabled:pointer-events-none */
+```
+
+Key details here:
+
+- `inline-flex items-center justify-center gap-2` handles text and icon alignment.
+- `whitespace-nowrap` prevents button text from wrapping.
+- `transition-colors duration-150` makes hover and active states feel smooth.
+- The `focus-visible` utilities provide keyboard-accessible focus rings without showing them on mouse clicks.
+- `disabled` styles use `pointer-events-none` to prevent click handlers from firing.
+
+## Variants
+
+A solid button system needs at least four variants: primary, secondary, outline, and ghost.
+
+```css
+/* Primary — high-emphasis actions */
+/* bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 */
+
+/* Secondary — medium-emphasis actions */
+/* bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300
+   dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 */
+
+/* Outline — low-emphasis or paired with primary */
+/* border border-gray-300 bg-transparent text-gray-700
+   hover:bg-gray-50 active:bg-gray-100
+   dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 */
+
+/* Ghost — minimal emphasis, often for navigation or toolbars */
+/* bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200
+   dark:text-gray-300 dark:hover:bg-gray-800 */
+```
+
+You might also want a `destructive` variant for delete confirmations:
+
+```css
+/* Destructive */
+/* bg-red-600 text-white hover:bg-red-700 active:bg-red-800 */
+```
+
+## Sizes
+
+Three sizes cover most use cases. The differences are in padding, font size, and height:
+
+```css
+/* Small — compact UIs, tables, toolbars */
+/* h-8 px-3 text-xs rounded-md */
+
+/* Medium (default) */
+/* h-10 px-4 text-sm rounded-lg */
+
+/* Large — hero CTAs, prominent actions */
+/* h-12 px-6 text-base rounded-lg */
+```
+
+Using fixed heights (`h-8`, `h-10`, `h-12`) instead of relying on padding alone ensures buttons align consistently in flex and grid layouts.
+
+## Loading State
+
+A loading button should be visually distinct and non-interactive. Replace the label text with a spinner, or overlay one:
+
+```css
+/* Loading button */
+/* relative text-transparent pointer-events-none */
+
+/* Spinner (pseudo-element or child) */
+.button-spinner {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 9999px;
+  animation: spin 0.6s linear infinite;
+}
+```
+
+The `text-transparent` trick keeps the button the same width as its non-loading state (the text is still there, just invisible). This prevents layout shifts when toggling between states.
+
+An alternative approach keeps the text visible alongside the spinner:
+
+```css
+/* Loading with visible text */
+/* opacity-80 pointer-events-none */
+/* Prepend: animate-spin h-4 w-4 border-2 border-current
+   border-r-transparent rounded-full */
+```
+
+## Icon Buttons
+
+Square buttons with only an icon need equal width and height. Use the same height values from your size system:
+
+```css
+/* Icon button — small */
+/* h-8 w-8 p-0 */
+
+/* Icon button — medium */
+/* h-10 w-10 p-0 */
+
+/* Icon button — large */
+/* h-12 w-12 p-0 */
+```
+
+Always include an `aria-label` on icon-only buttons for accessibility. The visual icon is meaningless to screen readers.
+
+## Button Groups
+
+When buttons sit side by side in a group, remove individual border radii and collapse shared borders:
+
+```css
+/* Button group container */
+/* inline-flex rounded-lg overflow-hidden */
+
+/* Group items */
+/* rounded-none border-r border-gray-200 last:border-r-0 */
+```
+
+The container handles the outer radius, and each item removes its own rounding. The `overflow-hidden` on the container clips the corners cleanly.
+
+## Advanced: Animated Borders and Hover Effects
+
+If you want buttons that feel more premium, animated borders and gradient hover effects add polish without heavy dependencies. This is where I draw inspiration from component libraries like [Spell UI](https://spell.sh), which offers animated border and hover components that go beyond flat color swaps.
+
+A simple gradient hover effect using only Tailwind:
+
+```css
+/* Gradient hover */
+/* relative overflow-hidden bg-gray-900 text-white */
+/* Before pseudo-element: */
+.gradient-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+.gradient-button:hover::before {
+  transform: translateX(100%);
+}
+```
+
+This creates a light sweep effect on hover — subtle enough for professional UIs, but noticeable enough to feel intentional.
+
+## Dark Mode Considerations
+
+Every variant needs dark mode treatment. The general pattern:
+
+- **Primary** — Usually works as-is since the brand color is consistent across themes.
+- **Secondary** — Swap light grays for dark grays (`bg-gray-100` becomes `dark:bg-gray-800`).
+- **Outline** — Adjust border and text colors for contrast on dark backgrounds.
+- **Ghost** — Same swap as secondary for the hover background.
+
+Test each variant against both light and dark backgrounds. Contrast ratios should meet WCAG AA (4.5:1 for text, 3:1 for interactive elements).
+
+## Putting It Together
+
+A complete button system with four variants, three sizes, loading state, icon support, and dark mode covers 95% of real-world needs. Build it once, document the combinations, and stop reinventing button styles on every project.

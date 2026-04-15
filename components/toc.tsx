@@ -50,6 +50,7 @@ export function DocsTableOfContents({
   toc,
   className,
   docId,
+  boldActive = true,
 }: {
   toc: {
     title?: React.ReactNode;
@@ -58,6 +59,7 @@ export function DocsTableOfContents({
   }[];
   className?: string;
   docId?: string;
+  boldActive?: boolean;
 }) {
   const itemIds = React.useMemo(
     () => toc.map((item) => item.url.replace("#", "")),
@@ -84,7 +86,10 @@ export function DocsTableOfContents({
         <a
           key={item.url}
           href={item.url}
-          className="text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:font-medium text-[0.9rem] no-underline transition-colors data-[depth=3]:pl-4 data-[depth=4]:pl-6"
+          className={cn(
+            "text-muted-foreground hover:text-foreground data-[active=true]:text-foreground text-[0.9rem] no-underline transition-colors data-[depth=3]:pl-4 data-[depth=4]:pl-6",
+            boldActive && "data-[active=true]:font-medium",
+          )}
           data-active={item.url === `#${activeHeading}`}
           data-depth={item.depth}
         >

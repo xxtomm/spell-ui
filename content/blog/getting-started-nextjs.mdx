@@ -1,0 +1,146 @@
+---
+title: "Getting Started with Next.js: A Practical Guide"
+description: "Everything you need to know to start building with Next.js — App Router, file-based routing, layouts, and server components explained with real examples."
+image: "/og?title=Getting+Started+with+Next.js:+A+Practical+Guide"
+tag: "Next.js"
+publishedOn: "2025-02-18"
+featured: false
+---
+
+[Next.js](https://nextjs.org) has become the default framework for building production [React](https://react.dev) applications, and for good reason. It handles routing, rendering, and optimization out of the box so you can focus on building your product instead of configuring webpack.
+
+This guide covers the fundamentals you need to start building with Next.js using the App Router — the modern approach introduced in Next.js 13 and refined through subsequent releases.
+
+## Creating a New Project
+
+Spin up a new Next.js project with a single command:
+
+```bash
+npx create-next-app@latest my-app
+```
+
+The CLI will ask you about [TypeScript](https://www.typescriptlang.org), [Tailwind CSS](https://tailwindcss.com), ESLint, and a few other options. For most projects, accept the defaults. You'll get a working app with sensible configuration.
+
+```bash
+cd my-app
+npm run dev
+```
+
+Your app is running at `http://localhost:3000`.
+
+## File-Based Routing
+
+The App Router uses the filesystem as the routing layer. Every folder inside `app/` becomes a URL segment, and a `page.js` file inside that folder makes it publicly accessible.
+
+```
+app/
+  page.js          → /
+  about/
+    page.js        → /about
+  blog/
+    page.js        → /blog
+    [slug]/
+      page.js      → /blog/any-slug-here
+```
+
+Dynamic segments use square brackets. The `[slug]` folder matches any value in that URL position and passes it as a param:
+
+```js
+// app/blog/[slug]/page.js
+export default function BlogPost({ params }) {
+  return <h1>Post: {params.slug}</h1>
+}
+```
+
+## Layouts
+
+Layouts are one of the App Router's best features. A `layout.js` file wraps all pages in its directory and nested subdirectories. It persists across navigations, meaning shared UI like headers and sidebars don't re-render when you navigate between pages.
+
+```js
+// app/layout.js
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <nav>My App</nav>
+        <main>{children}</main>
+      </body>
+    </html>
+  )
+}
+```
+
+You can nest layouts. An `app/dashboard/layout.js` wraps everything under `/dashboard` while inheriting the root layout above it.
+
+## Server Components
+
+By default, every component in the App Router is a Server Component. This means it runs on the server, has zero JavaScript sent to the client, and can directly access databases, file systems, or environment variables.
+
+```js
+// This runs on the server — no "use client" directive
+export default async function UsersPage() {
+  const users = await fetch("https://api.example.com/users")
+  const data = await users.json()
+
+  return (
+    <ul>
+      {data.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+No `useEffect`. No loading states to manage. The component fetches data on the server and sends rendered HTML to the browser.
+
+When you need interactivity — state, event handlers, browser APIs — add `"use client"` at the top of the file:
+
+```js
+"use client"
+
+import { useState } from "react"
+
+export default function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+}
+```
+
+The mental model: keep as much as possible on the server, and push only interactive pieces to the client.
+
+## Loading and Error States
+
+The App Router has built-in conventions for loading and error UI. Drop a `loading.js` or `error.js` file next to your page and Next.js handles the rest:
+
+```js
+// app/dashboard/loading.js
+export default function Loading() {
+  return <div>Loading dashboard...</div>
+}
+```
+
+```js
+// app/dashboard/error.js
+"use client"
+
+export default function Error({ error, reset }) {
+  return (
+    <div>
+      <p>Something went wrong: {error.message}</p>
+      <button onClick={reset}>Try again</button>
+    </div>
+  )
+}
+```
+
+## Where to Go Next
+
+Once you're comfortable with routing, layouts, and the server/client component split, you'll want to explore:
+
+- **Server Actions** for handling form submissions without API routes
+- **Metadata API** for SEO (title, description, Open Graph tags)
+- **Image and Font optimization** built into `next/image` and `next/font`
+- **Component libraries** like [Spell UI](https://spell.sh) for pre-built, animated components that drop into any Next.js project
+
+The best way to learn Next.js is to build something real with it. Pick a project, start with the basics above, and layer in features as you need them.
