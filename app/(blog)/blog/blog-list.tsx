@@ -37,6 +37,22 @@ function TagBadge({ tag }: { tag: string }) {
   );
 }
 
+function BlogImage({ src, alt, className, sizes, fill, priority }: {
+  src: string; alt: string; className?: string; sizes?: string; fill?: boolean; priority?: boolean;
+}) {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      className={className}
+      sizes={sizes}
+      fill={fill}
+      priority={priority}
+      unoptimized={!src.startsWith("http")}
+    />
+  );
+}
+
 export default function BlogList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -78,7 +94,7 @@ export default function BlogList() {
               >
                 {featuredPosts[0].image && (
                   <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-border">
-                    <Image
+                    <BlogImage
                       src={featuredPosts[0].image}
                       alt={featuredPosts[0].title}
                       fill
@@ -193,7 +209,7 @@ export default function BlogList() {
               >
                 {blog.image && (
                   <div className="relative h-[200px] overflow-hidden rounded-xl border border-border">
-                    <Image
+                    <BlogImage
                       src={blog.image}
                       alt={blog.title}
                       fill

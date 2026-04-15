@@ -271,6 +271,7 @@ export default async function BlogPostPage({
                   priority
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 800px"
+                  unoptimized={!post.image.startsWith("http")}
                 />
               </div>
             )}
