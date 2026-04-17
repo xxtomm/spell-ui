@@ -7,7 +7,7 @@ publishedOn: "2026-02-09"
 featured: false
 ---
 
-Scroll-triggered animations used to require heavy JavaScript libraries. In 2025, you can do most of it with CSS alone. Between [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver) for triggering, scroll-driven animations for progress-linked effects, and the new `scroll-timeline` spec, the native platform covers a lot of ground.
+Scroll-triggered animations used to require heavy JavaScript libraries. In 2026, you can do most of it with CSS alone. Between [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver) for triggering, scroll-driven animations for progress-linked effects, and the new `scroll-timeline` spec, the native platform covers a lot of ground.
 
 Here's a practical guide to all three approaches.
 
@@ -179,7 +179,7 @@ For more complex scenarios, you can create named scroll timelines and reference 
 
 Named timelines let you tie animations to specific scroll containers rather than the viewport. This works well for sectioned layouts where different content areas drive different animations.
 
-## Browser Support in 2025
+## Browser Support in 2026
 
 Scroll-driven animations (`animation-timeline`, `view()`, `scroll()`) are supported in Chrome, Edge, and Firefox. Safari added support in late 2024. For production apps that need to support older browsers, use IntersectionObserver as a fallback.
 
@@ -229,4 +229,4 @@ One last technique borrowed from traditional animation: follow-through. Let elem
 - **Want viewport-triggered reveals** → `animation-timeline: view()`
 - **Complex multi-element choreography** → Named scroll timelines
 
-Start with IntersectionObserver if you need reliability. Add scroll-driven animations where progressive enhancement makes sense. The native CSS approach is the future, and browser support in 2025 is finally there.
+Start with IntersectionObserver if you need reliability. Add scroll-driven animations where progressive enhancement makes sense. The native CSS approach is the future, and browser support in 2026 is finally there.
