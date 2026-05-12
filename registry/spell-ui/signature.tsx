@@ -23,6 +23,15 @@ type SignatureFont = {
 const SVG_HEIGHT = 100;
 const PATH_DELAY_STEP = 0.2;
 const OPACITY_DELAY_OFFSET = 0.01;
+const fontCache = new Map<string, SignatureFont>();
+
+function getFontCacheKey(path: string): string {
+  try {
+    return new URL(path, window.location.origin).href;
+  } catch {
+    return path;
+  }
+}
 
 function getPathTransition(index: number, duration: number, delay: number) {
   const pathDelay = delay + index * PATH_DELAY_STEP;
@@ -43,6 +52,13 @@ function getPathTransition(index: number, duration: number, delay: number) {
 async function loadFontFromPaths(fontPaths: string[]): Promise<SignatureFont> {
   for (const path of fontPaths) {
     try {
+      const cacheKey = getFontCacheKey(path);
+      const cachedFont = fontCache.get(cacheKey);
+
+      if (cachedFont) {
+        return cachedFont;
+      }
+
       const response = await fetch(path);
 
       if (!response.ok) {
@@ -50,7 +66,10 @@ async function loadFontFromPaths(fontPaths: string[]): Promise<SignatureFont> {
       }
 
       const fontBuffer = await response.arrayBuffer();
-      return parseFont(fontBuffer) as SignatureFont;
+      const font = parseFont(fontBuffer) as SignatureFont;
+      fontCache.set(cacheKey, font);
+
+      return font;
     } catch {
       // Try next path
     }
@@ -70,10 +89,7 @@ async function buildSignaturePaths({
   baseline: number;
   horizontalPadding: number;
 }): Promise<{ paths: string[]; width: number }> {
-  const font = await loadFontFromPaths([
-    "/LastoriaBoldRegular.otf",
-    `${window.location.origin}/LastoriaBoldRegular.otf`,
-  ]);
+  const font = await loadFontFromPaths(["/LastoriaBoldRegular.otf"]);
 
   let x = horizontalPadding;
   const nextPaths: string[] = [];
