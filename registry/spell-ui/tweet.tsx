@@ -369,7 +369,24 @@ export function Tweet({
     return <TweetNotFound className={className} />;
   }
 
-  const enrichedTweet = enrichTweet(tweet);
+  // X's syndication API omits empty entity arrays, but react-tweet's
+  // enrichTweet assumes they exist and throws "n is not iterable" otherwise.
+  let enrichedTweet: EnrichedTweet;
+  try {
+    const entities = tweet.entities ?? {};
+    enrichedTweet = enrichTweet({
+      ...tweet,
+      entities: {
+        ...entities,
+        hashtags: entities.hashtags ?? [],
+        urls: entities.urls ?? [],
+        user_mentions: entities.user_mentions ?? [],
+        symbols: entities.symbols ?? [],
+      },
+    });
+  } catch {
+    return <TweetNotFound className={className} />;
+  }
 
   return (
     <TweetContent
