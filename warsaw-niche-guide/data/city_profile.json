@@ -1,0 +1,17 @@
+{
+  "city": "Warszawa",
+  "country": "Polska",
+  "lang": "pl",
+  "has_metro": true,
+  "transit_systems": ["Metro M1", "Metro M2", "Tramwaje Warszawskie", "SKM", "Koleje Mazowieckie", "Autobusy ZTM"],
+  "center": { "la": 52.2319, "lo": 21.0067 },
+  "bbox": [52.05, 20.80, 52.40, 21.30],
+  "tile_source": "ESRI World Imagery (fallback) + Wikimedia Commons (foto) + Google Grafika (link)",
+  "basemap": "CartoDB Dark Matter (ciemne kafle, brak klucza API)",
+  "modules_applicable": {
+    "hazard": "adapt: brak keirin/sumo/jai-alai -> Tor Wyscigow Konnych Sluzewiec, strzelnice, tory gokartowe, gale boksu/MMA",
+    "adult": "Warszawa konserwatywna -> burleska / performance / sztuka erotyczna; mozliwy NO_LOCAL_EQUIVALENT lub UNDERFILLED",
+    "knives": "lokalni nozownicy/kowale + sklepy z nozami premium; mozliwy UNDERFILLED"
+  },
+  "notes": "M1 czerwona (Kabaty-Mlociny), M2 zielona (Bemowo-Brodno). Kolory linii zweryfikowane jako czerwony/zielony przez WebSearch; dokladny hex wg standardowych wartosci operatora (ZTM/Metro Warszawskie). Wikipedia i mapa-metro zwracaly 403 przez egress proxy."
+}

@@ -1,0 +1,8 @@
+{
+  "M1": { "name": "Metro M1 · Kabaty–Młociny", "color": "#D7282F" },
+  "M2": { "name": "Metro M2 · Bemowo–Bródno", "color": "#009640" },
+  "TRAM": { "name": "Tramwaje Warszawskie", "color": "#8b949e" },
+  "SKM": { "name": "Szybka Kolej Miejska", "color": "#1f6feb" },
+  "KM": { "name": "Koleje Mazowieckie", "color": "#e3b341" },
+  "BUS": { "name": "Autobusy ZTM", "color": "#5c6370" }
+}

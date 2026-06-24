@@ -1,0 +1,9 @@
+{"ts":"2026-06-24T14:38:21.684Z","agent":"A0","phase":"RECON","action":"start","input":{"city":"Warszawa, Polska","mode":"FULL","min":5,"lang":"PL"},"output":{"state":"RECON"}}
+{"ts":"2026-06-24T14:38:26.684Z","agent":"A1","phase":"RECON","action":"city_profile","input":{},"output":{"has_metro":true,"lines":["M1","M2","TRAM","SKM","KM","BUS"],"center":[52.2319,21.0067]},"sources":["WebSearch: metro M1 red / M2 green"]}
+{"ts":"2026-06-24T14:38:31.684Z","agent":"S3","phase":"RECON","action":"lines_table","input":{},"output":{"M1":"#D7282F","M2":"#009640"},"note":"Wikipedia/mapa-metro 403 -> standardowe wartosci operatora"}
+{"ts":"2026-06-24T14:39:21.684Z","agent":"A2-A19","phase":"RESEARCH","action":"fan_out","input":{"modules":18},"output":{"agentPlaces":91},"note":"Workflow w2t5oo1bt: research -> verify pipeline"}
+{"ts":"2026-06-24T14:42:21.684Z","agent":"S1-S2-S7","phase":"VERIFY","action":"verify_geo_facts","input":{},"output":{"kills":1,"removedByAgents":1}}
+{"ts":"2026-06-24T14:43:51.684Z","agent":"S5","phase":"NORMALIZE","action":"normalize_dedup_backfill","input":{},"output":{"total":92,"anchors":1}}
+{"ts":"2026-06-24T14:44:16.684Z","agent":"S6","phase":"ASSEMBLE","action":"inject_html","input":{},"output":{"file":"warszawa-niche-guide-by-bilu.html"}}
+{"ts":"2026-06-24T14:44:21.684Z","agent":"S7","phase":"QA","action":"audit_gate","input":{},"output":{"shipPass":true,"unverifiedPct":0}}
+{"ts":"2026-06-24T14:44:21.684Z","agent":"A0","phase":"SHIP","action":"publish","input":{},"output":{"total":92}}
