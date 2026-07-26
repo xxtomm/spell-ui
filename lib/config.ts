@@ -4,6 +4,11 @@ export const siteConfig = {
   ogImage: "https://spell.sh/og",
   description:
     "Beautiful, sophisticated UI components designed for modern React and Tailwind CSS applications.",
+  carbon: {
+    // Setting serve to "" disables ads entirely.
+    serve: "CWBDE53E",
+    placement: "spellsh",
+  },
   links: {
     tom: "https://x.com/tomm_ui",
     x: "https://x.com/intent/follow?screen_name=tomm_ui",

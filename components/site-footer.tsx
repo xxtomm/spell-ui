@@ -7,6 +7,7 @@ import { siteConfig } from "@/lib/config";
 import Link from "next/link";
 import { SiGithub, SiX, SiDiscord } from "@icons-pack/react-simple-icons";
 import { SpellLogo } from "./spell-logo";
+import { CarbonAds } from "./carbon-ads";
 
 const TIER_ORDER = ["diamond", "platinum", "gold"] as const;
 
@@ -151,7 +152,7 @@ export async function SiteFooter() {
           ))}
         </div>
 
-        <div className="pb-4">
+        <div className="flex flex-col gap-10 pb-4 md:flex-row md:items-start md:justify-between">
           <div className="flex flex-col gap-6">
             <Link
               href="/sponsor"
@@ -239,6 +240,7 @@ export async function SiteFooter() {
                 </Link>
               )}
             </div>
+            <CarbonAds variant="footer" className="w-full md:w-[400px] md:shrink-0" />
           </div>
 
         <div className="py-6 text-xs text-muted-foreground/60">

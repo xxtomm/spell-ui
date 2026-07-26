@@ -196,3 +196,18 @@ summary {
   background-color: var(--color-primary);
   color: var(--color-background);
 }
+
+/* Carbon Ads: the cover/responsive formats ship their own markup and styles,
+   themed via these custom properties. Tokens flip automatically in .dark. */
+#carbon-cover,
+#carbon-responsive {
+  --carbon-font-family: inherit;
+  --carbon-bg-primary: var(--card);
+  --carbon-bg-secondary: var(--border);
+  --carbon-text-color: var(--muted-foreground);
+  --carbon-shadow: none;
+}
+
+#carbon-responsive .carbon-responsive-wrap {
+  border-radius: calc(var(--radius) + 2px);
+}
