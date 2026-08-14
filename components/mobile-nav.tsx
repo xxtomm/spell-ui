@@ -74,9 +74,6 @@ export function MobileNav({
                 <MobileLink href="/docs/mcp" onOpenChange={setOpen}>
                   MCP
                 </MobileLink>
-                <MobileLink href="/sponsor" onOpenChange={setOpen}>
-                  Sponsor
-                </MobileLink>
               </div>
             </div>
             {docSchema.map((section, index) => (

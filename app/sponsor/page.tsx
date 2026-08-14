@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/site-header";
+import { redirect } from "next/navigation";
 import { ShinyButton } from "@/components/shiny-button";
 import { Button } from "@/components/ui/button";
 import { getDocSchema } from "@/lib/doc";
@@ -304,6 +305,10 @@ export default async function SponsorPage({
 }: {
   searchParams: Promise<{ checkout_status?: string; payment_id?: string }>;
 }) {
+  // Whop checkout is paused; purchases can't be fulfilled, so the page is
+  // offline until it's back. Remove this to relaunch.
+  redirect("/");
+
   const { checkout_status, payment_id } = await searchParams;
   const isVerifiedSuccess =
     checkout_status === "success" && (await verifyCheckoutSuccess(payment_id));

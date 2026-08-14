@@ -34,12 +34,6 @@ export default function SiteHeader({ docSchema }: { docSchema?: DocSchema }) {
             >
               Components
             </Link>
-            <Link
-              href="/sponsor"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Sponsor
-            </Link>
           </nav>
         </div>
         <div className="flex gap-2 lg:gap-3 items-center">
