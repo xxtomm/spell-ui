@@ -211,3 +211,7 @@ summary {
 #carbon-responsive .carbon-responsive-wrap {
   border-radius: calc(var(--radius) + 2px);
 }
+
+[data-carbon="toast"] .carbon-responsive-wrap {
+  box-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.3);
+}

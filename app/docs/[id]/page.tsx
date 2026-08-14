@@ -197,7 +197,7 @@ export default async function DocPage({
               </div>
             )}
           </header>
-          <CarbonAds variant="inline" className="not-prose mb-8" />
+          <CarbonAds variant="toast" className="not-prose" />
           <Doc />
 
           <nav className="not-prose flex items-center justify-between mt-12 pt-12 border-t">

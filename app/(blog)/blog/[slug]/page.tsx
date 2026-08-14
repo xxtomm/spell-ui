@@ -277,7 +277,7 @@ export default async function BlogPostPage({
               </div>
             )}
 
-            <CarbonAds variant="inline" className="mb-8" />
+            <CarbonAds variant="toast" />
             <div className="prose prose-neutral dark:prose-invert max-w-none">
               <MDXContent code={post.body.code} components={components} />
             </div>
