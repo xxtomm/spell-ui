@@ -10,7 +10,6 @@ import Link from "next/link";
 import { siteConfig } from "@/lib/config";
 import { SiX, SiDiscord } from "@icons-pack/react-simple-icons";
 import MenuLeft from "./icons/menu-left";
-import { CarbonAds } from "./carbon-ads";
 
 function useActiveItem(itemIds: string[]) {
   const [activeId, setActiveId] = React.useState<string | null>(null);
@@ -128,7 +127,6 @@ export function DocsTableOfContents({
           Join community
         </Link>
       </div>
-      <CarbonAds variant="toc" className="mt-3" />
     </div>
   );
 }

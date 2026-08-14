@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DocsTableOfContents } from "@/components/toc";
+import { CarbonAds } from "@/components/carbon-ads";
 import { getTableOfContents } from "@/lib/toc";
 import { readFile } from "fs/promises";
 import { join } from "path";
@@ -196,6 +197,7 @@ export default async function DocPage({
               </div>
             )}
           </header>
+          <CarbonAds variant="inline" className="not-prose mb-8" />
           <Doc />
 
           <nav className="not-prose flex items-center justify-between mt-12 pt-12 border-t">
@@ -226,6 +228,7 @@ export default async function DocPage({
 
         <aside className="hidden xl:block sticky top-[90px] h-fit">
           <DocsTableOfContents toc={toc} docId={id} />
+          <CarbonAds variant="toc" className="mx-4 mt-3" />
         </aside>
       </div>
     </div>

@@ -10,6 +10,7 @@ const XL_QUERY = "(min-width: 1280px)";
 
 const VARIANTS = {
   toc: { format: "cover", className: "min-h-[280px]" },
+  inline: { format: "responsive", className: "min-h-[155px] xl:hidden" },
   footer: { format: "responsive", className: "min-h-[155px]" },
 } as const;
 
@@ -33,17 +34,31 @@ export function CarbonAds({
     return () => mql.removeEventListener("change", update);
   }, []);
 
-  // Carbon's terms allow one ad per page. The footer unit only renders on
-  // the home page (no TOC there), and the TOC unit only injects at xl+
-  // where its `hidden xl:block` sidebar is actually visible, so hidden
-  // impressions are never wasted.
+  // Carbon's terms allow one ad per page. Articles carry two containers that
+  // are never enabled together: the TOC unit injects at xl+ where its
+  // `hidden xl:block` sidebar is visible, the inline unit below xl. The
+  // footer unit only renders on the home page, which has neither.
   const enabled =
     siteConfig.carbon.serve !== "" &&
-    (variant === "toc" ? isXl === true : pathname === "/");
+    (variant === "toc"
+      ? isXl === true
+      : variant === "inline"
+        ? isXl === false
+        : pathname === "/");
 
   React.useEffect(() => {
     const container = ref.current;
-    if (!container || !enabled) return;
+    if (!container) return;
+
+    if (!enabled) {
+      // Crossing the xl boundary swaps which unit is enabled; clear the
+      // disabled one so the page never holds two ads.
+      if (injectedKey.current !== null) {
+        container.innerHTML = "";
+        injectedKey.current = null;
+      }
+      return;
+    }
 
     // An async carbon.js script still executes after being detached from the
     // DOM, so StrictMode's double effect run would inject two ads if we

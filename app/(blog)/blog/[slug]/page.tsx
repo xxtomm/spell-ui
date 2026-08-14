@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/registry/spell-ui/badge";
 import { DocsTableOfContents } from "@/components/toc";
+import { CarbonAds } from "@/components/carbon-ads";
 import { getTableOfContents } from "@/lib/toc";
 import type { VariantProps } from "class-variance-authority";
 import type { badgeVariants } from "@/registry/spell-ui/badge";
@@ -276,6 +277,7 @@ export default async function BlogPostPage({
               </div>
             )}
 
+            <CarbonAds variant="inline" className="mb-8" />
             <div className="prose prose-neutral dark:prose-invert max-w-none">
               <MDXContent code={post.body.code} components={components} />
             </div>
@@ -283,6 +285,7 @@ export default async function BlogPostPage({
 
           <aside className="hidden xl:block sticky top-20 h-fit">
             <DocsTableOfContents toc={toc} boldActive={false} />
+            <CarbonAds variant="toc" className="mx-4 mt-3" />
           </aside>
         </div>
 
