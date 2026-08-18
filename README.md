@@ -27,7 +27,7 @@ Have questions, comments or feedback? [Join our Discord](https://discord.gg/Cxzq
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=xxtomm/spell-ui&type=Date)](https://www.star-history.com/#xxtomm/spell-ui&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=xxtomm/spell-ui&type=Date)](https://star-history.dera.page/#xxtomm/spell-ui&Date)
 
 
 ## License
