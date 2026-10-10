@@ -8,7 +8,7 @@
 
 <div align="center">
   <a href="https://github.com/xxtomm/spell-ui/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/xxtomm/spell-ui"></a>
-  <a href="https://x.com/tomm_ui"><img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/tomm_ui"></a>
+  <a href="https://x.com/sushidrip"><img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/sushidrip"></a>
   <a href="https://github.com/xxtomm/spell-ui/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
   <a href="https://discord.gg/CxzqwQ2EAa"><img alt="Discord" src="https://img.shields.io/badge/Discord-join-blue.svg"></a>
 </div>

@@ -115,7 +115,7 @@ export function DocsTableOfContents({
           className="transition-colors hover:text-foreground text-muted-foreground [&_svg]:size-3 flex gap-1.5 items-center"
         >
           <SiX className="pl-[1px]" />
-          <span>Follow @tomm_ui</span>
+          <span>Follow @sushidrip</span>
         </Link>
         <Link
           href={siteConfig.links.discord}
